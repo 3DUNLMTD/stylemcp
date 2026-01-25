@@ -1,0 +1,362 @@
+version: "1.0"
+name: "SaaS CTA Rules"
+description: "Call-to-action patterns and guidelines for B2B SaaS"
+
+guidelines:
+  verbStyle: imperative
+  maxWords: 4
+  capitalization: sentence
+  avoidWords:
+    - "Submit"
+    - "Click"
+    - "Click here"
+    - "Press"
+    - "Hit"
+    - "Go"
+    - "OK"
+    - "Yes"
+    - "No"
+    - "Proceed"
+    - "Continue" # unless genuinely continuing a process
+    - "Please"
+  preferWords:
+    - "Save"
+    - "Create"
+    - "Add"
+    - "Send"
+    - "Share"
+    - "Export"
+    - "Import"
+    - "Download"
+    - "Upload"
+    - "View"
+    - "Open"
+    - "Copy"
+    - "Delete"
+    - "Remove"
+    - "Cancel"
+    - "Sign up"
+    - "Log in"
+    - "Log out"
+    - "Try"
+    - "Start"
+    - "Upgrade"
+
+categories:
+  - name: "Primary Actions"
+    description: "Main actions users take"
+    ctas:
+      - id: cta-save
+        text: "Save"
+        context: ["forms", "settings", "editing"]
+        priority: primary
+        action: "persist changes"
+      - id: cta-save-changes
+        text: "Save changes"
+        context: ["forms with unsaved state"]
+        priority: primary
+      - id: cta-create
+        text: "Create"
+        context: ["new resource creation"]
+        priority: primary
+      - id: cta-create-item
+        text: "Create {{item}}"
+        context: ["specific resource creation"]
+        priority: primary
+      - id: cta-add
+        text: "Add"
+        context: ["adding to existing collection"]
+        priority: primary
+      - id: cta-send
+        text: "Send"
+        context: ["messages", "emails", "invitations"]
+        priority: primary
+      - id: cta-share
+        text: "Share"
+        context: ["sharing resources"]
+        priority: primary
+
+  - name: "Authentication"
+    description: "Login and signup flows"
+    ctas:
+      - id: cta-signup
+        text: "Sign up"
+        context: ["registration"]
+        priority: primary
+      - id: cta-signup-free
+        text: "Sign up free"
+        context: ["free tier registration"]
+        priority: primary
+      - id: cta-login
+        text: "Log in"
+        context: ["returning user"]
+        priority: primary
+      - id: cta-logout
+        text: "Log out"
+        context: ["session end"]
+        priority: secondary
+      - id: cta-forgot
+        text: "Forgot password?"
+        context: ["password recovery"]
+        priority: tertiary
+      - id: cta-reset
+        text: "Reset password"
+        context: ["password reset form"]
+        priority: primary
+
+  - name: "Data Actions"
+    description: "Importing and exporting data"
+    ctas:
+      - id: cta-export
+        text: "Export"
+        context: ["data export"]
+        priority: primary
+      - id: cta-export-format
+        text: "Export as {{format}}"
+        context: ["specific format export"]
+        priority: primary
+      - id: cta-download
+        text: "Download"
+        context: ["file download"]
+        priority: primary
+      - id: cta-import
+        text: "Import"
+        context: ["data import"]
+        priority: primary
+      - id: cta-upload
+        text: "Upload"
+        context: ["file upload"]
+        priority: primary
+      - id: cta-copy
+        text: "Copy"
+        context: ["clipboard copy"]
+        priority: secondary
+      - id: cta-copy-link
+        text: "Copy link"
+        context: ["sharing via link"]
+        priority: secondary
+
+  - name: "Destructive Actions"
+    description: "Irreversible or dangerous actions"
+    ctas:
+      - id: cta-delete
+        text: "Delete"
+        context: ["permanent removal"]
+        priority: primary
+        action: "permanent deletion"
+      - id: cta-delete-item
+        text: "Delete {{item}}"
+        context: ["specific item deletion"]
+        priority: primary
+      - id: cta-remove
+        text: "Remove"
+        context: ["removal from collection, reversible"]
+        priority: primary
+      - id: cta-cancel-action
+        text: "Cancel {{item}}"
+        context: ["canceling subscription, action"]
+        priority: primary
+
+  - name: "Navigation"
+    description: "Moving between views"
+    ctas:
+      - id: cta-view
+        text: "View"
+        context: ["viewing details"]
+        priority: secondary
+      - id: cta-view-all
+        text: "View all"
+        context: ["seeing full list"]
+        priority: secondary
+      - id: cta-view-details
+        text: "View details"
+        context: ["expanded view"]
+        priority: secondary
+      - id: cta-open
+        text: "Open"
+        context: ["opening resource"]
+        priority: secondary
+      - id: cta-back
+        text: "Back"
+        context: ["returning to previous"]
+        priority: tertiary
+      - id: cta-learn-more
+        text: "Learn more"
+        context: ["documentation link"]
+        priority: tertiary
+
+  - name: "Cancellation"
+    description: "Canceling or dismissing"
+    ctas:
+      - id: cta-cancel
+        text: "Cancel"
+        context: ["dismissing modal", "abandoning action"]
+        priority: secondary
+      - id: cta-dismiss
+        text: "Dismiss"
+        context: ["closing notification"]
+        priority: tertiary
+      - id: cta-close
+        text: "Close"
+        context: ["closing modal"]
+        priority: secondary
+      - id: cta-skip
+        text: "Skip"
+        context: ["optional onboarding"]
+        priority: tertiary
+      - id: cta-skip-for-now
+        text: "Skip for now"
+        context: ["optional but recommended step"]
+        priority: tertiary
+      - id: cta-not-now
+        text: "Not now"
+        context: ["dismissing soft prompt"]
+        priority: tertiary
+
+  - name: "Conversion"
+    description: "Upgrade and billing"
+    ctas:
+      - id: cta-upgrade
+        text: "Upgrade"
+        context: ["plan upgrade"]
+        priority: primary
+      - id: cta-upgrade-plan
+        text: "Upgrade plan"
+        context: ["explicit plan upgrade"]
+        priority: primary
+      - id: cta-view-plans
+        text: "View plans"
+        context: ["pricing comparison"]
+        priority: secondary
+      - id: cta-start-trial
+        text: "Start free trial"
+        context: ["trial initiation"]
+        priority: primary
+      - id: cta-try-free
+        text: "Try for free"
+        context: ["trial CTA"]
+        priority: primary
+      - id: cta-get-started
+        text: "Get started"
+        context: ["onboarding initiation"]
+        priority: primary
+
+  - name: "Communication"
+    description: "Reaching out"
+    ctas:
+      - id: cta-contact
+        text: "Contact us"
+        context: ["support", "sales"]
+        priority: secondary
+      - id: cta-contact-support
+        text: "Contact support"
+        context: ["help request"]
+        priority: secondary
+      - id: cta-contact-sales
+        text: "Contact sales"
+        context: ["enterprise inquiry"]
+        priority: primary
+      - id: cta-send-feedback
+        text: "Send feedback"
+        context: ["feedback form"]
+        priority: secondary
+      - id: cta-report-issue
+        text: "Report issue"
+        context: ["bug report"]
+        priority: secondary
+
+antiPatterns:
+  - pattern: "(?i)^submit$"
+    isRegex: true
+    reason: "Generic and unclear"
+    suggestion: "Use specific action: 'Save', 'Send', 'Create'"
+
+  - pattern: "(?i)^click here"
+    isRegex: true
+    reason: "Poor accessibility and unclear"
+    suggestion: "Describe the destination or action"
+
+  - pattern: "(?i)^yes$"
+    isRegex: true
+    reason: "Doesn't describe the action"
+    suggestion: "Use the specific action: 'Delete', 'Confirm', 'Log out'"
+
+  - pattern: "(?i)^no$"
+    isRegex: true
+    reason: "Doesn't describe the action"
+    suggestion: "Use 'Cancel' or 'Keep {{item}}'"
+
+  - pattern: "(?i)^ok$"
+    isRegex: true
+    reason: "Vague confirmation"
+    suggestion: "Use the specific action or 'Done'"
+
+  - pattern: "(?i)^go$"
+    isRegex: true
+    reason: "Doesn't describe what happens"
+    suggestion: "Use specific action: 'Search', 'View', 'Open'"
+
+  - pattern: "(?i)^proceed"
+    isRegex: true
+    reason: "Formal and unclear"
+    suggestion: "Use specific action"
+
+  - pattern: "(?i)^continue$"
+    isRegex: true
+    reason: "Only use when genuinely continuing a multi-step process"
+    suggestion: "Use specific action if not in a wizard"
+
+  - pattern: "(?i)!$"
+    isRegex: true
+    reason: "CTAs don't need exclamation marks"
+    suggestion: "Remove the exclamation mark"
+
+  - pattern: "(?i)^please "
+    isRegex: true
+    reason: "CTAs should be direct commands"
+    suggestion: "Remove 'please'"
+
+  - pattern: "(?i)\\bhere\\b"
+    isRegex: true
+    reason: "'here' is meaningless in CTAs"
+    suggestion: "Describe the destination"
+
+contextualRules:
+  - context: "Destructive action confirmation"
+    required: []
+    forbidden:
+      - "Yes"
+      - "OK"
+      - "Confirm"
+    preferred:
+      - "Delete"
+      - "Remove"
+      - "Cancel {{item}}"
+
+  - context: "Form submission"
+    required: []
+    forbidden:
+      - "Submit"
+    preferred:
+      - "Save"
+      - "Create"
+      - "Send"
+      - "Add"
+
+  - context: "Modal dismissal"
+    required: []
+    forbidden:
+      - "X" # as text, icon is fine
+    preferred:
+      - "Cancel"
+      - "Close"
+      - "Done"
+
+  - context: "Onboarding skip"
+    required: []
+    forbidden:
+      - "No thanks"
+    preferred:
+      - "Skip"
+      - "Skip for now"
+      - "Set up later"

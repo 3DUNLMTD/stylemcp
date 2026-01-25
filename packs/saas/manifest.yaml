@@ -1,0 +1,16 @@
+name: saas
+version: "1.0.0"
+description: "Default style pack for B2B SaaS products. Professional, clear, helpful."
+author: StyleMCP
+license: MIT
+
+files:
+  voice: voice.yaml
+  copyPatterns: copy_patterns.yaml
+  ctaRules: cta_rules.yaml
+  tokens: tokens.json
+  tests: tests.yaml
+
+config:
+  strictMode: false
+  minScore: 70

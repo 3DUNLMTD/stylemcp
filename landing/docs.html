@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation - StyleMCP</title>
+  <meta name="description" content="Learn how to use StyleMCP to validate and rewrite AI-generated content to match your brand voice.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#0a0a0b;--bg-elevated:#141416;--bg-card:#1a1a1e;--border:#2a2a2e;--text:#fafafa;--text-muted:#a1a1aa;--accent:#6366f1;--accent-hover:#818cf8;--green:#22c55e;--red:#ef4444;--yellow:#eab308}
+    body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}
+
+    .layout{display:flex;min-height:100vh}
+
+    /* Sidebar */
+    .sidebar{width:280px;background:var(--bg-elevated);border-right:1px solid var(--border);padding:24px;position:fixed;height:100vh;overflow-y:auto}
+    .sidebar-logo{font-weight:700;font-size:1.25rem;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;margin-bottom:32px}
+    .sidebar-logo .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent) 0%,#a855f7 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+
+    .nav-section{margin-bottom:24px}
+    .nav-section-title{font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:12px}
+    .nav-link{display:block;padding:8px 12px;color:var(--text-muted);text-decoration:none;font-size:0.9rem;border-radius:6px;margin-bottom:2px;transition:all 0.2s}
+    .nav-link:hover{background:var(--bg-card);color:var(--text)}
+    .nav-link.active{background:var(--accent);color:white}
+
+    /* Main content */
+    .main{flex:1;margin-left:280px;padding:48px 64px;max-width:900px}
+
+    h1{font-size:2.5rem;font-weight:700;margin-bottom:16px;letter-spacing:-0.02em}
+    h2{font-size:1.75rem;font-weight:600;margin-top:48px;margin-bottom:16px;padding-top:24px;border-top:1px solid var(--border)}
+    h3{font-size:1.25rem;font-weight:600;margin-top:32px;margin-bottom:12px}
+
+    p{color:var(--text-muted);margin-bottom:16px}
+    p code{background:var(--bg-card);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.85em;color:var(--text)}
+
+    .lead{font-size:1.2rem;color:var(--text);margin-bottom:32px}
+
+    ul,ol{color:var(--text-muted);margin-bottom:16px;padding-left:24px}
+    li{margin-bottom:8px}
+    li code{background:var(--bg-card);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.85em;color:var(--text)}
+
+    a{color:var(--accent)}
+    a:hover{color:var(--accent-hover)}
+
+    .code-block{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;margin:24px 0;overflow:hidden}
+    .code-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg-elevated);border-bottom:1px solid var(--border);font-size:0.85rem;color:var(--text-muted)}
+    .code-lang{font-weight:500}
+    .code-body{padding:16px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;overflow-x:auto;line-height:1.6}
+    .code-body .comment{color:#6b7280}
+    .code-body .string{color:#22c55e}
+    .code-body .key{color:#a855f7}
+    .code-body .number{color:#f59e0b}
+    .code-body .boolean{color:#3b82f6}
+
+    .endpoint{display:inline-flex;align-items:center;gap:8px;padding:4px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;margin:4px 0}
+    .method{padding:2px 6px;border-radius:4px;font-weight:600;font-size:0.75rem}
+    .method.get{background:rgba(34,197,94,0.2);color:var(--green)}
+    .method.post{background:rgba(99,102,241,0.2);color:var(--accent)}
+
+    .callout{padding:16px 20px;border-radius:8px;margin:24px 0;border-left:4px solid}
+    .callout.info{background:rgba(99,102,241,0.1);border-color:var(--accent)}
+    .callout.warning{background:rgba(234,179,8,0.1);border-color:var(--yellow)}
+    .callout.success{background:rgba(34,197,94,0.1);border-color:var(--green)}
+    .callout p{margin:0;color:var(--text)}
+
+    .table-wrapper{overflow-x:auto;margin:24px 0}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--border)}
+    th{font-weight:600;color:var(--text);background:var(--bg-elevated)}
+    td{color:var(--text-muted)}
+    td code{background:var(--bg-card);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.85em}
+
+    @media(max-width:900px){
+      .sidebar{display:none}
+      .main{margin-left:0;padding:24px}
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <a href="/" class="sidebar-logo">
+        <div class="logo-icon">S</div>
+        StyleMCP
+      </a>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Getting Started</div>
+        <a href="#introduction" class="nav-link active">Introduction</a>
+        <a href="#quick-start" class="nav-link">Quick Start</a>
+        <a href="#authentication" class="nav-link">Authentication</a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">API Reference</div>
+        <a href="#validate" class="nav-link">Validate Text</a>
+        <a href="#rewrite" class="nav-link">Rewrite Text</a>
+        <a href="#batch" class="nav-link">Batch Validation</a>
+        <a href="#packs" class="nav-link">Style Packs</a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Integrations</div>
+        <a href="#mcp" class="nav-link">MCP (Claude, etc.)</a>
+        <a href="#github-actions" class="nav-link">GitHub Actions</a>
+        <a href="#cli" class="nav-link">CLI</a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Style Packs</div>
+        <a href="#pack-structure" class="nav-link">Pack Structure</a>
+        <a href="#custom-packs" class="nav-link">Custom Packs</a>
+      </div>
+    </nav>
+
+    <main class="main">
+      <h1 id="introduction">Documentation</h1>
+      <p class="lead">StyleMCP validates and rewrites AI-generated text to match your brand voice. Use it via REST API, MCP, or CLI.</p>
+
+      <div class="callout info">
+        <p><strong>Base URL:</strong> <code>https://stylemcp.com</code></p>
+      </div>
+
+      <h2 id="quick-start">Quick Start</h2>
+      <p>Validate text against brand rules with a single API call:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">cURL</span>
+        </div>
+        <div class="code-body">
+<pre>curl -X POST https://stylemcp.com/api/validate \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Click here to learn more!"}'</pre>
+        </div>
+      </div>
+
+      <p>Response:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">JSON</span>
+        </div>
+        <div class="code-body">
+<pre>{
+  <span class="key">"valid"</span>: <span class="boolean">false</span>,
+  <span class="key">"score"</span>: <span class="number">65</span>,
+  <span class="key">"issues"</span>: [
+    {
+      <span class="key">"rule"</span>: <span class="string">"no-click-here"</span>,
+      <span class="key">"severity"</span>: <span class="string">"error"</span>,
+      <span class="key">"message"</span>: <span class="string">"Avoid 'click here' - describe the destination instead"</span>,
+      <span class="key">"suggestion"</span>: <span class="string">"Learn more about our features"</span>
+    }
+  ]
+}</pre>
+        </div>
+      </div>
+
+      <h2 id="authentication">Authentication</h2>
+      <p>If API key authentication is enabled, include your key in the <code>X-Api-Key</code> header:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">cURL</span>
+        </div>
+        <div class="code-body">
+<pre>curl -X POST https://stylemcp.com/api/validate \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: your-api-key" \
+  -d '{"text": "Your text here"}'</pre>
+        </div>
+      </div>
+
+      <h2 id="validate">Validate Text</h2>
+      <p class="endpoint"><span class="method post">POST</span> /api/validate</p>
+
+      <p>Check if text matches your brand rules.</p>
+
+      <h3>Request Body</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>text</code></td><td>string</td><td><strong>Required.</strong> The text to validate</td></tr>
+            <tr><td><code>pack</code></td><td>string</td><td>Style pack to use (default: "saas")</td></tr>
+            <tr><td><code>context</code></td><td>object</td><td>Additional context (e.g., content type)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Response</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>valid</code></td><td>boolean</td><td>Whether text passes all rules</td></tr>
+            <tr><td><code>score</code></td><td>number</td><td>Quality score (0-100)</td></tr>
+            <tr><td><code>issues</code></td><td>array</td><td>List of rule violations</td></tr>
+            <tr><td><code>suggestions</code></td><td>array</td><td>Improvement suggestions</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="rewrite">Rewrite Text</h2>
+      <p class="endpoint"><span class="method post">POST</span> /api/rewrite</p>
+
+      <p>Automatically rewrite text to match your brand voice.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">cURL</span>
+        </div>
+        <div class="code-body">
+<pre>curl -X POST https://stylemcp.com/api/rewrite \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Please click here to utilize our product!",
+    "mode": "normal"
+  }'</pre>
+        </div>
+      </div>
+
+      <h3>Rewrite Modes</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Mode</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>minimal</code></td><td>Only fix rule violations</td></tr>
+            <tr><td><code>normal</code></td><td>Fix violations + improve clarity</td></tr>
+            <tr><td><code>aggressive</code></td><td>Complete rewrite in brand voice</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="batch">Batch Validation</h2>
+      <p class="endpoint"><span class="method post">POST</span> /api/validate/batch</p>
+
+      <p>Validate multiple texts in a single request:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">cURL</span>
+        </div>
+        <div class="code-body">
+<pre>curl -X POST https://stylemcp.com/api/validate/batch \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {"id": "headline", "text": "Revolutionary AI Solution!"},
+      {"id": "cta", "text": "Click here to get started"},
+      {"id": "body", "text": "We help teams work better."}
+    ]
+  }'</pre>
+        </div>
+      </div>
+
+      <h2 id="packs">Style Packs</h2>
+      <p class="endpoint"><span class="method get">GET</span> /api/packs</p>
+
+      <p>List available style packs:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Response</span>
+        </div>
+        <div class="code-body">
+<pre>{
+  <span class="key">"packs"</span>: [<span class="string">"saas"</span>]
+}</pre>
+        </div>
+      </div>
+
+      <p>Get pack details:</p>
+      <p class="endpoint"><span class="method get">GET</span> /api/packs/{pack}</p>
+      <p class="endpoint"><span class="method get">GET</span> /api/packs/{pack}/voice</p>
+      <p class="endpoint"><span class="method get">GET</span> /api/packs/{pack}/patterns</p>
+      <p class="endpoint"><span class="method get">GET</span> /api/packs/{pack}/ctas</p>
+
+      <h2 id="mcp">MCP Integration</h2>
+      <p>StyleMCP supports the <a href="https://modelcontextprotocol.io" target="_blank">Model Context Protocol</a> for direct integration with AI agents like Claude.</p>
+
+      <h3>SSE Endpoint</h3>
+      <p class="endpoint"><span class="method get">GET</span> /api/mcp/sse</p>
+
+      <h3>Tool Calls</h3>
+      <p class="endpoint"><span class="method post">POST</span> /api/mcp/call</p>
+
+      <p>Available MCP tools:</p>
+      <ul>
+        <li><code>validate_text</code> - Validate text against brand rules</li>
+        <li><code>rewrite_to_style</code> - Rewrite text to match brand voice</li>
+        <li><code>get_voice_rules</code> - Get voice and tone guidelines</li>
+        <li><code>get_copy_patterns</code> - Get approved copy patterns</li>
+        <li><code>get_cta_rules</code> - Get CTA guidelines</li>
+        <li><code>list_packs</code> - List available style packs</li>
+      </ul>
+
+      <h3>Claude Desktop Config</h3>
+      <p>Add to your <code>claude_desktop_config.json</code>:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">JSON</span>
+        </div>
+        <div class="code-body">
+<pre>{
+  <span class="key">"mcpServers"</span>: {
+    <span class="key">"stylemcp"</span>: {
+      <span class="key">"command"</span>: <span class="string">"npx"</span>,
+      <span class="key">"args"</span>: [<span class="string">"stylemcp"</span>]
+    }
+  }
+}</pre>
+        </div>
+      </div>
+
+      <h2 id="github-actions">GitHub Actions</h2>
+      <p>Run brand validation in CI:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">.github/workflows/brand-check.yml</span>
+        </div>
+        <div class="code-body">
+<pre>name: Brand Check
+on: [pull_request]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check copy
+        run: |
+          npx stylemcp validate src/copy/*.json \
+            --min-score 80 \
+            --format github</pre>
+        </div>
+      </div>
+
+      <h2 id="cli">CLI</h2>
+      <p>Install and use the CLI:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Terminal</span>
+        </div>
+        <div class="code-body">
+<pre><span class="comment"># Install</span>
+npm install -g stylemcp
+
+<span class="comment"># Validate text</span>
+stylemcp validate "Click here to learn more"
+
+<span class="comment"># Validate file</span>
+stylemcp validate src/copy/homepage.json
+
+<span class="comment"># Rewrite text</span>
+stylemcp rewrite "Please utilize our product" --mode aggressive</pre>
+        </div>
+      </div>
+
+      <h2 id="pack-structure">Pack Structure</h2>
+      <p>A style pack is a directory containing YAML/JSON files:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Directory Structure</span>
+        </div>
+        <div class="code-body">
+<pre>packs/
+  my-brand/
+    manifest.yaml      <span class="comment"># Pack metadata and config</span>
+    voice.yaml         <span class="comment"># Tone, vocabulary, forbidden words</span>
+    copy_patterns.yaml <span class="comment"># Reusable copy templates</span>
+    cta_rules.yaml     <span class="comment"># Button and CTA guidelines</span>
+    tokens.json        <span class="comment"># Design tokens (optional)</span></pre>
+        </div>
+      </div>
+
+      <h3>manifest.yaml</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">YAML</span>
+        </div>
+        <div class="code-body">
+<pre>name: my-brand
+version: "1.0.0"
+description: "Brand voice for My Company"
+
+files:
+  voice: voice.yaml
+  copyPatterns: copy_patterns.yaml
+  ctaRules: cta_rules.yaml
+
+config:
+  strictMode: false
+  minScore: 70</pre>
+        </div>
+      </div>
+
+      <h3>voice.yaml</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">YAML</span>
+        </div>
+        <div class="code-body">
+<pre>tone:
+  summary: "Friendly, clear, and helpful"
+  attributes:
+    - name: friendly
+      weight: 0.8
+
+vocabulary:
+  rules:
+    - preferred: "use"
+      avoid: ["utilize", "leverage"]
+
+  forbidden:
+    - "synergy"
+    - "game-changing"
+
+doNot:
+  - pattern: "click here"
+    reason: "Poor accessibility"
+    suggestion: "Describe the destination"</pre>
+        </div>
+      </div>
+
+      <h2 id="custom-packs">Custom Packs</h2>
+      <p>To create your own style pack:</p>
+
+      <ol>
+        <li>Copy the default pack: <code>cp -r packs/saas packs/my-brand</code></li>
+        <li>Edit the YAML files to match your brand guidelines</li>
+        <li>Update <code>manifest.yaml</code> with your pack name</li>
+        <li>Use it via API: <code>{"pack": "my-brand"}</code></li>
+      </ol>
+
+      <div class="callout success">
+        <p><strong>Tip:</strong> Start with the <code>saas</code> pack and modify it. Most of the rules are good defaults for professional B2B copy.</p>
+      </div>
+
+    </main>
+  </div>
+</body>
+</html>

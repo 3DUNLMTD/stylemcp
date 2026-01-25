@@ -1,0 +1,59 @@
+name: 'StyleMCP'
+description: 'Validate text and copy against brand/voice rules. Brand CI for AI output.'
+author: 'StyleMCP'
+
+branding:
+  icon: 'check-circle'
+  color: 'blue'
+
+inputs:
+  pack:
+    description: 'Style pack to use (built-in: saas, or path to custom pack)'
+    required: false
+    default: 'saas'
+  files:
+    description: 'Glob pattern for files to validate (e.g., "src/**/*.tsx", "docs/**/*.md")'
+    required: false
+    default: ''
+  text:
+    description: 'Direct text to validate (alternative to files)'
+    required: false
+    default: ''
+  min-score:
+    description: 'Minimum passing score (0-100)'
+    required: false
+    default: '70'
+  strict:
+    description: 'Fail on any violation, regardless of score'
+    required: false
+    default: 'false'
+  fail-on-warning:
+    description: 'Treat warnings as failures'
+    required: false
+    default: 'false'
+  content-type:
+    description: 'Content type hint (ui-copy, marketing, docs, support, general)'
+    required: false
+    default: 'general'
+  comment-on-pr:
+    description: 'Post validation results as a PR comment'
+    required: false
+    default: 'true'
+  github-token:
+    description: 'GitHub token for PR comments (defaults to GITHUB_TOKEN)'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  score:
+    description: 'Overall validation score (0-100)'
+  valid:
+    description: 'Whether validation passed'
+  violations:
+    description: 'Number of violations found'
+  report:
+    description: 'Full validation report as JSON'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

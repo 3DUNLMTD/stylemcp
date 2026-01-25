@@ -1,0 +1,423 @@
+version: "1.0"
+name: "SaaS Copy Patterns"
+description: "Reusable patterns for common SaaS UI situations"
+
+patterns:
+  # ERROR STATES
+  - id: error-generic
+    name: "Generic Error"
+    category: error
+    description: "When something fails but we don't know the specific cause"
+    variants:
+      - template: "Something went wrong. Try again or contact support if this continues."
+        tone: neutral
+      - template: "We hit a snag. Refresh the page to try again."
+        tone: friendly
+    guidelines:
+      - "Never blame the user"
+      - "Always provide a next step"
+      - "Don't say 'Oops' or use emojis"
+    examples:
+      good:
+        - "Something went wrong loading your data. Refresh to try again."
+        - "We couldn't complete that action. Try again in a few seconds."
+      bad:
+        - "Oops! Something went wrong 😅"
+        - "Error occurred."
+        - "An unexpected error has occurred. Please try again later."
+
+  - id: error-network
+    name: "Network Error"
+    category: error
+    description: "When the user loses connection"
+    variants:
+      - template: "You're offline. Check your connection and try again."
+        tone: neutral
+      - template: "No internet connection. We'll sync your changes when you're back online."
+        tone: friendly
+    guidelines:
+      - "Be specific about what's happening"
+      - "Mention auto-retry if applicable"
+
+  - id: error-permission
+    name: "Permission Denied"
+    category: error
+    description: "When user lacks access to a resource"
+    variants:
+      - template: "You don't have access to {{resource}}. Ask {{owner_role}} to invite you."
+        tone: neutral
+      - template: "This {{resource}} is private. Request access from the owner."
+        tone: neutral
+    placeholders:
+      resource:
+        description: "The thing they can't access"
+        examples: ["this project", "this workspace", "this file"]
+        required: true
+      owner_role:
+        description: "Who can grant access"
+        examples: ["the workspace admin", "the project owner"]
+        required: false
+
+  - id: error-validation
+    name: "Form Validation Error"
+    category: form-validation
+    description: "When a form field has invalid input"
+    variants:
+      - template: "{{field}} {{requirement}}. Example: {{example}}"
+        tone: neutral
+    placeholders:
+      field:
+        description: "The field name"
+        examples: ["Email", "Password", "Username"]
+        required: true
+      requirement:
+        description: "What's required"
+        examples: ["must be at least 8 characters", "needs an @ symbol"]
+        required: true
+      example:
+        description: "A valid example"
+        examples: ["name@company.com", "MyP@ssw0rd"]
+        required: true
+    guidelines:
+      - "Always show what's wrong, not just that something is wrong"
+      - "Give an example when possible"
+      - "Use inline validation, don't wait for submit"
+    examples:
+      good:
+        - "Password must be at least 8 characters. You have 6."
+        - "Enter a valid email. Example: name@company.com"
+      bad:
+        - "Invalid email"
+        - "This field is required"
+        - "Please enter a valid value"
+
+  # EMPTY STATES
+  - id: empty-first-use
+    name: "First-Time Empty State"
+    category: empty-state
+    description: "When a feature/section is empty because user hasn't used it yet"
+    variants:
+      - template: "No {{items}} yet. {{cta}} to get started."
+        tone: neutral
+      - template: "Create your first {{item}} to {{benefit}}."
+        tone: friendly
+    placeholders:
+      items:
+        description: "Plural item name"
+        examples: ["projects", "tasks", "reports"]
+        required: true
+      item:
+        description: "Singular item name"
+        examples: ["project", "task", "report"]
+        required: true
+      cta:
+        description: "The action to take"
+        examples: ["Create one", "Add your first project"]
+        required: true
+      benefit:
+        description: "What they'll get"
+        examples: ["start tracking progress", "organize your work"]
+        required: false
+    guidelines:
+      - "Focus on the benefit, not the emptiness"
+      - "Include a clear CTA"
+      - "Don't apologize for being empty"
+    examples:
+      good:
+        - "No projects yet. Create one to start tracking your work."
+        - "Your dashboard is ready. Add a widget to see your data at a glance."
+      bad:
+        - "Nothing to see here!"
+        - "It's empty in here... 🦗"
+        - "No data available."
+
+  - id: empty-search
+    name: "No Search Results"
+    category: empty-state
+    description: "When a search returns no matches"
+    variants:
+      - template: "No results for \"{{query}}\". Try a different search term."
+        tone: neutral
+      - template: "We couldn't find anything matching \"{{query}}\". Check your spelling or try broader terms."
+        tone: helpful
+    placeholders:
+      query:
+        description: "The search term"
+        examples: ["quarterly report", "john@"]
+        required: true
+    guidelines:
+      - "Echo back their search term"
+      - "Suggest how to improve the search"
+    examples:
+      good:
+        - "No results for \"invocie\". Did you mean \"invoice\"?"
+        - "No matches for \"Q3 sales\". Try searching for \"sales\" or \"Q3\"."
+      bad:
+        - "No results found."
+        - "Your search returned 0 items."
+
+  - id: empty-filtered
+    name: "No Results After Filtering"
+    category: empty-state
+    description: "When filters exclude all items"
+    variants:
+      - template: "No {{items}} match your filters. Clear filters to see all {{items}}."
+        tone: neutral
+    guidelines:
+      - "Make it easy to clear filters"
+      - "Don't make them start over"
+
+  # SUCCESS STATES
+  - id: success-action
+    name: "Action Completed"
+    category: success
+    description: "When an action completes successfully"
+    variants:
+      - template: "{{item}} {{action}}."
+        tone: neutral
+        length: short
+      - template: "{{item}} {{action}}. {{next_step}}"
+        tone: neutral
+        length: medium
+    placeholders:
+      item:
+        description: "What was affected"
+        examples: ["Project", "Your settings", "Invoice #1234"]
+        required: true
+      action:
+        description: "What happened"
+        examples: ["created", "saved", "sent"]
+        required: true
+      next_step:
+        description: "Optional next action"
+        examples: ["View it in your dashboard.", "You'll receive a confirmation email."]
+        required: false
+    guidelines:
+      - "Be specific about what happened"
+      - "Keep it brief - success shouldn't demand attention"
+      - "Include next step only if relevant"
+    examples:
+      good:
+        - "Project created."
+        - "Settings saved."
+        - "Invoice sent to client@example.com."
+      bad:
+        - "Success!"
+        - "Your action was completed successfully."
+        - "Great job! You did it! 🎉"
+    metadata:
+      maxLength: 80
+
+  - id: success-destructive
+    name: "Destructive Action Completed"
+    category: success
+    description: "When a delete/remove action completes"
+    variants:
+      - template: "{{item}} deleted."
+        tone: neutral
+      - template: "{{item}} deleted. Undo"
+        tone: neutral
+    guidelines:
+      - "Offer undo when possible"
+      - "Don't celebrate deletion"
+    examples:
+      good:
+        - "Task deleted. Undo"
+        - "3 files removed."
+      bad:
+        - "Successfully deleted!"
+        - "Gone forever! 👋"
+
+  # LOADING STATES
+  - id: loading-default
+    name: "Default Loading"
+    category: loading
+    description: "Generic loading state"
+    variants:
+      - template: "Loading..."
+        tone: neutral
+        length: short
+      - template: "Loading {{item}}..."
+        tone: neutral
+        length: short
+    guidelines:
+      - "Keep it simple"
+      - "Be specific when possible"
+      - "For long waits (>3s), explain why"
+    examples:
+      good:
+        - "Loading..."
+        - "Loading your dashboard..."
+      bad:
+        - "Please wait..."
+        - "Hang tight!"
+        - "Just a moment... ⏳"
+
+  - id: loading-long
+    name: "Long Loading State"
+    category: loading
+    description: "When something takes more than a few seconds"
+    variants:
+      - template: "This is taking longer than usual. {{reason}}"
+        tone: neutral
+      - template: "Still working on it. {{reason}}"
+        tone: friendly
+    placeholders:
+      reason:
+        description: "Why it's slow"
+        examples: ["Large file processing.", "Connecting to your data source."]
+        required: false
+    guidelines:
+      - "Acknowledge the wait"
+      - "Explain what's happening if you can"
+
+  # CONFIRMATION DIALOGS
+  - id: confirm-destructive
+    name: "Destructive Action Confirmation"
+    category: confirmation
+    description: "Before irreversible destructive actions"
+    variants:
+      - template: "Delete {{item}}? {{consequence}}"
+        tone: neutral
+    placeholders:
+      item:
+        description: "What will be deleted"
+        examples: ["this project", "your account"]
+        required: true
+      consequence:
+        description: "What they'll lose"
+        examples: ["You'll lose all 12 tasks.", "This removes all your data."]
+        required: true
+    guidelines:
+      - "Be specific about what they'll lose"
+      - "Use 'Delete' not 'Yes' for the confirm button"
+      - "Make cancel the default/prominent option"
+    examples:
+      good:
+        - "Delete this project? You'll lose all 47 tasks and 12 files."
+        - "Remove team member? They'll lose access to all shared projects."
+      bad:
+        - "Are you sure?"
+        - "Are you sure you want to delete this? This cannot be undone."
+
+  - id: confirm-logout
+    name: "Logout Confirmation"
+    category: confirmation
+    description: "When user is about to log out"
+    variants:
+      - template: "Log out of {{app}}?"
+        tone: neutral
+      - template: "Log out? You have unsaved changes in {{location}}."
+        tone: warning
+
+  # ONBOARDING
+  - id: onboarding-welcome
+    name: "Welcome Message"
+    category: onboarding
+    description: "First thing user sees after signup"
+    variants:
+      - template: "Welcome to {{app}}. Let's get you set up."
+        tone: neutral
+      - template: "You're in. Here's how to get started with {{app}}."
+        tone: friendly
+    guidelines:
+      - "Keep it brief"
+      - "Guide to first action immediately"
+      - "Don't overwhelm with features"
+    examples:
+      good:
+        - "Welcome to Acme. Create your first project to get started."
+        - "You're in. Let's set up your workspace."
+      bad:
+        - "Welcome to Acme! We're so excited to have you! 🎉 Here's everything you can do..."
+        - "Congratulations on signing up!"
+
+  - id: onboarding-tooltip
+    name: "Feature Tooltip"
+    category: tooltip
+    description: "Brief explanation of a feature"
+    variants:
+      - template: "{{feature}}: {{benefit}}"
+        tone: neutral
+    guidelines:
+      - "One sentence max"
+      - "Focus on what it does, not how"
+      - "No exclamation marks"
+    metadata:
+      maxLength: 100
+
+  # NOTIFICATIONS
+  - id: notification-mention
+    name: "Mention Notification"
+    category: notification
+    description: "When someone mentions the user"
+    variants:
+      - template: "{{person}} mentioned you in {{location}}: \"{{preview}}\""
+        tone: neutral
+
+  - id: notification-assignment
+    name: "Assignment Notification"
+    category: notification
+    description: "When user is assigned something"
+    variants:
+      - template: "{{person}} assigned you to {{item}}"
+        tone: neutral
+
+  # FEATURE GATES
+  - id: feature-upgrade
+    name: "Feature Requires Upgrade"
+    category: feature-gate
+    description: "When a feature is locked behind a plan"
+    variants:
+      - template: "{{feature}} is available on {{plan}}. {{cta}}"
+        tone: neutral
+      - template: "Upgrade to {{plan}} to {{benefit}}."
+        tone: neutral
+    placeholders:
+      feature:
+        description: "The locked feature"
+        examples: ["Advanced analytics", "Custom domains"]
+        required: true
+      plan:
+        description: "Required plan"
+        examples: ["Pro", "Team", "Enterprise"]
+        required: true
+      benefit:
+        description: "What they'll get"
+        examples: ["export unlimited reports", "add unlimited team members"]
+        required: false
+      cta:
+        description: "Upgrade action"
+        examples: ["View plans", "Upgrade now"]
+        required: false
+    guidelines:
+      - "Be clear about what plan is needed"
+      - "Focus on benefit, not restriction"
+      - "Don't guilt or pressure"
+    examples:
+      good:
+        - "Custom reports are available on Pro. View plans"
+        - "Upgrade to Team to add more than 5 members."
+      bad:
+        - "Sorry, this feature is not available on your current plan."
+        - "Unlock this feature! 🔓"
+
+  - id: feature-limit
+    name: "Usage Limit Reached"
+    category: feature-gate
+    description: "When user hits a plan limit"
+    variants:
+      - template: "You've used all {{limit}} {{items}} in your plan. {{cta}}"
+        tone: neutral
+    placeholders:
+      limit:
+        description: "The limit number"
+        examples: ["5", "100"]
+        required: true
+      items:
+        description: "What's limited"
+        examples: ["projects", "API calls", "team seats"]
+        required: true
+    guidelines:
+      - "State the limit clearly"
+      - "Offer upgrade path without pressure"

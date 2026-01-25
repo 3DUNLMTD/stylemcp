@@ -1,0 +1,232 @@
+version: "1.0"
+name: "SaaS Professional"
+description: "Clear, confident, and helpful. We're experts who make complex things simple."
+
+tone:
+  summary: "Professional but approachable. Confident but not arrogant. Helpful without being patronizing."
+  attributes:
+    - name: professional
+      weight: 0.8
+      description: "Expert, competent, trustworthy"
+    - name: clear
+      weight: 0.9
+      description: "Simple, direct, jargon-free unless necessary"
+    - name: helpful
+      weight: 0.7
+      description: "Solution-oriented, empathetic, supportive"
+    - name: confident
+      weight: 0.6
+      description: "Assured but not boastful"
+    - name: friendly
+      weight: 0.5
+      description: "Warm but not overly casual"
+
+vocabulary:
+  rules:
+    - preferred: "use"
+      avoid: ["utilize", "leverage", "employ"]
+      context: "General usage"
+    - preferred: "help"
+      avoid: ["assist", "aid", "facilitate"]
+      context: "When offering support"
+    - preferred: "start"
+      avoid: ["commence", "initiate", "begin"]
+      context: "Starting actions"
+    - preferred: "end"
+      avoid: ["terminate", "conclude", "finalize"]
+      context: "Ending actions"
+    - preferred: "get"
+      avoid: ["obtain", "acquire", "retrieve"]
+      context: "Receiving or accessing"
+    - preferred: "show"
+      avoid: ["display", "exhibit", "demonstrate"]
+      context: "Revealing information"
+    - preferred: "need"
+      avoid: ["require", "necessitate"]
+      context: "Requirements"
+    - preferred: "about"
+      avoid: ["approximately", "roughly", "circa"]
+      context: "Approximations"
+    - preferred: "buy"
+      avoid: ["purchase", "procure"]
+      context: "Transactions"
+    - preferred: "try"
+      avoid: ["attempt", "endeavor"]
+      context: "Attempting actions"
+    - preferred: "change"
+      avoid: ["modify", "alter", "adjust"]
+      context: "Making changes"
+    - preferred: "set up"
+      avoid: ["configure", "establish"]
+      context: "Initial setup"
+    - preferred: "fix"
+      avoid: ["rectify", "resolve", "remediate"]
+      context: "Correcting problems"
+
+  forbidden:
+    - "synergy"
+    - "synergize"
+    - "paradigm"
+    - "paradigm shift"
+    - "disrupt"
+    - "disruptive"
+    - "revolutionary"
+    - "game-changing"
+    - "best-in-class"
+    - "world-class"
+    - "cutting-edge"
+    - "bleeding-edge"
+    - "state-of-the-art"
+    - "next-generation"
+    - "robust"
+    - "scalable solution"
+    - "holistic"
+    - "move the needle"
+    - "circle back"
+    - "touch base"
+    - "low-hanging fruit"
+    - "boil the ocean"
+    - "at the end of the day"
+    - "going forward"
+    - "it is what it is"
+    - "no-brainer"
+    - "pain point"
+    - "value-add"
+    - "value proposition"
+    - "bandwidth"
+    - "leverage" # as a verb
+    - "utilize"
+    - "incentivize"
+    - "operationalize"
+    - "democratize"
+    - "10x"
+    - "100x"
+
+  encouraged:
+    - "you"
+    - "your"
+    - "we"
+    - "our"
+    - "team"
+
+doNot:
+  - pattern: "\\bplease\\b.*\\bplease\\b"
+    isRegex: true
+    reason: "Double 'please' sounds desperate"
+    severity: warning
+    suggestion: "Use 'please' once or not at all"
+
+  - pattern: "^sorry"
+    isRegex: true
+    reason: "Don't start with apology unless actually apologizing for a mistake"
+    severity: info
+    suggestion: "Lead with solution or action"
+
+  - pattern: "\\b(obviously|clearly|simply|just|easily)\\b"
+    isRegex: true
+    reason: "These words can make users feel stupid if something isn't obvious to them"
+    severity: warning
+    suggestion: "Remove the word entirely"
+
+  - pattern: "\\bwe're sorry for any inconvenience\\b"
+    isRegex: true
+    reason: "Corporate non-apology"
+    severity: error
+    suggestion: "Be specific about what went wrong and what you're doing about it"
+
+  - pattern: "\\bclick here\\b"
+    isRegex: true
+    reason: "Poor accessibility and unclear destination"
+    severity: error
+    suggestion: "Describe the destination: 'View your dashboard' or 'Read the documentation'"
+
+  - pattern: "\\b(please do not hesitate|don't hesitate|feel free)\\b"
+    isRegex: true
+    reason: "Implies hesitation is expected"
+    severity: info
+    suggestion: "Just tell them what to do"
+
+  - pattern: "!"
+    isRegex: false
+    reason: "Exclamation marks feel unprofessional in most SaaS contexts"
+    severity: info
+    suggestion: "Use periods. Let the content convey enthusiasm."
+
+  - pattern: "\\b(very|really|extremely|incredibly|absolutely)\\b"
+    isRegex: true
+    reason: "Intensifiers weaken writing"
+    severity: info
+    suggestion: "Use stronger verbs or nouns instead"
+
+  - pattern: "\\bours? is the (best|only|first|most)\\b"
+    isRegex: true
+    reason: "Unsubstantiated superlatives hurt credibility"
+    severity: warning
+    suggestion: "Be specific about what makes you different"
+
+  - pattern: "\\bfyi\\b"
+    isRegex: true
+    reason: "Informal abbreviation"
+    severity: info
+    suggestion: "Spell it out or rephrase"
+
+  - pattern: "\\betc\\.?\\b"
+    isRegex: true
+    reason: "Lazy writing that doesn't help the reader"
+    severity: info
+    suggestion: "Be specific or use 'and more'"
+
+  - pattern: "\\bASAP\\b"
+    isRegex: true
+    reason: "Vague and pressure-inducing"
+    severity: warning
+    suggestion: "Give a specific timeframe"
+
+examples:
+  - bad: "We're excited to announce our revolutionary new feature!"
+    good: "Introducing batch exports. Now you can export up to 1,000 records at once."
+    explanation: "Specifics beat hyperbole"
+
+  - bad: "Please don't hesitate to reach out if you have any questions."
+    good: "Questions? Email support@example.com."
+    explanation: "Direct and actionable"
+
+  - bad: "We're sorry for any inconvenience this may have caused."
+    good: "Your export failed because the file was too large. We're increasing the limit to 500MB this week."
+    explanation: "Acknowledge the specific issue and state the fix"
+
+  - bad: "Click here to learn more."
+    good: "Read the migration guide."
+    explanation: "Accessible and descriptive"
+
+  - bad: "We utilize cutting-edge technology to leverage synergies."
+    good: "We built our own search engine so your queries return in under 100ms."
+    explanation: "Concrete claims beat jargon"
+
+  - bad: "Simply configure your settings and you're good to go!"
+    good: "Set up your preferences in Settings > Notifications."
+    explanation: "Specific guidance, no 'simply'"
+
+  - bad: "Due to unforeseen circumstances, your request could not be processed at this time."
+    good: "We couldn't process your request. Our payment provider is down. We'll retry automatically in 10 minutes."
+    explanation: "Tell them what happened and what's next"
+
+  - bad: "Thank you for your patience."
+    good: "This is taking longer than usual. Here's why: [specific reason]."
+    explanation: "Don't thank people for something they didn't choose"
+
+  - bad: "Invalid input."
+    good: "Email addresses need an @ symbol. Example: name@company.com"
+    explanation: "Show what's wrong and how to fix it"
+
+  - bad: "Are you sure you want to delete this? This action cannot be undone."
+    good: "Delete this project? You'll lose all 47 tasks and 12 files. This can't be undone."
+    explanation: "Show what they'll lose, not just that something will happen"
+
+constraints:
+  maxSentenceLength: 25
+  maxParagraphLength: 4
+  readingLevel: moderate
+  personPov: first-plural
+  contractions: allowed
+  oxfordComma: true

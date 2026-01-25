@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing - StyleMCP</title>
+  <meta name="description" content="Simple, usage-based pricing for StyleMCP. Start free, scale as you grow.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#0a0a0b;--bg-elevated:#141416;--bg-card:#1a1a1e;--border:#2a2a2e;--text:#fafafa;--text-muted:#a1a1aa;--accent:#6366f1;--accent-hover:#818cf8;--green:#22c55e}
+    body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+    .container{max-width:1200px;margin:0 auto;padding:0 24px}
+
+    nav{position:fixed;top:0;left:0;right:0;background:rgba(10,10,11,0.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:100}
+    nav .container{display:flex;align-items:center;justify-content:space-between;height:64px}
+    .logo{font-weight:700;font-size:1.25rem;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
+    .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent) 0%,#a855f7 100%);border-radius:8px;display:flex;align-items:center;justify-content:center}
+    .nav-links{display:flex;align-items:center;gap:32px}
+    .nav-links a{color:var(--text-muted);text-decoration:none;font-size:0.9rem;font-weight:500;transition:color 0.2s}
+    .nav-links a:hover{color:var(--text)}
+
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:8px;font-weight:500;font-size:0.95rem;text-decoration:none;transition:all 0.2s;cursor:pointer;border:none;width:100%}
+    .btn-primary{background:var(--accent);color:white}
+    .btn-primary:hover{background:var(--accent-hover)}
+    .btn-secondary{background:var(--bg-card);color:var(--text);border:1px solid var(--border)}
+    .btn-secondary:hover{background:var(--bg-elevated);border-color:var(--text-muted)}
+    .btn-enterprise{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+    .btn-enterprise:hover{background:var(--accent);color:white}
+
+    .hero{padding:140px 0 80px;text-align:center}
+    h1{font-size:3rem;font-weight:700;margin-bottom:16px;letter-spacing:-0.02em}
+    .hero p{font-size:1.25rem;color:var(--text-muted);max-width:600px;margin:0 auto}
+
+    .pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:60px}
+    @media(max-width:1000px){.pricing-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:640px){.pricing-grid{grid-template-columns:1fr}}
+
+    .pricing-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:32px;display:flex;flex-direction:column}
+    .pricing-card.popular{border-color:var(--accent);position:relative}
+    .popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;padding:4px 16px;border-radius:50px;font-size:0.8rem;font-weight:600}
+
+    .tier-name{font-size:1.25rem;font-weight:600;margin-bottom:8px}
+    .tier-desc{color:var(--text-muted);font-size:0.9rem;margin-bottom:24px;min-height:44px}
+
+    .price{font-size:3rem;font-weight:700;margin-bottom:4px}
+    .price span{font-size:1rem;font-weight:400;color:var(--text-muted)}
+    .price-period{color:var(--text-muted);font-size:0.9rem;margin-bottom:24px}
+
+    .features{list-style:none;margin-bottom:32px;flex-grow:1}
+    .features li{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;color:var(--text-muted);font-size:0.9rem}
+    .features li::before{content:"✓";color:var(--green);font-weight:bold;flex-shrink:0}
+
+    .faq{padding:100px 0}
+    .faq h2{font-size:2rem;font-weight:700;text-align:center;margin-bottom:48px}
+    .faq-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+    @media(max-width:768px){.faq-grid{grid-template-columns:1fr}}
+
+    .faq-item{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px}
+    .faq-item h3{font-size:1.1rem;font-weight:600;margin-bottom:12px}
+    .faq-item p{color:var(--text-muted);font-size:0.95rem}
+
+    footer{padding:60px 0;border-top:1px solid var(--border)}
+    .footer-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px}
+    .footer-links{display:flex;gap:32px}
+    .footer-links a{color:var(--text-muted);text-decoration:none;font-size:0.9rem}
+    .footer-links a:hover{color:var(--text)}
+    .footer-copy{color:var(--text-muted);font-size:0.9rem}
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="container">
+      <a href="/" class="logo"><div class="logo-icon">S</div>StyleMCP</a>
+      <div class="nav-links">
+        <a href="/#features">Features</a>
+        <a href="/docs.html">Docs</a>
+        <a href="/pricing.html">Pricing</a>
+        <a href="/login.html" class="btn btn-primary" style="width:auto;padding:8px 16px">Sign In</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Simple, predictable pricing</h1>
+      <p>Start free, scale as you grow. Only pay for what you use.</p>
+
+      <div class="pricing-grid">
+        <!-- Free -->
+        <div class="pricing-card">
+          <div class="tier-name">Free</div>
+          <div class="tier-desc">For side projects and experimentation</div>
+          <div class="price">$0<span>/mo</span></div>
+          <div class="price-period">No credit card required</div>
+          <ul class="features">
+            <li>1,000 requests/month</li>
+            <li>All API endpoints</li>
+            <li>Default SaaS pack</li>
+            <li>Community support</li>
+          </ul>
+          <a href="/signup.html" class="btn btn-secondary">Get Started</a>
+        </div>
+
+        <!-- Pro -->
+        <div class="pricing-card popular">
+          <div class="popular-badge">Most Popular</div>
+          <div class="tier-name">Pro</div>
+          <div class="tier-desc">For growing products and teams</div>
+          <div class="price">$29<span>/mo</span></div>
+          <div class="price-period">Billed monthly</div>
+          <ul class="features">
+            <li>50,000 requests/month</li>
+            <li>All API endpoints</li>
+            <li>Custom style packs</li>
+            <li>Priority support</li>
+            <li>Usage analytics</li>
+          </ul>
+          <a href="/signup.html?plan=pro" class="btn btn-primary">Start Free Trial</a>
+        </div>
+
+        <!-- Team -->
+        <div class="pricing-card">
+          <div class="tier-name">Team</div>
+          <div class="tier-desc">For teams building at scale</div>
+          <div class="price">$99<span>/mo</span></div>
+          <div class="price-period">Billed monthly</div>
+          <ul class="features">
+            <li>250,000 requests/month</li>
+            <li>All API endpoints</li>
+            <li>Unlimited custom packs</li>
+            <li>Priority support</li>
+            <li>Team management</li>
+            <li>SSO (coming soon)</li>
+          </ul>
+          <a href="/signup.html?plan=team" class="btn btn-secondary">Start Free Trial</a>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="pricing-card">
+          <div class="tier-name">Enterprise</div>
+          <div class="tier-desc">For large organizations</div>
+          <div class="price">Custom</div>
+          <div class="price-period">Contact for pricing</div>
+          <ul class="features">
+            <li>Unlimited requests</li>
+            <li>Self-hosted option</li>
+            <li>Custom integrations</li>
+            <li>Dedicated support</li>
+            <li>SLA guarantee</li>
+            <li>On-boarding assistance</li>
+          </ul>
+          <a href="mailto:hello@stylemcp.com" class="btn btn-enterprise">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq">
+    <div class="container">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h3>What counts as a request?</h3>
+          <p>Each API call to /api/validate, /api/rewrite, or /api/validate/batch counts as one request, regardless of text length. Batch requests count based on the number of items in the batch.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Can I change plans anytime?</h3>
+          <p>Yes, you can upgrade or downgrade at any time. When upgrading, you'll be charged the prorated difference. When downgrading, the change takes effect at the next billing cycle.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What happens if I exceed my limit?</h3>
+          <p>API requests will return a 429 error until your quota resets on the 1st of each month. You can upgrade anytime to get more requests immediately.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Do you offer annual billing?</h3>
+          <p>Yes, contact us for annual billing options. Annual plans come with 2 months free (pay for 10, get 12).</p>
+        </div>
+        <div class="faq-item">
+          <h3>Can I self-host StyleMCP?</h3>
+          <p>Enterprise customers can self-host StyleMCP on their own infrastructure. Contact sales for licensing details.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Is there a free trial?</h3>
+          <p>The Free tier is essentially a permanent trial. For Pro and Team features, contact us for a 14-day trial with full access.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-links">
+          <a href="/docs.html">Docs</a>
+          <a href="/api/packs">API</a>
+          <a href="/health">Status</a>
+          <a href="mailto:hello@stylemcp.com">Contact</a>
+        </div>
+        <div class="footer-copy">&copy; 2026 StyleMCP</div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

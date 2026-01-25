@@ -1,0 +1,61 @@
+{
+  "name": "stylemcp",
+  "version": "0.1.0",
+  "description": "Executable brand rules for models and agents. Brand CI for AI output.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "stylemcp": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/server/http.js",
+    "start:mcp": "node dist/server/index.js",
+    "cli": "node dist/cli/index.js",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts",
+    "validate": "node dist/cli/index.js validate",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "brand",
+    "style-guide",
+    "ai",
+    "validation",
+    "model-context-protocol"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@supabase/supabase-js": "^2.91.1",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "cors": "^2.8.6",
+    "diff": "^5.2.0",
+    "express": "^5.2.1",
+    "js-yaml": "^4.1.0",
+    "stripe": "^14.25.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/diff": "^5.2.1",
+    "@types/express": "^5.0.6",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "packs",
+    "action"
+  ]
+}
