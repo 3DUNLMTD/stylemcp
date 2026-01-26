@@ -164,7 +164,7 @@ doNot:
 
 ```bash
 # Clone the repo
-git clone https://github.com/stylemcp/stylemcp.git
+git clone https://github.com/3DUNLMTD/stylemcp.git
 cd stylemcp
 
 # Set up environment
