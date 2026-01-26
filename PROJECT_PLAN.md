@@ -55,9 +55,9 @@ Add features that justify paying for the hosted version over self-hosting.
 ## Implementation Phases
 
 ### Phase 1: Foundation (Week 1-2)
-1. Implement AI-powered rewrites
-2. Update pricing tiers
-3. Add "Try without signup" feature
+1. ✅ Implement AI-powered rewrites (Claude 3.5 Haiku)
+2. ✅ Update pricing tiers ($0/5k, $9/25k, $29/100k)
+3. ✅ Add "Try without signup" feature (/api/demo/validate)
 4. Create 4 pre-built style pack templates
 
 ### Phase 2: Value Add (Week 3-4)
@@ -129,4 +129,11 @@ Every day, I will:
 ### 2026-01-26
 - Created project plan
 - Identified 6 critical issues
-- Starting Phase 1 implementation
+- **Completed:**
+  - AI-powered rewrites via Claude 3.5 Haiku (/api/rewrite/ai)
+  - New pricing: Free $0 (5k), Pro $9 (25k), Team $29 (100k)
+  - Public demo endpoint (/api/demo/validate) - 10 req/hr, no signup
+  - Updated landing page FAQ with differentiator messaging
+  - AI rewrites gated to Pro+ tiers
+- Set up daily research cron job (9am CST)
+- **Next:** Deploy to production, create style pack templates, test AI rewrites
