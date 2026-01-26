@@ -137,12 +137,16 @@ stylemcp/
 
 ## Pricing Tiers
 
-| Tier | Monthly Price | Requests/Month |
-|------|---------------|----------------|
-| Free | $0 | 1,000 |
-| Pro | $29 | 50,000 |
-| Team | $99 | 250,000 |
-| Enterprise | Custom | Unlimited |
+| Tier | Monthly Price | Requests/Month | AI Rewrites |
+|------|---------------|----------------|-------------|
+| Free | $0 | 5,000 | ❌ Basic only |
+| Pro | $9 | 25,000 | ✅ Included |
+| Team | $29 | 100,000 | ✅ Included |
+| Enterprise | Custom | Unlimited | ✅ + Self-host |
+
+### Stripe Product IDs (update in billing.ts)
+- Pro: `price_pro_monthly` → $9/mo, 25,000 requests
+- Team: `price_team_monthly` → $29/mo, 100,000 requests
 
 ## Troubleshooting
 

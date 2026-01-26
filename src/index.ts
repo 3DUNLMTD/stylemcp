@@ -14,6 +14,12 @@ export {
   formatChanges,
   generateDiff,
   RewriteOptions,
+  // AI rewriter
+  aiRewrite,
+  isAIRewriteAvailable,
+  estimateAIRewriteCost,
+  AIRewriteOptions,
+  AIRewriteResult,
 } from './rewriter/index.js';
 
 // Pack loader exports

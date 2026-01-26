@@ -96,27 +96,28 @@
           <div class="price">$0<span>/mo</span></div>
           <div class="price-period">No credit card required</div>
           <ul class="features">
-            <li>1,000 requests/month</li>
+            <li>5,000 requests/month</li>
             <li>All API endpoints</li>
+            <li>Basic rule-based rewrites</li>
             <li>Default SaaS pack</li>
             <li>Community support</li>
           </ul>
-          <a href="/signup.html" class="btn btn-secondary">Get Started</a>
+          <a href="/signup.html" class="btn btn-secondary">Get Started Free</a>
         </div>
 
         <!-- Pro -->
         <div class="pricing-card popular">
           <div class="popular-badge">Most Popular</div>
           <div class="tier-name">Pro</div>
-          <div class="tier-desc">For growing products and teams</div>
-          <div class="price">$29<span>/mo</span></div>
-          <div class="price-period">Billed monthly</div>
+          <div class="tier-desc">For indie devs and small teams</div>
+          <div class="price">$9<span>/mo</span></div>
+          <div class="price-period">Less than a coffee a week ☕</div>
           <ul class="features">
-            <li>50,000 requests/month</li>
-            <li>All API endpoints</li>
+            <li>25,000 requests/month</li>
+            <li><strong>AI-powered rewrites</strong></li>
             <li>Custom style packs</li>
-            <li>Priority support</li>
-            <li>Usage analytics</li>
+            <li>Usage analytics dashboard</li>
+            <li>Email support</li>
           </ul>
           <a href="/signup.html?plan=pro" class="btn btn-primary">Start Free Trial</a>
         </div>
@@ -124,16 +125,16 @@
         <!-- Team -->
         <div class="pricing-card">
           <div class="tier-name">Team</div>
-          <div class="tier-desc">For teams building at scale</div>
-          <div class="price">$99<span>/mo</span></div>
+          <div class="tier-desc">For growing teams and agencies</div>
+          <div class="price">$29<span>/mo</span></div>
           <div class="price-period">Billed monthly</div>
           <ul class="features">
-            <li>250,000 requests/month</li>
-            <li>All API endpoints</li>
+            <li>100,000 requests/month</li>
+            <li><strong>AI-powered rewrites</strong></li>
             <li>Unlimited custom packs</li>
-            <li>Priority support</li>
             <li>Team management</li>
-            <li>SSO (coming soon)</li>
+            <li>Priority support</li>
+            <li>Brand health reports</li>
           </ul>
           <a href="/signup.html?plan=team" class="btn btn-secondary">Start Free Trial</a>
         </div>
@@ -146,11 +147,11 @@
           <div class="price-period">Contact for pricing</div>
           <ul class="features">
             <li>Unlimited requests</li>
-            <li>Self-hosted option</li>
+            <li><strong>Self-hosted option</strong></li>
+            <li>"Learn my voice" AI training</li>
             <li>Custom integrations</li>
-            <li>Dedicated support</li>
-            <li>SLA guarantee</li>
-            <li>On-boarding assistance</li>
+            <li>Dedicated support + SLA</li>
+            <li>SSO &amp; audit logs</li>
           </ul>
           <a href="mailto:hello@stylemcp.com" class="btn btn-enterprise">Contact Sales</a>
         </div>
@@ -163,28 +164,28 @@
       <h2>Frequently Asked Questions</h2>
       <div class="faq-grid">
         <div class="faq-item">
-          <h3>What counts as a request?</h3>
-          <p>Each API call to /api/validate, /api/rewrite, or /api/validate/batch counts as one request, regardless of text length. Batch requests count based on the number of items in the batch.</p>
+          <h3>What's the difference between basic and AI rewrites?</h3>
+          <p><strong>Basic rewrites</strong> (Free tier): Simple word swaps based on your vocabulary rules (e.g., "utilize" → "use"). Fast and predictable.<br><strong>AI rewrites</strong> (Pro+): Intelligent rewrites using Claude AI that understand context, fix complex patterns, and maintain your brand voice naturally.</p>
         </div>
         <div class="faq-item">
-          <h3>Can I change plans anytime?</h3>
-          <p>Yes, you can upgrade or downgrade at any time. When upgrading, you'll be charged the prorated difference. When downgrading, the change takes effect at the next billing cycle.</p>
+          <h3>What counts as a request?</h3>
+          <p>Each API call to /api/validate, /api/rewrite, or /api/validate/batch counts as one request. AI rewrites (/api/rewrite/ai) count as 1 request. Batch requests count based on the number of items.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Can I try before signing up?</h3>
+          <p>Yes! Use our <a href="/#try" style="color:var(--accent)">live demo</a> to test validation without creating an account. You get 10 free requests per hour, no signup required.</p>
         </div>
         <div class="faq-item">
           <h3>What happens if I exceed my limit?</h3>
           <p>API requests will return a 429 error until your quota resets on the 1st of each month. You can upgrade anytime to get more requests immediately.</p>
         </div>
         <div class="faq-item">
-          <h3>Do you offer annual billing?</h3>
-          <p>Yes, contact us for annual billing options. Annual plans come with 2 months free (pay for 10, get 12).</p>
-        </div>
-        <div class="faq-item">
           <h3>Can I self-host StyleMCP?</h3>
-          <p>Enterprise customers can self-host StyleMCP on their own infrastructure. Contact sales for licensing details.</p>
+          <p>The core validation engine is open source (MIT). Enterprise customers can self-host with AI features included. <a href="https://github.com/3DUNLMTD/stylemcp" style="color:var(--accent)">View on GitHub</a></p>
         </div>
         <div class="faq-item">
-          <h3>Is there a free trial?</h3>
-          <p>The Free tier is essentially a permanent trial. For Pro and Team features, contact us for a 14-day trial with full access.</p>
+          <h3>How is this different from Writer or Jasper?</h3>
+          <p>Writer and Jasper are content <em>generators</em> with brand features built in. StyleMCP is brand <em>validation</em> — it works with ANY AI (Claude, GPT, Llama, your own models) and validates/rewrites their output. We're the quality layer, not the generator.</p>
         </div>
       </div>
     </div>

@@ -27,11 +27,16 @@ export function getStripe(): Stripe {
 
 // Tier configuration
 export const TIERS = {
-  free: { limit: 1000, price: 0 },
-  pro: { limit: 50000, price: 2900 }, // $29.00 in cents
-  team: { limit: 250000, price: 9900 }, // $99.00 in cents
-  enterprise: { limit: Infinity, price: null }, // Custom pricing
+  free: { limit: 5000, price: 0, aiRewrites: false },
+  pro: { limit: 25000, price: 900, aiRewrites: true }, // $9.00 in cents
+  team: { limit: 100000, price: 2900, aiRewrites: true }, // $29.00 in cents
+  enterprise: { limit: Infinity, price: null, aiRewrites: true }, // Custom pricing
 } as const;
+
+// Check if tier has AI rewrite access
+export function tierHasAIAccess(tier: Tier): boolean {
+  return TIERS[tier]?.aiRewrites ?? false;
+}
 
 export type Tier = keyof typeof TIERS;
 

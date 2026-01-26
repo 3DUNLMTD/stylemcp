@@ -4,7 +4,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { loadPack, getPacksDirectory, listAvailablePacks } from '../utils/pack-loader.js';
 import { validate } from '../validator/index.js';
-import { rewrite, rewriteMinimal, rewriteAggressive, formatChanges } from '../rewriter/index.js';
+import { rewrite, rewriteMinimal, rewriteAggressive, formatChanges, aiRewrite, isAIRewriteAvailable, estimateAIRewriteCost } from '../rewriter/index.js';
 import { Pack } from '../schema/index.js';
 import { join } from 'path';
 import crypto from 'crypto';
@@ -125,6 +125,78 @@ app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', version: '0.1.4' });
 });
 
+// Simple in-memory rate limiter for demo endpoint
+const demoRateLimiter = new Map<string, { count: number; resetAt: number }>();
+const DEMO_LIMIT = 10; // 10 requests per hour
+const DEMO_WINDOW = 60 * 60 * 1000; // 1 hour
+
+function checkDemoRateLimit(ip: string): { allowed: boolean; remaining: number; resetAt: number } {
+  const now = Date.now();
+  let record = demoRateLimiter.get(ip);
+  
+  if (!record || record.resetAt < now) {
+    record = { count: 0, resetAt: now + DEMO_WINDOW };
+    demoRateLimiter.set(ip, record);
+  }
+  
+  if (record.count >= DEMO_LIMIT) {
+    return { allowed: false, remaining: 0, resetAt: record.resetAt };
+  }
+  
+  record.count++;
+  return { allowed: true, remaining: DEMO_LIMIT - record.count, resetAt: record.resetAt };
+}
+
+// Public demo endpoint - try without signup (rate limited)
+app.post('/api/demo/validate', async (req: Request, res: Response) => {
+  try {
+    const clientIp = req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress || 'unknown';
+    const rateLimit = checkDemoRateLimit(clientIp);
+    
+    // Set rate limit headers
+    res.setHeader('X-RateLimit-Limit', DEMO_LIMIT);
+    res.setHeader('X-RateLimit-Remaining', rateLimit.remaining);
+    res.setHeader('X-RateLimit-Reset', Math.ceil(rateLimit.resetAt / 1000));
+    
+    if (!rateLimit.allowed) {
+      res.status(429).json({ 
+        error: 'Demo rate limit exceeded',
+        message: 'Sign up for free to get 5,000 requests/month',
+        resetAt: new Date(rateLimit.resetAt).toISOString(),
+      });
+      return;
+    }
+    
+    const { text, pack: packName = 'saas' } = req.body;
+
+    if (!text || typeof text !== 'string') {
+      res.status(400).json({ error: 'Missing or invalid "text" field' });
+      return;
+    }
+
+    // Limit text length for demo
+    if (text.length > 500) {
+      res.status(400).json({ 
+        error: 'Demo text limited to 500 characters',
+        message: 'Sign up for free to validate longer text',
+      });
+      return;
+    }
+
+    const pack = await getPack(packName);
+    const result = validate({ pack, text });
+
+    res.json({
+      ...result,
+      demo: true,
+      requestsRemaining: rateLimit.remaining,
+      upgradeMessage: 'Sign up free for 5,000 requests/month → stylemcp.com/signup',
+    });
+  } catch (error) {
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+});
+
 // List available packs
 app.get('/api/packs', authMiddleware, async (_req: Request, res: Response) => {
   try {
@@ -239,6 +311,82 @@ app.post('/api/rewrite', authMiddleware, async (req: Request, res: Response) => 
   } catch (error) {
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
+});
+
+// AI-powered rewrite (requires paid tier)
+app.post('/api/rewrite/ai', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const { text, pack: packName = 'saas', context } = req.body;
+
+    if (!text || typeof text !== 'string') {
+      res.status(400).json({ error: 'Missing or invalid "text" field' });
+      return;
+    }
+
+    // Check if AI rewriting is available
+    if (!isAIRewriteAvailable()) {
+      res.status(503).json({ 
+        error: 'AI rewriting is not configured on this server',
+        hint: 'Set ANTHROPIC_API_KEY environment variable to enable AI rewrites'
+      });
+      return;
+    }
+
+    const pack = await getPack(packName);
+    
+    // First validate to get violations
+    const validation = validate({ pack, text, context });
+
+    // If no violations, return original text
+    if (validation.violations.length === 0) {
+      res.json({
+        original: text,
+        rewritten: text,
+        explanation: 'No violations found - text already matches brand voice',
+        score: { before: validation.score, after: validation.score },
+        tokensUsed: { input: 0, output: 0 },
+        estimatedCost: 0,
+      });
+      return;
+    }
+
+    // Perform AI rewrite
+    const result = await aiRewrite({
+      pack,
+      text,
+      violations: validation.violations,
+      context,
+    });
+
+    // Re-validate the rewritten text
+    const afterValidation = validate({ pack, text: result.rewritten, context });
+
+    res.json({
+      ...result,
+      score: {
+        before: validation.score,
+        after: afterValidation.score,
+      },
+      violationsFixed: validation.violations.length,
+      estimatedCost: estimateAIRewriteCost(result.tokensUsed.input, result.tokensUsed.output),
+    });
+  } catch (error) {
+    console.error('AI rewrite error:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+});
+
+// Check AI rewrite availability
+app.get('/api/rewrite/ai/status', authMiddleware, (_req: Request, res: Response) => {
+  res.json({
+    available: isAIRewriteAvailable(),
+    model: 'claude-3-5-haiku-20241022',
+    pricing: {
+      inputPer1M: 0.25,
+      outputPer1M: 1.25,
+      currency: 'USD',
+    },
+  });
 });
 
 // Get voice rules

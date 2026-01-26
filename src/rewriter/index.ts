@@ -1,6 +1,10 @@
 import { Pack, RewriteResult, Violation, ValidationResult } from '../schema/index.js';
 import { validate } from '../validator/index.js';
 
+// Re-export AI rewriter
+export { aiRewrite, isAIRewriteAvailable, estimateAIRewriteCost } from './ai-rewriter.js';
+export type { AIRewriteOptions, AIRewriteResult } from './ai-rewriter.js';
+
 export interface RewriteOptions {
   pack: Pack;
   text: string;
