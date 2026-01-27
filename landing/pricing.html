@@ -50,7 +50,8 @@
     @media(max-width:1000px){.pricing-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:640px){.pricing-grid{grid-template-columns:1fr}}
 
-    .pricing-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:32px;display:flex;flex-direction:column}
+    .pricing-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:32px;display:flex;flex-direction:column;transition:border-color 0.2s}
+    .pricing-card:hover{border-color:var(--text-muted)}
     .pricing-card.popular{border-color:var(--accent);position:relative}
     .popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;padding:4px 16px;border-radius:50px;font-size:0.8rem;font-weight:600}
 
@@ -90,15 +91,18 @@
         <a href="/#features">Features</a>
         <a href="/docs.html">Docs</a>
         <a href="/pricing.html">Pricing</a>
-        <a href="/login.html" class="btn btn-primary" style="width:auto;padding:8px 16px">Sign In</a>
+        <a href="/blog.html">Blog</a>
+        <a href="/login.html">Login</a>
+        <a href="/signup.html" class="btn btn-primary">Get Started</a>
       </div>
       <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle menu"><span></span><span></span><span></span></button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="/#features">Features</a>
+    <a href="/#features" onclick="closeMobileMenu()">Features</a>
     <a href="/docs.html">Docs</a>
     <a href="/pricing.html">Pricing</a>
+    <a href="/blog.html">Blog</a>
     <a href="/login.html">Login</a>
     <a href="/signup.html" class="btn btn-primary">Get Started</a>
   </div>
@@ -218,6 +222,7 @@
           <a href="https://github.com/3DUNLMTD/stylemcp">GitHub</a>
           <a href="/docs.html">Documentation</a>
           <a href="/pricing.html">Pricing</a>
+          <a href="/blog.html">Blog</a>
           <a href="/status.html">Status</a>
           <a href="/privacy.html">Privacy</a>
           <a href="/terms.html">Terms</a>
@@ -228,7 +233,8 @@
   </footer>
   <script>
     function toggleMobileMenu(){const m=document.getElementById('mobileMenu'),b=document.querySelector('.mobile-menu-btn');m.classList.toggle('active');b.classList.toggle('active');document.body.style.overflow=m.classList.contains('active')?'hidden':''}
-    window.addEventListener('resize',()=>{if(window.innerWidth>768){document.getElementById('mobileMenu').classList.remove('active');document.querySelector('.mobile-menu-btn').classList.remove('active');document.body.style.overflow=''}})
+    function closeMobileMenu(){const m=document.getElementById('mobileMenu'),b=document.querySelector('.mobile-menu-btn');m.classList.remove('active');b.classList.remove('active');document.body.style.overflow=''}
+    window.addEventListener('resize',()=>{if(window.innerWidth>768){closeMobileMenu()}})
   </script>
 </body>
 </html>

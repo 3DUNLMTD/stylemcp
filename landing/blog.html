@@ -8,52 +8,374 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    :root{--bg:#0a0a0b;--bg-elevated:#141416;--bg-card:#1a1a1e;--border:#2a2a2e;--text:#fafafa;--text-muted:#a1a1aa;--accent:#6366f1;--accent-hover:#818cf8}
-    body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}
-    .container{max-width:1000px;margin:0 auto;padding:0 24px}
-    nav{position:fixed;top:0;left:0;right:0;background:rgba(10,10,11,0.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:100}
-    nav .container{display:flex;align-items:center;justify-content:space-between;height:64px;max-width:1200px}
-    .logo{font-weight:700;font-size:1.25rem;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
-    .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent) 0%,#a855f7 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700}
-    .nav-links{display:flex;align-items:center;gap:32px}
-    .nav-links a{color:var(--text-muted);text-decoration:none;font-size:0.9rem;font-weight:500;transition:color 0.2s}
-    .nav-links a:hover{color:var(--text)}
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;font-weight:500;font-size:0.9rem;text-decoration:none;transition:all 0.2s;cursor:pointer;border:none}
-    .btn-primary{background:var(--accent);color:white}
-    .btn-primary:hover{background:var(--accent-hover)}
-    main{padding:120px 0 80px}
-    .page-header{text-align:center;margin-bottom:60px}
-    h1{font-size:3rem;font-weight:700;margin-bottom:16px}
-    h1 span{background:linear-gradient(135deg,var(--accent) 0%,#a855f7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .page-header p{color:var(--text-muted);font-size:1.1rem;max-width:600px;margin:0 auto}
-    .posts-grid{display:grid;gap:24px}
-    .post-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:32px;transition:border-color 0.2s}
-    .post-card:hover{border-color:var(--accent)}
-    .post-card a{text-decoration:none;color:inherit}
-    .post-meta{display:flex;gap:16px;margin-bottom:16px;font-size:0.85rem;color:var(--text-muted)}
-    .post-tag{padding:4px 10px;background:rgba(99,102,241,0.1);border-radius:4px;color:var(--accent);font-size:0.75rem;font-weight:500}
-    .post-card h2{font-size:1.5rem;margin-bottom:12px}
-    .post-card h2:hover{color:var(--accent)}
-    .post-card p{color:var(--text-muted)}
-    .read-more{display:inline-flex;align-items:center;gap:6px;margin-top:16px;color:var(--accent);font-weight:500;font-size:0.9rem}
-    .read-more svg{width:16px;height:16px;transition:transform 0.2s}
-    .post-card:hover .read-more svg{transform:translateX(4px)}
-    footer{padding:60px 0;border-top:1px solid var(--border)}
-    .footer-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;max-width:1200px;margin:0 auto;padding:0 24px}
-    .footer-links{display:flex;gap:32px}
-    .footer-links a{color:var(--text-muted);text-decoration:none;font-size:0.9rem}
-    .footer-links a:hover{color:var(--text)}
-    .footer-copy{color:var(--text-muted);font-size:0.9rem}
-    @media(max-width:768px){.nav-links{display:none}h1{font-size:2rem}.post-card{padding:24px}}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0a0a0b;
+      --bg-elevated: #141416;
+      --bg-card: #1a1a1e;
+      --border: #2a2a2e;
+      --text: #fafafa;
+      --text-muted: #a1a1aa;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --green: #22c55e;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 10, 11, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      max-width: 1200px;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    /* Mobile menu button */
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      padding: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .mobile-menu-btn span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .mobile-menu-btn.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .mobile-menu-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-btn.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    /* Mobile menu overlay */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      padding: 24px;
+      z-index: 99;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mobile-menu.active {
+      display: flex;
+    }
+
+    .mobile-menu a {
+      display: block;
+      padding: 16px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .mobile-menu a:hover {
+      background: var(--bg-card);
+    }
+
+    .mobile-menu .btn {
+      margin-top: 16px;
+      text-align: center;
+      justify-content: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    /* Main content */
+    main {
+      padding: 120px 0 80px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    h1 span {
+      background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .posts-grid {
+      display: grid;
+      gap: 24px;
+    }
+
+    .post-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color 0.2s;
+    }
+
+    .post-card:hover {
+      border-color: var(--text-muted);
+    }
+
+    .post-card a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .post-meta {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .post-tag {
+      padding: 4px 10px;
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: 4px;
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .post-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+      transition: color 0.2s;
+    }
+
+    .post-card:hover h2 {
+      color: var(--accent);
+    }
+
+    .post-card p {
+      color: var(--text-muted);
+    }
+
+    .read-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      color: var(--accent);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .read-more svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s;
+    }
+
+    .post-card:hover .read-more svg {
+      transform: translateX(4px);
+    }
+
+    /* Footer */
+    footer {
+      padding: 60px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+    }
+
+    .footer-copy {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: flex;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .post-card {
+        padding: 24px;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+      }
+    }
   </style>
 </head>
 <body>
   <nav>
     <div class="container">
-      <a href="/" class="logo"><div class="logo-icon">S</div>StyleMCP</a>
+      <a href="/" class="logo">
+        <div class="logo-icon">S</div>
+        StyleMCP
+      </a>
       <div class="nav-links">
         <a href="/#features">Features</a>
         <a href="/docs.html">Docs</a>
@@ -61,8 +383,21 @@
         <a href="/login.html">Login</a>
         <a href="/signup.html" class="btn btn-primary">Get Started</a>
       </div>
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/#features" onclick="closeMobileMenu()">Features</a>
+    <a href="/docs.html">Docs</a>
+    <a href="/pricing.html">Pricing</a>
+    <a href="/login.html">Login</a>
+    <a href="/signup.html" class="btn btn-primary">Get Started</a>
+  </div>
 
   <main>
     <div class="container">
@@ -133,6 +468,7 @@
         <a href="https://github.com/3DUNLMTD/stylemcp">GitHub</a>
         <a href="/docs.html">Documentation</a>
         <a href="/pricing.html">Pricing</a>
+        <a href="/blog.html">Blog</a>
         <a href="/status.html">Status</a>
         <a href="/privacy.html">Privacy</a>
         <a href="/terms.html">Terms</a>
@@ -142,5 +478,27 @@
       </div>
     </div>
   </footer>
+
+  <script>
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const btn = document.querySelector('.mobile-menu-btn');
+      menu.classList.toggle('active');
+      btn.classList.toggle('active');
+      document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
+    }
+
+    function closeMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const btn = document.querySelector('.mobile-menu-btn');
+      menu.classList.remove('active');
+      btn.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) closeMobileMenu();
+    });
+  </script>
 </body>
 </html>
