@@ -27,83 +27,129 @@ vocabulary:
       avoid: ["will", "definitely", "certainly"]
       context: "Future financial outcomes"
     - preferred: "historical returns"
-      avoid: ["guaranteed returns", "expected gains"]
+      avoid: ["guaranteed returns", "expected gains", "promised returns"]
       context: "Past performance"
     - preferred: "potential"
       avoid: ["guaranteed", "promised", "assured"]
       context: "Investment outcomes"
     - preferred: "fee"
-      avoid: ["small charge", "nominal amount"]
+      avoid: ["small charge", "nominal amount", "minor cost"]
       context: "Costs - be specific about amounts"
     - preferred: "risk"
       avoid: ["opportunity for loss", "downside potential"]
       context: "Be direct about risks"
+    - preferred: "use"
+      avoid: ["utilize", "leverage", "employ"]
+      context: "General usage"
+    - preferred: "help"
+      avoid: ["assist", "facilitate", "aid"]
+      context: "When offering support"
+    - preferred: "start"
+      avoid: ["commence", "initiate", "begin"]
+      context: "Starting actions"
 
-  banned:
-    - word: "guaranteed returns"
-      reason: "No investment returns can be guaranteed"
-    - word: "risk-free"
-      reason: "All investments carry some risk"
-    - word: "get rich"
-      reason: "Unrealistic promises"
-    - word: "double your money"
-      reason: "Sounds like a scam"
-    - word: "secret"
-      reason: "Implies hidden information, reduces trust"
-    - word: "insider"
-      reason: "Potential securities law issues"
-    - word: "can't lose"
-      reason: "All investments can lose value"
-    - word: "act now"
-      reason: "High-pressure tactics inappropriate for financial decisions"
+  forbidden:
+    - "guaranteed returns"
+    - "risk-free"
+    - "get rich"
+    - "double your money"
+    - "secret"
+    - "insider"
+    - "can't lose"
+    - "act now"
+    - "easy money"
+    - "100% safe"
+    - "no risk"
+    - "sure thing"
+    - "free money"
+
+  encouraged:
+    - "past performance does not guarantee future results"
+    - "investments can lose value"
+    - "consider your risk tolerance"
+    - "consult a financial advisor"
+    - "potential"
+    - "may"
 
 doNot:
-  patterns:
-    - pattern: "guaranteed"
-      severity: error
-      message: "Financial guarantees require specific regulatory approval"
-      suggestion: "Use 'potential' or 'historical' instead"
-    - pattern: "risk.free"
-      severity: error
-      message: "No investment is truly risk-free"
-      suggestion: "Be transparent about the specific risks involved"
-    - pattern: "\\d+% returns?"
-      severity: warning
-      message: "Specific return percentages need context and disclaimers"
-      suggestion: "Add 'past performance does not guarantee future results'"
-    - pattern: "beat the market"
-      severity: warning
-      message: "Performance claims need substantiation"
-      suggestion: "Use historical data with appropriate disclaimers"
-    - pattern: "easy money"
-      severity: error
-      message: "Implies unrealistic expectations"
-      suggestion: "Focus on long-term financial planning"
-    - pattern: "!!!+"
-      severity: error
-      message: "Multiple exclamation points inappropriate for financial content"
-      suggestion: "Use professional, measured language"
+  - pattern: "guaranteed.*(return|profit|gain)"
+    isRegex: true
+    severity: error
+    reason: "Financial guarantees require specific regulatory approval"
+    suggestion: "Use 'potential' or 'historical' instead"
+  - pattern: "risk.free"
+    isRegex: true
+    severity: error
+    reason: "No investment is truly risk-free"
+    suggestion: "Be transparent about the specific risks involved"
+  - pattern: "get rich"
+    isRegex: false
+    severity: error
+    reason: "Unrealistic expectations can harm consumers"
+    suggestion: "Focus on long-term financial planning"
+  - pattern: "double your money"
+    isRegex: false
+    severity: error
+    reason: "Sounds like a scam and may violate regulations"
+    suggestion: "Remove entirely"
+  - pattern: "beat the market"
+    isRegex: false
+    severity: warning
+    reason: "Performance claims need substantiation"
+    suggestion: "Use historical data with appropriate disclaimers"
+  - pattern: "easy money"
+    isRegex: false
+    severity: error
+    reason: "Implies unrealistic expectations"
+    suggestion: "Focus on long-term financial planning"
+  - pattern: "!!!+"
+    isRegex: true
+    severity: error
+    reason: "Multiple exclamation points inappropriate for financial content"
+    suggestion: "Use professional, measured language"
+  - pattern: "secret"
+    isRegex: false
+    severity: warning
+    reason: "Implies hidden information, reduces trust"
+    suggestion: "Be transparent and direct"
+  - pattern: "insider"
+    isRegex: false
+    severity: error
+    reason: "Potential securities law implications"
+    suggestion: "Remove entirely"
+  - pattern: "can't lose"
+    isRegex: false
+    severity: error
+    reason: "All investments can lose value"
+    suggestion: "Include appropriate risk disclosures"
+  - pattern: "act now"
+    isRegex: false
+    severity: error
+    reason: "High-pressure tactics inappropriate for financial decisions"
+    suggestion: "Allow time for informed decision-making"
+  - pattern: "click here"
+    isRegex: false
+    severity: error
+    reason: "Poor accessibility and vague"
+    suggestion: "Describe the action: 'View account details'"
 
-cta:
-  maxWords: 4
-  preferredVerbs:
-    - "Learn more"
-    - "Get started"
-    - "Explore"
-    - "Compare"
-    - "Calculate"
-    - "Schedule a consultation"
-  avoidVerbs:
-    - "Buy now"
-    - "Act fast"
-    - "Don't miss"
-    - "Invest today"
+examples:
+  - bad: "Guaranteed 10% returns on your investment!"
+    good: "This fund returned an average of 8.5% annually over the past 10 years. Past performance does not guarantee future results."
+    explanation: "No guarantees; cite specific historical data with disclaimer"
+  - bad: "Risk-free investment opportunity - act now!"
+    good: "Learn about this investment option. All investments carry risk, including potential loss of principal."
+    explanation: "Be transparent about risks; no pressure tactics"
+  - bad: "Secret strategy Wall Street doesn't want you to know"
+    good: "Here's how diversification can help manage portfolio risk"
+    explanation: "Be direct and educational, not clickbaity"
+  - bad: "Double your money in 6 months!"
+    good: "Build wealth over time with a diversified portfolio"
+    explanation: "Focus on realistic, long-term outcomes"
 
-compliance:
-  notes:
-    - "Include appropriate risk disclaimers"
-    - "Past performance does not guarantee future results"
-    - "Investments can lose value"
-    - "Consider investor suitability"
-    - "Follow SEC/FINRA guidelines"
-    - "Disclose fees and conflicts of interest"
+constraints:
+  maxSentenceLength: 30
+  readingLevel: moderate
+  personPov: second
+  contractions: allowed
+  oxfordComma: true

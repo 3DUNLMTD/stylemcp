@@ -41,43 +41,83 @@ vocabulary:
     - preferred: "perfect for"
       avoid: ["suitable for", "appropriate for", "ideal for"]
       context: "Product recommendations"
+    - preferred: "affordable"
+      avoid: ["cheap", "inexpensive", "budget"]
+      context: "Price positioning"
+    - preferred: "Add to cart"
+      avoid: ["buy now", "purchase now", "order now"]
+      context: "Primary shopping CTA"
 
-  banned:
-    - word: "cheap"
-      reason: "Use 'affordable' or 'great value' instead"
-    - word: "buy now"
-      reason: "Too pushy. Use 'Add to cart' or 'Get yours'"
-    - word: "limited time only"
-      reason: "Overused urgency tactic. Be specific about deadlines"
-    - word: "best seller"
-      reason: "Only use if actually true and verifiable"
+  forbidden:
+    - "cheap"
+    - "limited time only"
+    - "act now"
+    - "don't miss out"
+    - "hurry"
+    - "going fast"
+    - "almost gone"
+    - "last chance"
+    - "once in a lifetime"
+    - "buy now"
+
+  encouraged:
+    - "you"
+    - "your"
+    - "free shipping"
+    - "easy returns"
+    - "in stock"
 
 doNot:
-  patterns:
-    - pattern: "Act now"
-      severity: warning
-      message: "High-pressure tactics can feel spammy"
-      suggestion: "Focus on product benefits instead"
-    - pattern: "Don't miss out"
-      severity: warning
-      message: "FOMO language can feel manipulative"
-      suggestion: "Highlight what makes the product special"
-    - pattern: "!!!+"
-      severity: error
-      message: "Multiple exclamation points feel unprofessional"
-      suggestion: "Use one exclamation point maximum"
+  - pattern: "Act now"
+    isRegex: false
+    severity: warning
+    reason: "High-pressure tactics can feel spammy"
+    suggestion: "Focus on product benefits instead"
+  - pattern: "Don't miss out"
+    isRegex: false
+    severity: warning
+    reason: "FOMO language can feel manipulative"
+    suggestion: "Highlight what makes the product special"
+  - pattern: "Hurry"
+    isRegex: false
+    severity: warning
+    reason: "Creates false urgency"
+    suggestion: "If there's a real deadline, state it specifically"
+  - pattern: "!!!+"
+    isRegex: true
+    severity: error
+    reason: "Multiple exclamation points feel unprofessional"
+    suggestion: "Use one exclamation point maximum"
+  - pattern: "click here"
+    isRegex: false
+    severity: error
+    reason: "Poor accessibility and unclear destination"
+    suggestion: "Describe the action: 'View details' or 'Shop now'"
+  - pattern: "best seller"
+    isRegex: false
+    severity: warning
+    reason: "Only use if actually true and verifiable"
+    suggestion: "Remove unless you have data to support it"
+  - pattern: "amazing"
+    isRegex: false
+    severity: warning
+    reason: "Overused and vague"
+    suggestion: "Be specific about what makes it good"
 
-cta:
-  maxWords: 4
-  preferredVerbs:
-    - "Shop"
-    - "Get"
-    - "Add to cart"
-    - "Discover"
-    - "Explore"
-    - "Find"
-  avoidVerbs:
-    - "Buy"
-    - "Purchase"
-    - "Click"
-    - "Submit"
+examples:
+  - bad: "BUY NOW! Don't miss out on this AMAZING deal!!!"
+    good: "Add to cart. Free shipping on orders over $50."
+    explanation: "Calm, helpful, and informative beats pushy and loud"
+  - bad: "Click here to see our products"
+    good: "Shop the collection"
+    explanation: "Descriptive CTAs are clearer and more accessible"
+  - bad: "Our cheap prices will save you money"
+    good: "Great value without compromising quality"
+    explanation: "'Cheap' implies low quality; focus on value instead"
+
+constraints:
+  maxSentenceLength: 25
+  readingLevel: simple
+  personPov: second
+  contractions: allowed
+  oxfordComma: true

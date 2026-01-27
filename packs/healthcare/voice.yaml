@@ -24,7 +24,7 @@ tone:
 vocabulary:
   rules:
     - preferred: "may help"
-      avoid: ["will cure", "guarantees", "definitely works"]
+      avoid: ["will cure", "cures", "guarantees", "definitely works"]
       context: "Treatment outcomes"
     - preferred: "talk to your doctor"
       avoid: ["consult a physician", "seek medical counsel"]
@@ -35,68 +35,121 @@ vocabulary:
     - preferred: "condition"
       avoid: ["disease", "illness", "affliction"]
       context: "General health states (be specific when possible)"
-    - preferred: "people with [condition]"
-      avoid: ["[condition] patients", "sufferers", "victims"]
-      context: "Person-first language"
+    - preferred: "people with diabetes"
+      avoid: ["diabetics", "diabetes sufferers", "diabetes patients"]
+      context: "Person-first language for diabetes"
+    - preferred: "person with cancer"
+      avoid: ["cancer victim", "cancer sufferer"]
+      context: "Person-first language for cancer"
+    - preferred: "use"
+      avoid: ["utilize", "leverage", "employ"]
+      context: "General usage"
+    - preferred: "help"
+      avoid: ["assist", "facilitate", "aid"]
+      context: "When offering support"
 
-  banned:
-    - word: "cure"
-      reason: "Unless FDA-approved claim. Use 'may help manage' or 'supports'"
-    - word: "miracle"
-      reason: "Unsubstantiated claim"
-    - word: "guaranteed"
-      reason: "No medical outcome can be guaranteed"
-    - word: "100% effective"
-      reason: "No treatment is 100% effective for everyone"
-    - word: "no side effects"
-      reason: "All treatments have potential side effects"
-    - word: "all-natural"
-      reason: "Often misleading. Natural doesn't mean safe"
-    - word: "clinically proven"
-      reason: "Requires specific clinical trial data to support"
+  forbidden:
+    - "cure"
+    - "cures"
+    - "miracle"
+    - "guaranteed"
+    - "100% effective"
+    - "no side effects"
+    - "all-natural"
+    - "clinically proven"
+    - "doctors hate"
+    - "big pharma"
+    - "secret"
+    - "risk-free"
+    - "act now"
+    - "buy now"
+
+  encouraged:
+    - "may help"
+    - "talk to your doctor"
+    - "healthcare provider"
+    - "consult"
+    - "individual results may vary"
 
 doNot:
-  patterns:
-    - pattern: "cures?"
-      severity: error
-      message: "Avoid cure claims unless FDA-approved"
-      suggestion: "Use 'may help' or 'supports'"
-    - pattern: "100%"
-      severity: error
-      message: "Absolute claims are rarely accurate in healthcare"
-      suggestion: "Be specific about efficacy rates from studies"
-    - pattern: "doctors hate"
-      severity: error
-      message: "Clickbait patterns damage credibility"
-      suggestion: "Focus on evidence-based benefits"
-    - pattern: "big pharma"
-      severity: error
-      message: "Conspiracy-adjacent language"
-      suggestion: "Stick to factual, evidence-based content"
-    - pattern: "secret"
-      severity: warning
-      message: "Implies hidden information, reduces trust"
-      suggestion: "Be transparent about information sources"
+  - pattern: "cures?"
+    isRegex: true
+    severity: error
+    reason: "Avoid cure claims unless FDA-approved"
+    suggestion: "Use 'may help' or 'supports'"
+  - pattern: "100%"
+    isRegex: false
+    severity: error
+    reason: "Absolute claims are rarely accurate in healthcare"
+    suggestion: "Be specific about efficacy rates from studies"
+  - pattern: "guaranteed"
+    isRegex: false
+    severity: error
+    reason: "No medical outcome can be guaranteed"
+    suggestion: "Use 'may help' with appropriate disclaimers"
+  - pattern: "miracle"
+    isRegex: false
+    severity: error
+    reason: "Unsubstantiated and potentially harmful claim"
+    suggestion: "Focus on evidence-based benefits"
+  - pattern: "doctors hate"
+    isRegex: false
+    severity: error
+    reason: "Clickbait pattern that damages credibility"
+    suggestion: "Focus on evidence-based benefits"
+  - pattern: "big pharma"
+    isRegex: false
+    severity: error
+    reason: "Conspiracy-adjacent language reduces trust"
+    suggestion: "Stick to factual, evidence-based content"
+  - pattern: "secret"
+    isRegex: false
+    severity: warning
+    reason: "Implies hidden information, reduces trust"
+    suggestion: "Be transparent about information sources"
+  - pattern: "click here"
+    isRegex: false
+    severity: error
+    reason: "Poor accessibility and unclear destination"
+    suggestion: "Describe the action: 'Learn about treatment options'"
+  - pattern: "sufferer"
+    isRegex: false
+    severity: warning
+    reason: "Not person-first language"
+    suggestion: "Use 'person with [condition]' instead"
+  - pattern: "victim"
+    isRegex: false
+    severity: warning
+    reason: "Not person-first language"
+    suggestion: "Use 'person with [condition]' instead"
+  - pattern: "no side effects"
+    isRegex: false
+    severity: error
+    reason: "All treatments have potential side effects"
+    suggestion: "Be transparent about common side effects"
+  - pattern: "risk.free"
+    isRegex: true
+    severity: error
+    reason: "No treatment is completely without risk"
+    suggestion: "Be transparent about risks involved"
 
-cta:
-  maxWords: 5
-  preferredVerbs:
-    - "Learn more"
-    - "Talk to your doctor"
-    - "Find a provider"
-    - "Schedule"
-    - "Get started"
-    - "Explore options"
-  avoidVerbs:
-    - "Buy now"
-    - "Act fast"
-    - "Don't wait"
-    - "Order today"
+examples:
+  - bad: "This supplement cures diabetes naturally!"
+    good: "This supplement may help support healthy blood sugar levels. Talk to your doctor to see if it's right for you."
+    explanation: "Never claim cures; always redirect to healthcare provider"
+  - bad: "Diabetics should take this medication"
+    good: "People with diabetes may benefit from this medication"
+    explanation: "Person-first language is more respectful"
+  - bad: "Guaranteed to lower your blood pressure"
+    good: "In clinical trials, participants experienced an average reduction in blood pressure. Individual results may vary."
+    explanation: "Be specific, cite evidence, acknowledge variability"
+  - bad: "Click here to learn about our risk-free treatment"
+    good: "Learn about treatment options and potential side effects"
+    explanation: "Clear CTAs and transparent about risks"
 
-compliance:
-  notes:
-    - "Always include appropriate disclaimers"
-    - "Never replace professional medical advice"
-    - "Be transparent about sponsorship/funding"
-    - "Follow HIPAA guidelines for patient information"
-    - "Verify all health claims with sources"
+constraints:
+  maxSentenceLength: 30
+  readingLevel: moderate
+  personPov: second
+  contractions: allowed
+  oxfordComma: true
