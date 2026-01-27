@@ -1,0 +1,83 @@
+version: "1.0"
+name: "E-commerce Friendly"
+description: "Warm, enthusiastic, and conversion-focused. We're your helpful shopping companion."
+
+tone:
+  summary: "Friendly and enthusiastic without being pushy. Focus on benefits and the customer's lifestyle."
+  attributes:
+    - name: friendly
+      weight: 0.9
+      description: "Warm, welcoming, like talking to a helpful friend"
+    - name: enthusiastic
+      weight: 0.7
+      description: "Excited about products but not over-the-top"
+    - name: helpful
+      weight: 0.8
+      description: "Focused on solving customer problems"
+    - name: trustworthy
+      weight: 0.7
+      description: "Honest about products, transparent about policies"
+    - name: conversational
+      weight: 0.8
+      description: "Natural, casual, easy to read"
+
+vocabulary:
+  rules:
+    - preferred: "you"
+      avoid: ["the customer", "one", "users"]
+      context: "Always address the reader directly"
+    - preferred: "get"
+      avoid: ["purchase", "acquire", "obtain"]
+      context: "Buying actions"
+    - preferred: "free shipping"
+      avoid: ["complimentary delivery", "shipping at no cost"]
+      context: "Shipping offers"
+    - preferred: "sale"
+      avoid: ["promotional event", "discount occasion"]
+      context: "Sales and promotions"
+    - preferred: "love"
+      avoid: ["appreciate", "enjoy"]
+      context: "Emotional connection (use sparingly)"
+    - preferred: "perfect for"
+      avoid: ["suitable for", "appropriate for", "ideal for"]
+      context: "Product recommendations"
+
+  banned:
+    - word: "cheap"
+      reason: "Use 'affordable' or 'great value' instead"
+    - word: "buy now"
+      reason: "Too pushy. Use 'Add to cart' or 'Get yours'"
+    - word: "limited time only"
+      reason: "Overused urgency tactic. Be specific about deadlines"
+    - word: "best seller"
+      reason: "Only use if actually true and verifiable"
+
+doNot:
+  patterns:
+    - pattern: "Act now"
+      severity: warning
+      message: "High-pressure tactics can feel spammy"
+      suggestion: "Focus on product benefits instead"
+    - pattern: "Don't miss out"
+      severity: warning
+      message: "FOMO language can feel manipulative"
+      suggestion: "Highlight what makes the product special"
+    - pattern: "!!!+"
+      severity: error
+      message: "Multiple exclamation points feel unprofessional"
+      suggestion: "Use one exclamation point maximum"
+
+cta:
+  maxWords: 4
+  preferredVerbs:
+    - "Shop"
+    - "Get"
+    - "Add to cart"
+    - "Discover"
+    - "Explore"
+    - "Find"
+  avoidVerbs:
+    - "Buy"
+    - "Purchase"
+    - "Click"
+    - "Submit"

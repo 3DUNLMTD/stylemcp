@@ -1,0 +1,12 @@
+name: healthcare
+version: "1.0.0"
+description: "Style pack for healthcare and wellness brands. Trustworthy, clear, compliant, and compassionate."
+author: StyleMCP
+license: MIT
+
+files:
+  voice: voice.yaml
+
+config:
+  strictMode: true
+  minScore: 70

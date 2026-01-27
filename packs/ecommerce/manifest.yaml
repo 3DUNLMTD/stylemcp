@@ -1,0 +1,12 @@
+name: ecommerce
+version: "1.0.0"
+description: "Style pack for e-commerce and DTC brands. Friendly, persuasive, conversion-focused."
+author: StyleMCP
+license: MIT
+
+files:
+  voice: voice.yaml
+
+config:
+  strictMode: false
+  minScore: 50

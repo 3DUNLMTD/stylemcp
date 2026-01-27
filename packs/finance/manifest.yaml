@@ -1,0 +1,12 @@
+name: finance
+version: "1.0.0"
+description: "Style pack for financial services and fintech. Professional, precise, compliant, and trustworthy."
+author: StyleMCP
+license: MIT
+
+files:
+  voice: voice.yaml
+
+config:
+  strictMode: true
+  minScore: 70

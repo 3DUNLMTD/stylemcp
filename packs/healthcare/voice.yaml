@@ -1,0 +1,102 @@
+version: "1.0"
+name: "Healthcare Professional"
+description: "Trustworthy, clear, and compassionate. We prioritize accuracy and patient well-being."
+
+tone:
+  summary: "Empathetic and professional. Clear without being condescending. Accurate and compliant."
+  attributes:
+    - name: trustworthy
+      weight: 0.95
+      description: "Credible, evidence-based, honest about limitations"
+    - name: clear
+      weight: 0.9
+      description: "Plain language, avoid unnecessary jargon"
+    - name: compassionate
+      weight: 0.8
+      description: "Empathetic, patient-centered, respectful"
+    - name: professional
+      weight: 0.85
+      description: "Competent, reliable, authoritative"
+    - name: inclusive
+      weight: 0.7
+      description: "Accessible to diverse audiences and abilities"
+
+vocabulary:
+  rules:
+    - preferred: "may help"
+      avoid: ["will cure", "guarantees", "definitely works"]
+      context: "Treatment outcomes"
+    - preferred: "talk to your doctor"
+      avoid: ["consult a physician", "seek medical counsel"]
+      context: "Medical advice redirects"
+    - preferred: "side effects"
+      avoid: ["adverse events", "negative outcomes"]
+      context: "Discussing risks (unless regulatory requires formal term)"
+    - preferred: "condition"
+      avoid: ["disease", "illness", "affliction"]
+      context: "General health states (be specific when possible)"
+    - preferred: "people with [condition]"
+      avoid: ["[condition] patients", "sufferers", "victims"]
+      context: "Person-first language"
+
+  banned:
+    - word: "cure"
+      reason: "Unless FDA-approved claim. Use 'may help manage' or 'supports'"
+    - word: "miracle"
+      reason: "Unsubstantiated claim"
+    - word: "guaranteed"
+      reason: "No medical outcome can be guaranteed"
+    - word: "100% effective"
+      reason: "No treatment is 100% effective for everyone"
+    - word: "no side effects"
+      reason: "All treatments have potential side effects"
+    - word: "all-natural"
+      reason: "Often misleading. Natural doesn't mean safe"
+    - word: "clinically proven"
+      reason: "Requires specific clinical trial data to support"
+
+doNot:
+  patterns:
+    - pattern: "cures?"
+      severity: error
+      message: "Avoid cure claims unless FDA-approved"
+      suggestion: "Use 'may help' or 'supports'"
+    - pattern: "100%"
+      severity: error
+      message: "Absolute claims are rarely accurate in healthcare"
+      suggestion: "Be specific about efficacy rates from studies"
+    - pattern: "doctors hate"
+      severity: error
+      message: "Clickbait patterns damage credibility"
+      suggestion: "Focus on evidence-based benefits"
+    - pattern: "big pharma"
+      severity: error
+      message: "Conspiracy-adjacent language"
+      suggestion: "Stick to factual, evidence-based content"
+    - pattern: "secret"
+      severity: warning
+      message: "Implies hidden information, reduces trust"
+      suggestion: "Be transparent about information sources"
+
+cta:
+  maxWords: 5
+  preferredVerbs:
+    - "Learn more"
+    - "Talk to your doctor"
+    - "Find a provider"
+    - "Schedule"
+    - "Get started"
+    - "Explore options"
+  avoidVerbs:
+    - "Buy now"
+    - "Act fast"
+    - "Don't wait"
+    - "Order today"
+
+compliance:
+  notes:
+    - "Always include appropriate disclaimers"
+    - "Never replace professional medical advice"
+    - "Be transparent about sponsorship/funding"
+    - "Follow HIPAA guidelines for patient information"
+    - "Verify all health claims with sources"
