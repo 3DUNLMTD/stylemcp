@@ -112,6 +112,15 @@ Every day, I will:
 4. **No managed style packs** — Users must write YAML
 5. **No integrations** — Raw API only
 6. **Marketing claims don't match reality** — "Auto-rewrite" oversells
+7. **Auth system not implemented** — Login/signup pages exist but OAuth buttons are non-functional (hidden 2026-01-27)
+
+---
+
+## Future Backlog
+
+- [ ] **User Authentication** — Set up Supabase, implement Google/GitHub OAuth (buttons currently hidden on login/signup pages)
+- [ ] **User Dashboard** — API key management, usage stats, billing
+- [ ] **Stripe Integration** — Subscription management tied to auth
 
 ---
 
