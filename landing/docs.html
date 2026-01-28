@@ -45,25 +45,28 @@
     html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
     body { font-family: var(--font-sans); background: var(--bg-cream); color: var(--text-primary); line-height: 1.7; }
 
-    /* Header */
-    .header {
-      position: sticky;
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* Navigation - same as index.html */
+    nav {
+      position: fixed;
       top: 0;
-      z-index: 100;
-      background: var(--bg-paper);
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(250, 248, 245, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
       border-bottom: 1px solid var(--border);
     }
 
-    .header-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 16px 24px;
+    .nav-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      height: 72px;
     }
 
-    .header-logo {
+    .logo {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -71,70 +74,139 @@
       color: var(--text-primary);
     }
 
-    .header-logo .logo-mark {
-      width: 36px;
-      height: 36px;
+    .logo-mark {
+      width: 40px;
+      height: 40px;
       background: var(--bg-dark);
-      border-radius: 8px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: var(--font-serif);
-      font-size: 20px;
+      font-size: 24px;
       font-style: italic;
       color: var(--text-inverse);
+      font-weight: 400;
     }
 
-    .header-logo span {
+    .logo-text {
+      font-family: var(--font-sans);
       font-weight: 600;
-      font-size: 17px;
+      font-size: 18px;
       letter-spacing: -0.02em;
     }
 
-    .header-nav {
+    .nav-links {
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .header-nav a {
-      padding: 8px 16px;
-      color: var(--text-secondary);
-      text-decoration: none;
+    .nav-link {
+      padding: 10px 16px;
       font-size: 14px;
       font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
       border-radius: var(--radius-sm);
-      transition: all 0.2s;
+      transition: all 0.2s ease;
     }
 
-    .header-nav a:hover {
+    .nav-link:hover {
       color: var(--text-primary);
       background: var(--bg-warm);
     }
 
-    .header-nav a.active {
+    .nav-link.active {
       color: var(--accent);
       background: var(--accent-soft);
     }
 
-    .header-nav .btn-primary {
+    .nav-cta {
+      margin-left: 8px;
+      padding: 10px 20px;
       background: var(--bg-dark);
       color: var(--text-inverse);
-      padding: 8px 20px;
-      border-radius: var(--radius-md);
+      font-size: 14px;
       font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
     }
 
-    .header-nav .btn-primary:hover {
+    .nav-cta:hover {
       background: var(--accent);
+      transform: translateY(-1px);
     }
 
-    /* Layout container */
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      padding: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .mobile-menu-btn span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-primary);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 72px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-cream);
+      padding: 24px;
+      z-index: 999;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .mobile-menu.active {
+      display: flex;
+    }
+
+    .mobile-menu a {
+      display: block;
+      padding: 16px 20px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 17px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      transition: background 0.2s;
+    }
+
+    .mobile-menu a:hover {
+      background: var(--bg-warm);
+    }
+
+    .mobile-menu .nav-cta {
+      margin: 20px 0 0 0;
+      text-align: center;
+      padding: 16px;
+    }
+
+    /* Docs Layout */
+    .docs-wrapper {
+      padding-top: 72px;
+    }
+
     .docs-container {
       max-width: 1200px;
       margin: 0 auto;
       display: flex;
-      min-height: calc(100vh - 69px);
+      min-height: calc(100vh - 72px);
     }
 
     /* Sidebar */
@@ -145,16 +217,16 @@
       border-right: 1px solid var(--border);
       padding: 32px 24px;
       position: sticky;
-      top: 69px;
-      height: calc(100vh - 69px);
+      top: 72px;
+      height: calc(100vh - 72px);
       overflow-y: auto;
     }
 
-    .nav-section { margin-bottom: 28px; }
-    .nav-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 12px; padding-left: 12px; }
-    .nav-link { display: block; padding: 10px 12px; color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-sm); margin-bottom: 2px; transition: all 0.2s; }
-    .nav-link:hover { background: var(--bg-warm); color: var(--text-primary); }
-    .nav-link.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+    .sidebar-section { margin-bottom: 28px; }
+    .sidebar-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 12px; padding-left: 12px; }
+    .sidebar-link { display: block; padding: 10px 12px; color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-sm); margin-bottom: 2px; transition: all 0.2s; }
+    .sidebar-link:hover { background: var(--bg-warm); color: var(--text-primary); }
+    .sidebar-link.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 
     .sidebar-footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
     .sidebar-footer a { display: flex; align-items: center; gap: 8px; padding: 10px 12px; color: var(--text-secondary); text-decoration: none; font-size: 14px; border-radius: var(--radius-sm); transition: all 0.2s; }
@@ -185,8 +257,8 @@
     li { margin-bottom: 10px; }
     li code { background: var(--bg-warm); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.88em; color: var(--text-primary); }
 
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    .main a { color: var(--accent); text-decoration: none; }
+    .main a:hover { text-decoration: underline; }
 
     /* Code blocks */
     .code-block { background: var(--bg-ink); border-radius: var(--radius-md); margin: 28px 0; overflow: hidden; box-shadow: var(--shadow-md); }
@@ -217,158 +289,117 @@
     td code { background: var(--bg-warm); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.88em; }
     tr:last-child td { border-bottom: none; }
 
-    /* Mobile menu toggle */
-    .mobile-menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      padding: 8px;
-      cursor: pointer;
-      color: var(--text-primary);
-    }
-
-    @media (max-width: 900px) {
-      .mobile-menu-toggle {
-        display: block;
-      }
-
-      .header-nav {
-        display: none;
-      }
-
-      .header-nav.open {
-        display: flex;
-        flex-direction: column;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: var(--bg-paper);
-        border-bottom: 1px solid var(--border);
-        padding: 16px;
-        gap: 4px;
-      }
-
-      .sidebar {
-        display: none;
-        position: fixed;
-        top: 69px;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        z-index: 50;
-        background: var(--bg-paper);
-      }
-
-      .sidebar.open {
-        display: block;
-      }
-
-      .docs-container {
-        flex-direction: column;
-      }
-
-      .main {
-        padding: 24px;
-        max-width: 100%;
-      }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mobile-menu-btn { display: flex; }
+      .sidebar { display: none; }
+      .docs-container { flex-direction: column; }
+      .main { padding: 24px; max-width: 100%; }
     }
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="header-inner">
-      <a href="/" class="header-logo">
+  <!-- Navigation - same as index.html -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="/" class="logo">
         <div class="logo-mark">S</div>
-        <span>StyleMCP</span>
+        <span class="logo-text">StyleMCP</span>
       </a>
-
-      <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 12h18M3 6h18M3 18h18"/>
-        </svg>
+      <div class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="/docs.html" class="nav-link active">Docs</a>
+        <a href="/pricing.html" class="nav-link">Pricing</a>
+        <a href="/blog.html" class="nav-link">Blog</a>
+        <a href="/login.html" class="nav-link">Login</a>
+        <a href="/signup.html" class="nav-cta">Get Started</a>
+      </div>
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
       </button>
-
-      <nav class="header-nav" id="headerNav">
-        <a href="/docs.html" class="active">Docs</a>
-        <a href="/pricing.html">Pricing</a>
-        <a href="/blog.html">Blog</a>
-        <a href="https://github.com/3DUNLMTD/stylemcp">GitHub</a>
-        <a href="/login.html">Login</a>
-        <a href="/signup.html" class="btn-primary">Get Started</a>
-      </nav>
     </div>
-  </header>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/#features">Features</a>
+    <a href="/docs.html">Docs</a>
+    <a href="/pricing.html">Pricing</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/login.html">Login</a>
+    <a href="/signup.html" class="nav-cta">Get Started</a>
+  </div>
 
   <!-- Docs Layout -->
-  <div class="docs-container">
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-      <div class="nav-section">
-        <div class="nav-section-title">Getting Started</div>
-        <a href="#introduction" class="nav-link active">Introduction</a>
-        <a href="#quick-start" class="nav-link">Quick Start</a>
-        <a href="#authentication" class="nav-link">Authentication</a>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">API Reference</div>
-        <a href="#validate" class="nav-link">Validate Text</a>
-        <a href="#rewrite" class="nav-link">Rewrite Text</a>
-        <a href="#batch" class="nav-link">Batch Operations</a>
-        <a href="#packs" class="nav-link">Style Packs</a>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Integrations</div>
-        <a href="#mcp" class="nav-link">MCP Server</a>
-        <a href="#cli" class="nav-link">CLI</a>
-        <a href="#github-action" class="nav-link">GitHub Action</a>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Advanced</div>
-        <a href="#custom-packs" class="nav-link">Custom Packs</a>
-        <a href="#self-hosting" class="nav-link">Self-Hosting</a>
-      </div>
-
-      <div class="sidebar-footer">
-        <a href="https://github.com/3DUNLMTD/stylemcp">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-          GitHub
-        </a>
-      </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="main">
-      <div class="main-content">
-        <h1 id="introduction">Documentation</h1>
-        <p class="lead">StyleMCP validates and rewrites AI-generated text to match your brand voice. Use it as an API, MCP server, CLI, or GitHub Action.</p>
-
-        <div class="callout info">
-          <p><strong>New to StyleMCP?</strong> Start with the <a href="#quick-start">Quick Start</a> guide to make your first API call in under 2 minutes.</p>
+  <div class="docs-wrapper">
+    <div class="docs-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-title">Getting Started</div>
+          <a href="#introduction" class="sidebar-link active">Introduction</a>
+          <a href="#quick-start" class="sidebar-link">Quick Start</a>
+          <a href="#authentication" class="sidebar-link">Authentication</a>
         </div>
 
-        <h2 id="quick-start">Quick Start</h2>
-        <p>The fastest way to try StyleMCP is with a simple cURL request. No signup required for the demo endpoint.</p>
+        <div class="sidebar-section">
+          <div class="sidebar-title">API Reference</div>
+          <a href="#validate" class="sidebar-link">Validate Text</a>
+          <a href="#rewrite" class="sidebar-link">Rewrite Text</a>
+          <a href="#batch" class="sidebar-link">Batch Operations</a>
+          <a href="#packs" class="sidebar-link">Style Packs</a>
+        </div>
 
-        <div class="code-block">
-          <div class="code-header">Terminal</div>
-          <div class="code-body">
+        <div class="sidebar-section">
+          <div class="sidebar-title">Integrations</div>
+          <a href="#mcp" class="sidebar-link">MCP Server</a>
+          <a href="#cli" class="sidebar-link">CLI</a>
+          <a href="#github-action" class="sidebar-link">GitHub Action</a>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-title">Advanced</div>
+          <a href="#custom-packs" class="sidebar-link">Custom Packs</a>
+          <a href="#self-hosting" class="sidebar-link">Self-Hosting</a>
+        </div>
+
+        <div class="sidebar-footer">
+          <a href="https://github.com/3DUNLMTD/stylemcp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            GitHub
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main">
+        <div class="main-content">
+          <h1 id="introduction">Documentation</h1>
+          <p class="lead">StyleMCP validates and rewrites AI-generated text to match your brand voice. Use it as an API, MCP server, CLI, or GitHub Action.</p>
+
+          <div class="callout info">
+            <p><strong>New to StyleMCP?</strong> Start with the <a href="#quick-start">Quick Start</a> guide to make your first API call in under 2 minutes.</p>
+          </div>
+
+          <h2 id="quick-start">Quick Start</h2>
+          <p>The fastest way to try StyleMCP is with a simple cURL request. No signup required for the demo endpoint.</p>
+
+          <div class="code-block">
+            <div class="code-header">Terminal</div>
+            <div class="code-body">
 <pre>curl -X POST https://stylemcp.com/api/validate \
   -H "Content-Type: application/json" \
   -d '{"text": "Click here to learn more!"}'</pre>
+            </div>
           </div>
-        </div>
 
-        <p>You'll get a response like this:</p>
+          <p>You'll get a response like this:</p>
 
-        <div class="code-block">
-          <div class="code-header">Response</div>
-          <div class="code-body">
+          <div class="code-block">
+            <div class="code-header">Response</div>
+            <div class="code-body">
 <pre>{
   <span class="key">"valid"</span>: <span class="boolean">false</span>,
   <span class="key">"score"</span>: <span class="number">65</span>,
@@ -382,80 +413,80 @@
     }
   ]
 }</pre>
+            </div>
           </div>
-        </div>
 
-        <h2 id="authentication">Authentication</h2>
-        <p>For production use, you'll need an API key. Get one free at <a href="/signup.html">stylemcp.com/signup</a>.</p>
+          <h2 id="authentication">Authentication</h2>
+          <p>For production use, you'll need an API key. Get one free at <a href="/signup.html">stylemcp.com/signup</a>.</p>
 
-        <div class="code-block">
-          <div class="code-header">With API Key</div>
-          <div class="code-body">
+          <div class="code-block">
+            <div class="code-header">With API Key</div>
+            <div class="code-body">
 <pre>curl -X POST https://stylemcp.com/api/validate \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -d '{"text": "Your content here"}'</pre>
+            </div>
           </div>
-        </div>
 
-        <h2 id="validate">Validate Text</h2>
-        <p>The validate endpoint checks text against your brand rules and returns a score, violations, and suggestions.</p>
+          <h2 id="validate">Validate Text</h2>
+          <p>The validate endpoint checks text against your brand rules and returns a score, violations, and suggestions.</p>
 
-        <div class="endpoint">
-          <span class="method post">POST</span>
-          <span>/api/validate</span>
-        </div>
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <span>/api/validate</span>
+          </div>
 
-        <h3>Request Body</h3>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-            </thead>
-            <tbody>
-              <tr><td><code>text</code></td><td>string</td><td><strong>Required.</strong> The text to validate.</td></tr>
-              <tr><td><code>pack</code></td><td>string</td><td>Style pack to use. Default: <code>saas</code></td></tr>
-              <tr><td><code>context</code></td><td>string</td><td>Optional context (e.g., "email", "tweet", "docs")</td></tr>
-            </tbody>
-          </table>
-        </div>
+          <h3>Request Body</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>text</code></td><td>string</td><td><strong>Required.</strong> The text to validate.</td></tr>
+                <tr><td><code>pack</code></td><td>string</td><td>Style pack to use. Default: <code>saas</code></td></tr>
+                <tr><td><code>context</code></td><td>string</td><td>Optional context (e.g., "email", "tweet", "docs")</td></tr>
+              </tbody>
+            </table>
+          </div>
 
-        <h3>Response</h3>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-            </thead>
-            <tbody>
-              <tr><td><code>valid</code></td><td>boolean</td><td>Whether the text passes all rules</td></tr>
-              <tr><td><code>score</code></td><td>number</td><td>Brand compliance score (0-100)</td></tr>
-              <tr><td><code>violations</code></td><td>array</td><td>List of rule violations found</td></tr>
-              <tr><td><code>summary</code></td><td>object</td><td>Count of errors, warnings, and info</td></tr>
-            </tbody>
-          </table>
-        </div>
+          <h3>Response</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>valid</code></td><td>boolean</td><td>Whether the text passes all rules</td></tr>
+                <tr><td><code>score</code></td><td>number</td><td>Brand compliance score (0-100)</td></tr>
+                <tr><td><code>violations</code></td><td>array</td><td>List of rule violations found</td></tr>
+                <tr><td><code>summary</code></td><td>object</td><td>Count of errors, warnings, and info</td></tr>
+              </tbody>
+            </table>
+          </div>
 
-        <h2 id="rewrite">Rewrite Text</h2>
-        <p>The rewrite endpoint automatically fixes brand violations and returns corrected text.</p>
+          <h2 id="rewrite">Rewrite Text</h2>
+          <p>The rewrite endpoint automatically fixes brand violations and returns corrected text.</p>
 
-        <div class="endpoint">
-          <span class="method post">POST</span>
-          <span>/api/rewrite</span>
-        </div>
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <span>/api/rewrite</span>
+          </div>
 
-        <div class="code-block">
-          <div class="code-header">Request</div>
-          <div class="code-body">
+          <div class="code-block">
+            <div class="code-header">Request</div>
+            <div class="code-body">
 <pre>{
   <span class="key">"text"</span>: <span class="string">"We leverage AI to facilitate amazing outcomes!"</span>,
   <span class="key">"mode"</span>: <span class="string">"normal"</span>
 }</pre>
+            </div>
           </div>
-        </div>
 
-        <div class="code-block">
-          <div class="code-header">Response</div>
-          <div class="code-body">
+          <div class="code-block">
+            <div class="code-header">Response</div>
+            <div class="code-body">
 <pre>{
   <span class="key">"rewritten"</span>: <span class="string">"We use AI to help you get better results."</span>,
   <span class="key">"changes"</span>: [
@@ -463,59 +494,59 @@
     { <span class="key">"from"</span>: <span class="string">"facilitate"</span>, <span class="key">"to"</span>: <span class="string">"help you get"</span> }
   ]
 }</pre>
+            </div>
           </div>
-        </div>
 
-        <h3>Rewrite Modes</h3>
-        <ul>
-          <li><code>minimal</code> — Only fix critical errors</li>
-          <li><code>normal</code> — Fix errors and warnings (default)</li>
-          <li><code>aggressive</code> — Rewrite for maximum brand alignment</li>
-        </ul>
+          <h3>Rewrite Modes</h3>
+          <ul>
+            <li><code>minimal</code> — Only fix critical errors</li>
+            <li><code>normal</code> — Fix errors and warnings (default)</li>
+            <li><code>aggressive</code> — Rewrite for maximum brand alignment</li>
+          </ul>
 
-        <h2 id="batch">Batch Operations</h2>
-        <p>Validate or rewrite multiple texts in a single request.</p>
+          <h2 id="batch">Batch Operations</h2>
+          <p>Validate or rewrite multiple texts in a single request.</p>
 
-        <div class="endpoint">
-          <span class="method post">POST</span>
-          <span>/api/validate/batch</span>
-        </div>
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <span>/api/validate/batch</span>
+          </div>
 
-        <div class="code-block">
-          <div class="code-header">Request</div>
-          <div class="code-body">
+          <div class="code-block">
+            <div class="code-header">Request</div>
+            <div class="code-body">
 <pre>{
   <span class="key">"items"</span>: [
     { <span class="key">"id"</span>: <span class="string">"1"</span>, <span class="key">"text"</span>: <span class="string">"Click here for more"</span> },
     { <span class="key">"id"</span>: <span class="string">"2"</span>, <span class="key">"text"</span>: <span class="string">"Learn about our features"</span> }
   ]
 }</pre>
+            </div>
           </div>
-        </div>
 
-        <h2 id="packs">Style Packs</h2>
-        <p>Style packs define your brand rules. StyleMCP includes pre-built packs for common industries.</p>
+          <h2 id="packs">Style Packs</h2>
+          <p>Style packs define your brand rules. StyleMCP includes pre-built packs for common industries.</p>
 
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr><th>Pack</th><th>Best For</th><th>Key Features</th></tr>
-            </thead>
-            <tbody>
-              <tr><td><code>saas</code></td><td>B2B SaaS products</td><td>Professional, clear, helpful tone</td></tr>
-              <tr><td><code>ecommerce</code></td><td>DTC & retail</td><td>Friendly, conversion-focused</td></tr>
-              <tr><td><code>healthcare</code></td><td>Medical & wellness</td><td>Compliant language, person-first</td></tr>
-              <tr><td><code>finance</code></td><td>Fintech & banking</td><td>Precise, risk-aware</td></tr>
-            </tbody>
-          </table>
-        </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Pack</th><th>Best For</th><th>Key Features</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>saas</code></td><td>B2B SaaS products</td><td>Professional, clear, helpful tone</td></tr>
+                <tr><td><code>ecommerce</code></td><td>DTC & retail</td><td>Friendly, conversion-focused</td></tr>
+                <tr><td><code>healthcare</code></td><td>Medical & wellness</td><td>Compliant language, person-first</td></tr>
+                <tr><td><code>finance</code></td><td>Fintech & banking</td><td>Precise, risk-aware</td></tr>
+              </tbody>
+            </table>
+          </div>
 
-        <h2 id="mcp">MCP Server</h2>
-        <p>StyleMCP works as a Model Context Protocol server for direct integration with Claude, Cursor, and other AI tools.</p>
+          <h2 id="mcp">MCP Server</h2>
+          <p>StyleMCP works as a Model Context Protocol server for direct integration with Claude, Cursor, and other AI tools.</p>
 
-        <div class="code-block">
-          <div class="code-header">claude_desktop_config.json</div>
-          <div class="code-body">
+          <div class="code-block">
+            <div class="code-header">claude_desktop_config.json</div>
+            <div class="code-body">
 <pre>{
   <span class="key">"mcpServers"</span>: {
     <span class="key">"stylemcp"</span>: {
@@ -524,15 +555,15 @@
     }
   }
 }</pre>
+            </div>
           </div>
-        </div>
 
-        <h2 id="cli">CLI</h2>
-        <p>Install the CLI for local validation and CI/CD integration.</p>
+          <h2 id="cli">CLI</h2>
+          <p>Install the CLI for local validation and CI/CD integration.</p>
 
-        <div class="code-block">
-          <div class="code-header">Terminal</div>
-          <div class="code-body">
+          <div class="code-block">
+            <div class="code-header">Terminal</div>
+            <div class="code-body">
 <pre><span class="comment"># Install globally</span>
 npm install -g stylemcp
 
@@ -544,15 +575,15 @@ stylemcp validate src/copy/homepage.json --pack saas
 
 <span class="comment"># Rewrite text</span>
 stylemcp rewrite "Please utilize our product" --mode aggressive</pre>
+            </div>
           </div>
-        </div>
 
-        <h2 id="github-action">GitHub Action</h2>
-        <p>Run brand checks on every pull request.</p>
+          <h2 id="github-action">GitHub Action</h2>
+          <p>Run brand checks on every pull request.</p>
 
-        <div class="code-block">
-          <div class="code-header">.github/workflows/brand-check.yml</div>
-          <div class="code-body">
+          <div class="code-block">
+            <div class="code-header">.github/workflows/brand-check.yml</div>
+            <div class="code-body">
 <pre>name: Brand Check
 on: [pull_request]
 
@@ -566,15 +597,15 @@ jobs:
           npx stylemcp validate src/copy/*.json \
             --min-score 80 \
             --format github</pre>
+            </div>
           </div>
-        </div>
 
-        <h2 id="custom-packs">Custom Style Packs</h2>
-        <p>Create your own style pack by defining rules in YAML.</p>
+          <h2 id="custom-packs">Custom Style Packs</h2>
+          <p>Create your own style pack by defining rules in YAML.</p>
 
-        <div class="code-block">
-          <div class="code-header">my-brand/voice.yaml</div>
-          <div class="code-body">
+          <div class="code-block">
+            <div class="code-header">my-brand/voice.yaml</div>
+            <div class="code-body">
 <pre>tone:
   summary: <span class="string">"Friendly, clear, and helpful"</span>
 
@@ -593,15 +624,15 @@ doNot:
   - pattern: <span class="string">"click here"</span>
     reason: <span class="string">"Poor accessibility"</span>
     severity: error</pre>
+            </div>
           </div>
-        </div>
 
-        <h2 id="self-hosting">Self-Hosting</h2>
-        <p>Run StyleMCP on your own infrastructure. The core validation engine is fully open source.</p>
+          <h2 id="self-hosting">Self-Hosting</h2>
+          <p>Run StyleMCP on your own infrastructure. The core validation engine is fully open source.</p>
 
-        <div class="code-block">
-          <div class="code-header">Terminal</div>
-          <div class="code-body">
+          <div class="code-block">
+            <div class="code-header">Terminal</div>
+            <div class="code-body">
 <pre><span class="comment"># Clone the repo</span>
 git clone https://github.com/3DUNLMTD/stylemcp.git
 cd stylemcp
@@ -611,34 +642,34 @@ docker compose up -d
 
 <span class="comment"># Check health</span>
 curl http://localhost:3000/health</pre>
+            </div>
+          </div>
+
+          <div class="callout success">
+            <p><strong>Need help?</strong> Join our <a href="https://github.com/3DUNLMTD/stylemcp/discussions">GitHub Discussions</a> or email <a href="mailto:hello@stylemcp.com">hello@stylemcp.com</a></p>
           </div>
         </div>
-
-        <div class="callout success">
-          <p><strong>Need help?</strong> Join our <a href="https://github.com/3DUNLMTD/stylemcp/discussions">GitHub Discussions</a> or email <a href="mailto:hello@stylemcp.com">hello@stylemcp.com</a></p>
-        </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 
   <script>
-    // Active link highlighting
-    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      document.getElementById('mobileMenu').classList.toggle('active');
+    }
+
+    // Sidebar active link highlighting
+    document.querySelectorAll('.sidebar-link').forEach(link => {
       link.addEventListener('click', () => {
-        document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
         link.classList.add('active');
       });
     });
 
-    // Mobile menu toggle
-    function toggleMobileMenu() {
-      document.getElementById('headerNav').classList.toggle('open');
-      document.getElementById('sidebar').classList.toggle('open');
-    }
-
     // Highlight current section on scroll
     const sections = document.querySelectorAll('h1[id], h2[id]');
-    const navLinks = document.querySelectorAll('.sidebar .nav-link');
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
 
     window.addEventListener('scroll', () => {
       let current = '';
@@ -649,7 +680,7 @@ curl http://localhost:3000/health</pre>
         }
       });
 
-      navLinks.forEach(link => {
+      sidebarLinks.forEach(link => {
         link.classList.remove('active');
         if (link.getAttribute('href') === '#' + current) {
           link.classList.add('active');
