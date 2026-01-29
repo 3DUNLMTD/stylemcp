@@ -55,8 +55,8 @@ export const VoiceSchema = z.object({
     maxSentenceLength: z.number().optional().describe('Maximum words per sentence'),
     maxParagraphLength: z.number().optional().describe('Maximum sentences per paragraph'),
     readingLevel: z.enum(['simple', 'moderate', 'technical']).optional(),
-    personPov: z.enum(['first-singular', 'first-plural', 'second', 'third']).optional().describe('Preferred point of view'),
-    contractions: z.enum(['required', 'allowed', 'forbidden']).default('allowed'),
+    personPov: z.enum(['first-singular', 'first-plural', 'second', 'third', 'second-or-third', 'any']).optional().describe('Preferred point of view'),
+    contractions: z.enum(['required', 'encouraged', 'allowed', 'discouraged', 'forbidden']).default('allowed'),
     oxfordComma: z.boolean().default(true),
   }).default({}),
 });

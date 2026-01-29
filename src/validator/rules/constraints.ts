@@ -128,7 +128,7 @@ function checkParagraphLength(text: string, maxSentences: number): Violation[] {
  */
 function checkContractions(
   text: string,
-  rule: 'required' | 'allowed' | 'forbidden'
+  rule: 'required' | 'encouraged' | 'allowed' | 'discouraged' | 'forbidden'
 ): Violation[] {
   const violations: Violation[] = [];
 
@@ -152,7 +152,10 @@ function checkContractions(
     "I have", "you have", "we have", "they have", "I would", "you would", "we would", "they would"
   ];
 
-  if (rule === 'forbidden') {
+  if (rule === 'forbidden' || rule === 'discouraged') {
+    // 'forbidden' = warning, 'discouraged' = info
+    const severity = rule === 'forbidden' ? 'warning' : 'info';
+    const message = rule === 'forbidden' ? 'Contractions are not allowed' : 'Contractions are discouraged';
     // Check for contractions using a single combined regex for efficiency
     for (let i = 0; i < contractions.length; i++) {
       const contraction = contractions[i];
@@ -162,8 +165,8 @@ function checkContractions(
         violations.push(
           createViolation(
             'constraints.contractions',
-            'warning',
-            `Contractions are not allowed`,
+            severity,
+            message,
             match[0],
             { start: match.index, end: match.index + match[0].length },
             expanded[i]
@@ -171,7 +174,11 @@ function checkContractions(
         );
       }
     }
-  } else if (rule === 'required') {
+  } else if (rule === 'required' || rule === 'encouraged') {
+    // 'required' = info, 'encouraged' = info (both suggest using contractions)
+    const message = rule === 'required'
+      ? 'Use contractions for a more natural tone'
+      : 'Consider using contractions for a friendlier tone';
     // Check for expanded forms that should be contracted
     for (let i = 0; i < expanded.length; i++) {
       const exp = expanded[i];
@@ -182,7 +189,7 @@ function checkContractions(
           createViolation(
             'constraints.contractions',
             'info',
-            `Use contractions for a more natural tone`,
+            message,
             match[0],
             { start: match.index, end: match.index + match[0].length },
             contractions[i]
