@@ -1,0 +1,281 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1a1a1a;
+  background: #faf9f7;
+}
+
+.container {
+  width: 320px;
+  min-height: 200px;
+}
+
+/* Header */
+.header {
+  padding: 16px;
+  border-bottom: 1px solid #e5e3df;
+  background: white;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-icon {
+  width: 28px;
+  height: 28px;
+  background: #c54b32;
+  color: white;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.logo-text {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Main */
+.main {
+  padding: 16px;
+}
+
+.section {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Setup Section */
+.setup-section h2 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.setup-section p {
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.hint {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #888;
+}
+
+.hint a {
+  color: #c54b32;
+  text-decoration: none;
+}
+
+/* Inputs */
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e3df;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #c54b32;
+  box-shadow: 0 0 0 3px rgba(197, 75, 50, 0.1);
+}
+
+.select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e5e3df;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  width: 100%;
+  background: #c54b32;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #a83d28;
+}
+
+.btn-secondary {
+  flex: 1;
+  background: white;
+  border: 1px solid #e5e3df;
+  color: #1a1a1a;
+}
+
+.btn-secondary:hover {
+  background: #f5f4f2;
+  border-color: #d5d3cf;
+}
+
+.btn-link {
+  background: none;
+  padding: 8px;
+  color: #666;
+  font-size: 12px;
+}
+
+.btn-link:hover {
+  color: #c54b32;
+}
+
+.btn-icon {
+  font-size: 16px;
+}
+
+/* Pack Selector */
+.pack-selector {
+  margin-bottom: 16px;
+}
+
+.pack-selector label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+/* Status */
+.status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #e8f5e9;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.status-icon {
+  width: 32px;
+  height: 32px;
+  background: #4caf50;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.status-text strong {
+  display: block;
+  font-size: 14px;
+}
+
+.status-text span {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* Results */
+.result {
+  background: white;
+  border: 1px solid #e5e3df;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.result-score {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.result-score.good { color: #4caf50; }
+.result-score.warning { color: #ff9800; }
+.result-score.bad { color: #c54b32; }
+
+.result-count {
+  font-size: 12px;
+  padding: 4px 8px;
+  background: #fee;
+  color: #c54b32;
+  border-radius: 12px;
+}
+
+.result-violations {
+  font-size: 13px;
+}
+
+.violation-item {
+  padding: 8px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.violation-item:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.violation-text {
+  color: #c54b32;
+  font-weight: 500;
+}
+
+.violation-message {
+  color: #666;
+  font-size: 12px;
+}
+
+/* Footer */
+.footer-actions {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid #e5e3df;
+}

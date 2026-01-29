@@ -1,0 +1,71 @@
+/* StyleMCP Floating Indicator */
+#stylemcp-indicator {
+  position: absolute;
+  z-index: 999999;
+  display: none;
+  animation: stylemcp-fadein 0.2s ease;
+}
+
+@keyframes stylemcp-fadein {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stylemcp-indicator-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.stylemcp-logo {
+  width: 20px;
+  height: 20px;
+  background: #c54b32;
+  color: white;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.stylemcp-status {
+  font-weight: 500;
+  color: #666;
+}
+
+#stylemcp-indicator.loading .stylemcp-status {
+  color: #888;
+}
+
+#stylemcp-indicator.good .stylemcp-status {
+  color: #4caf50;
+}
+
+#stylemcp-indicator.warning .stylemcp-status {
+  color: #ff9800;
+}
+
+#stylemcp-indicator.bad .stylemcp-status {
+  color: #c54b32;
+}
+
+#stylemcp-indicator.good .stylemcp-logo {
+  background: #4caf50;
+}
+
+#stylemcp-indicator.warning .stylemcp-logo {
+  background: #ff9800;
+}
+
+#stylemcp-indicator.bad .stylemcp-logo {
+  background: #c54b32;
+}

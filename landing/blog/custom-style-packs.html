@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creating Custom Style Packs - StyleMCP Blog</title>
+  <meta name="description" content="Learn how to define your brand voice, vocabulary rules, and forbidden patterns in YAML to create a custom StyleMCP style pack.">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stylemcp.com/blog/custom-style-packs">
+  <meta property="og:title" content="Creating Custom Style Packs">
+  <meta property="og:description" content="Learn how to define your brand voice, vocabulary rules, and forbidden patterns in YAML.">
+  
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-cream: #FAF8F5;
+      --bg-paper: #FFFFFF;
+      --bg-warm: #F5F2ED;
+      --bg-dark: #1A1918;
+      --bg-ink: #0D0C0B;
+      --text-primary: #1A1918;
+      --text-secondary: #5C5856;
+      --text-tertiary: #8A8684;
+      --text-inverse: #FAF8F5;
+      --accent: #E85D04;
+      --accent-hover: #D45003;
+      --accent-soft: #FFF0E6;
+      --success: #2D6A4F;
+      --success-soft: #D8F3DC;
+      --error: #9D0208;
+      --error-soft: #FFE5E5;
+      --warning: #CC8B00;
+      --warning-soft: #FFF3CD;
+      --border: #E8E4DF;
+      --border-strong: #D4CFC8;
+      --shadow-sm: 0 1px 2px rgba(26, 25, 24, 0.04);
+      --shadow-md: 0 4px 12px rgba(26, 25, 24, 0.08);
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --font-serif: 'Instrument Serif', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+    }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-sans); background: var(--bg-cream); color: var(--text-primary); line-height: 1.6; }
+
+    .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+    /* Navigation */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(250, 248, 245, 0.85); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border); }
+    .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 48px); display: flex; align-items: center; justify-content: space-between; height: 72px; }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-primary); }
+    .logo-mark { width: 40px; height: 40px; background: var(--bg-dark); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 24px; font-style: italic; color: var(--text-inverse); }
+    .logo-text { font-weight: 600; font-size: 18px; letter-spacing: -0.02em; }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-link { padding: 10px 16px; font-size: 14px; font-weight: 500; color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-sm); transition: all 0.2s; }
+    .nav-link:hover { color: var(--text-primary); background: var(--bg-warm); }
+    .nav-cta { margin-left: 8px; padding: 10px 20px; background: var(--bg-dark); color: var(--text-inverse); font-size: 14px; font-weight: 600; text-decoration: none; border-radius: var(--radius-sm); transition: all 0.2s; }
+    .nav-cta:hover { background: var(--accent); }
+    .mobile-menu-btn { display: none; flex-direction: column; gap: 5px; padding: 10px; background: none; border: none; cursor: pointer; }
+    .mobile-menu-btn span { display: block; width: 22px; height: 2px; background: var(--text-primary); border-radius: 2px; }
+
+    @media (max-width: 768px) { .nav-links { display: none; } .mobile-menu-btn { display: flex; } }
+
+    /* Article */
+    article { padding: 140px 0 80px; }
+
+    .article-header { margin-bottom: 48px; text-align: center; }
+    .article-meta { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 24px; font-size: 14px; color: var(--text-tertiary); }
+    .article-tag { padding: 6px 14px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 600; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    h1 { font-family: var(--font-serif); font-size: clamp(36px, 6vw, 52px); font-weight: 400; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 24px; }
+    .article-intro { font-size: 20px; color: var(--text-secondary); line-height: 1.6; max-width: 640px; margin: 0 auto; }
+
+    /* Content */
+    .article-content { max-width: 680px; margin: 0 auto; }
+    .article-content h2 { font-family: var(--font-serif); font-size: 28px; font-weight: 400; margin-top: 56px; margin-bottom: 20px; }
+    .article-content h3 { font-family: var(--font-serif); font-size: 22px; font-weight: 400; margin-top: 40px; margin-bottom: 16px; }
+    .article-content p { color: var(--text-secondary); font-size: 17px; line-height: 1.8; margin-bottom: 24px; }
+    .article-content ul, .article-content ol { color: var(--text-secondary); font-size: 17px; line-height: 1.8; margin-bottom: 24px; padding-left: 24px; }
+    .article-content li { margin-bottom: 12px; }
+    .article-content strong { color: var(--text-primary); font-weight: 600; }
+    .article-content a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); transition: border-color 0.2s; }
+    .article-content a:hover { border-color: var(--accent); }
+    .article-content code { background: var(--bg-warm); padding: 3px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.9em; }
+
+    /* Code blocks */
+    .code-block { background: var(--bg-ink); border-radius: var(--radius-md); margin: 32px 0; overflow: hidden; box-shadow: var(--shadow-md); }
+    .code-header { display: flex; align-items: center; gap: 8px; padding: 14px 20px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .code-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .code-dot.red { background: #FF5F57; }
+    .code-dot.yellow { background: #FEBC2E; }
+    .code-dot.green { background: #28C840; }
+    .code-filename { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.4); }
+    .code-body { padding: 20px; font-family: var(--font-mono); font-size: 14px; line-height: 1.7; overflow-x: auto; color: rgba(255,255,255,0.85); }
+    .code-body pre { margin: 0; }
+    .code-body .comment { color: #6b7280; }
+    .code-body .string { color: #98C379; }
+    .code-body .key { color: #E9967A; }
+    .code-body .number { color: #D19A66; }
+
+    blockquote { border-left: 3px solid var(--accent); padding: 4px 0 4px 24px; margin: 32px 0; font-family: var(--font-serif); font-size: 20px; font-style: italic; color: var(--text-secondary); }
+
+    /* Callout */
+    .callout { background: var(--bg-paper); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px 24px; margin: 32px 0; }
+    .callout.warning { border-color: var(--warning); background: var(--warning-soft); }
+    .callout-title { font-weight: 600; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .callout.warning .callout-title { color: #92600a; }
+    .callout p { margin-bottom: 0; font-size: 15px; }
+
+    /* Comparison table */
+    .comparison-table { width: 100%; border-collapse: collapse; margin: 32px 0; background: var(--bg-paper); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border); }
+    .comparison-table th, .comparison-table td { padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border); }
+    .comparison-table th { background: var(--bg-warm); font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); }
+    .comparison-table tr:last-child td { border-bottom: none; }
+    .comparison-table td:first-child { color: var(--error); font-family: var(--font-mono); font-size: 14px; }
+    .comparison-table td:last-child { color: var(--success); font-family: var(--font-mono); font-size: 14px; }
+
+    /* CTA */
+    .article-cta { margin-top: 64px; padding: 48px; background: var(--bg-warm); border: 1px solid var(--border); border-radius: var(--radius-lg); text-align: center; }
+    .article-cta h3 { font-family: var(--font-serif); font-size: 28px; font-weight: 400; margin-bottom: 12px; }
+    .article-cta p { color: var(--text-secondary); margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; font-family: var(--font-sans); font-size: 15px; font-weight: 600; text-decoration: none; border-radius: var(--radius-md); transition: all 0.2s; }
+    .btn-primary { background: var(--bg-dark); color: var(--text-inverse); }
+    .btn-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    /* Footer */
+    footer { padding: 48px 0; background: var(--bg-cream); border-top: 1px solid var(--border); }
+    .footer-inner { max-width: 1280px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 48px); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
+    .footer-links { display: flex; gap: 32px; flex-wrap: wrap; }
+    .footer-links a { font-size: 14px; color: var(--text-secondary); text-decoration: none; }
+    .footer-links a:hover { color: var(--text-primary); }
+    .footer-copy { font-size: 14px; color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="logo">
+        <div class="logo-mark">S</div>
+        <span class="logo-text">StyleMCP</span>
+      </a>
+      <div class="nav-links">
+        <a href="/#features" class="nav-link">Features</a>
+        <a href="/docs.html" class="nav-link">Docs</a>
+        <a href="/pricing.html" class="nav-link">Pricing</a>
+        <a href="/blog.html" class="nav-link">Blog</a>
+        <a href="/login.html" class="nav-link">Login</a>
+        <a href="/signup.html" class="nav-cta">Get Started</a>
+      </div>
+      <button class="mobile-menu-btn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <article>
+    <div class="container">
+      <header class="article-header">
+        <div class="article-meta">
+          <span class="article-tag">Guide</span>
+          <span>January 26, 2026</span>
+          <span>·</span>
+          <span>5 min read</span>
+        </div>
+        <h1>Creating Custom Style Packs</h1>
+        <p class="article-intro">Learn how to define your brand voice, vocabulary rules, and forbidden patterns in YAML. A style pack is the heart of StyleMCP—it tells the system exactly what your brand sounds like.</p>
+      </header>
+
+      <div class="article-content">
+        <h2>What's in a Style Pack?</h2>
+        <p>A style pack is a YAML file that defines your brand's writing rules. It contains:</p>
+        <ul>
+          <li><strong>Vocabulary rules:</strong> Words to prefer, avoid, or forbid entirely</li>
+          <li><strong>Pattern rules:</strong> Regex patterns to catch structural issues</li>
+          <li><strong>Tone settings:</strong> Formality level, sentence length, reading grade</li>
+          <li><strong>Custom rules:</strong> Any brand-specific requirements</li>
+        </ul>
+
+        <h2>Basic Structure</h2>
+        <p>Here's a minimal style pack to get you started:</p>
+        
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+            <span class="code-filename">my-brand.yaml</span>
+          </div>
+          <div class="code-body">
+<pre><span class="key">name</span>: <span class="string">"my-brand"</span>
+<span class="key">version</span>: <span class="string">"1.0"</span>
+<span class="key">description</span>: <span class="string">"Brand voice guidelines for My Company"</span>
+
+<span class="key">vocabulary</span>:
+  <span class="key">prefer</span>:
+    - <span class="string">"use"</span>        <span class="comment"># instead of "utilize"</span>
+    - <span class="string">"help"</span>       <span class="comment"># instead of "assist"</span>
+    - <span class="string">"start"</span>      <span class="comment"># instead of "commence"</span>
+  
+  <span class="key">avoid</span>:
+    - <span class="string">"very"</span>       <span class="comment"># weak modifier</span>
+    - <span class="string">"really"</span>     <span class="comment"># weak modifier</span>
+    - <span class="string">"just"</span>       <span class="comment"># filler word</span>
+  
+  <span class="key">forbid</span>:
+    - <span class="string">"leverage"</span>
+    - <span class="string">"synergy"</span>
+    - <span class="string">"circle back"</span>
+
+<span class="key">patterns</span>:
+  <span class="key">forbid</span>:
+    - <span class="key">pattern</span>: <span class="string">"Click here"</span>
+      <span class="key">message</span>: <span class="string">"Use descriptive link text"</span>
+    - <span class="key">pattern</span>: <span class="string">"!!!+"</span>
+      <span class="key">message</span>: <span class="string">"One exclamation point max"</span></pre>
+          </div>
+        </div>
+
+        <h2>Vocabulary Rules</h2>
+        <p>Vocabulary rules control word choice at the individual word level.</p>
+        
+        <h3>Prefer vs Avoid vs Forbid</h3>
+        <p>These three levels give you graduated control:</p>
+        <ul>
+          <li><strong>prefer:</strong> Suggests alternatives, doesn't fail validation</li>
+          <li><strong>avoid:</strong> Flags as warning, minor score penalty</li>
+          <li><strong>forbid:</strong> Fails validation, must be fixed</li>
+        </ul>
+
+        <h3>Replacement Mappings</h3>
+        <p>You can specify exact replacements:</p>
+        
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+          </div>
+          <div class="code-body">
+<pre><span class="key">vocabulary</span>:
+  <span class="key">replacements</span>:
+    <span class="string">"utilize"</span>: <span class="string">"use"</span>
+    <span class="string">"purchase"</span>: <span class="string">"buy"</span>
+    <span class="string">"commence"</span>: <span class="string">"start"</span>
+    <span class="string">"terminate"</span>: <span class="string">"end"</span>
+    <span class="string">"regarding"</span>: <span class="string">"about"</span></pre>
+          </div>
+        </div>
+
+        <p>When auto-rewrite is enabled, StyleMCP will automatically apply these replacements.</p>
+
+        <h2>Pattern Rules</h2>
+        <p>Pattern rules use regular expressions to catch structural issues that go beyond single words.</p>
+        
+        <h3>Common Patterns</h3>
+        
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+          </div>
+          <div class="code-body">
+<pre><span class="key">patterns</span>:
+  <span class="key">forbid</span>:
+    <span class="comment"># Cliché openers</span>
+    - <span class="key">pattern</span>: <span class="string">"^In today's [\\w]+ world"</span>
+      <span class="key">message</span>: <span class="string">"Avoid cliché openings"</span>
+    
+    <span class="comment"># Passive voice (simple detection)</span>
+    - <span class="key">pattern</span>: <span class="string">"\\b(was|were|been|being) \\w+ed\\b"</span>
+      <span class="key">message</span>: <span class="string">"Consider active voice"</span>
+      <span class="key">severity</span>: <span class="string">"warning"</span>
+    
+    <span class="comment"># Vague CTAs</span>
+    - <span class="key">pattern</span>: <span class="string">"[Cc]lick here"</span>
+      <span class="key">message</span>: <span class="string">"Use descriptive link text"</span>
+    
+    <span class="comment"># Excessive punctuation</span>
+    - <span class="key">pattern</span>: <span class="string">"[!?]{2,}"</span>
+      <span class="key">message</span>: <span class="string">"Use single punctuation marks"</span>
+    
+    <span class="comment"># ALL CAPS (except acronyms)</span>
+    - <span class="key">pattern</span>: <span class="string">"\\b[A-Z]{5,}\\b"</span>
+      <span class="key">message</span>: <span class="string">"Avoid all-caps for emphasis"</span></pre>
+          </div>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-title">⚠️ Regex Escaping</div>
+          <p>In YAML, backslashes need to be doubled (<code>\\</code>) for regex special characters. Alternatively, use single quotes for patterns: <code>pattern: '\bword\b'</code></p>
+        </div>
+
+        <h2>Tone Settings</h2>
+        <p>Tone settings help enforce consistent voice beyond vocabulary:</p>
+        
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+          </div>
+          <div class="code-body">
+<pre><span class="key">tone</span>:
+  <span class="key">formality</span>: <span class="string">"conversational"</span>  <span class="comment"># formal | professional | conversational | casual</span>
+  <span class="key">maxSentenceLength</span>: <span class="number">25</span>        <span class="comment"># words per sentence</span>
+  <span class="key">maxParagraphLength</span>: <span class="number">4</span>        <span class="comment"># sentences per paragraph</span>
+  <span class="key">readingLevel</span>: <span class="number">8</span>              <span class="comment"># target grade level (Flesch-Kincaid)</span>
+  <span class="key">contractions</span>: <span class="string">"encouraged"</span>   <span class="comment"># required | encouraged | allowed | discouraged | forbidden</span></pre>
+          </div>
+        </div>
+
+        <h2>Industry-Specific Examples</h2>
+        
+        <h3>SaaS / Tech</h3>
+        <table class="comparison-table">
+          <tr>
+            <th>Avoid</th>
+            <th>Prefer</th>
+          </tr>
+          <tr>
+            <td>"leverage our platform"</td>
+            <td>"use our platform"</td>
+          </tr>
+          <tr>
+            <td>"seamless integration"</td>
+            <td>"works with your tools"</td>
+          </tr>
+          <tr>
+            <td>"cutting-edge solution"</td>
+            <td>describe what it actually does</td>
+          </tr>
+        </table>
+
+        <h3>Healthcare</h3>
+        <table class="comparison-table">
+          <tr>
+            <th>Avoid</th>
+            <th>Prefer</th>
+          </tr>
+          <tr>
+            <td>"patients" (if not clinical)</td>
+            <td>"people" or "members"</td>
+          </tr>
+          <tr>
+            <td>"treatment plan"</td>
+            <td>"care plan"</td>
+          </tr>
+          <tr>
+            <td>"compliance"</td>
+            <td>"following your plan"</td>
+          </tr>
+        </table>
+
+        <h3>Finance</h3>
+        <table class="comparison-table">
+          <tr>
+            <th>Avoid</th>
+            <th>Prefer</th>
+          </tr>
+          <tr>
+            <td>"utilize funds"</td>
+            <td>"use your money"</td>
+          </tr>
+          <tr>
+            <td>"fiscal responsibility"</td>
+            <td>"managing your budget"</td>
+          </tr>
+          <tr>
+            <td>"accrue interest"</td>
+            <td>"earn interest"</td>
+          </tr>
+        </table>
+
+        <h2>Testing Your Style Pack</h2>
+        <p>Before deploying, test your style pack locally:</p>
+        
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+          </div>
+          <div class="code-body">
+<pre><span class="comment"># Validate the style pack syntax</span>
+stylemcp pack validate my-brand.yaml
+
+<span class="comment"># Test against sample content</span>
+stylemcp validate --pack my-brand.yaml --file sample-content.txt
+
+<span class="comment"># Interactive testing</span>
+echo "Let's leverage synergies to circle back!" | stylemcp validate --pack my-brand.yaml</pre>
+          </div>
+        </div>
+
+        <h2>Uploading to StyleMCP Cloud</h2>
+        <p>Once you're happy with your style pack, upload it to your account:</p>
+        
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+          </div>
+          <div class="code-body">
+<pre><span class="comment"># Login to your account</span>
+stylemcp login
+
+<span class="comment"># Upload the style pack</span>
+stylemcp pack push my-brand.yaml
+
+<span class="comment"># Set as default for your account</span>
+stylemcp pack set-default my-brand</pre>
+          </div>
+        </div>
+
+        <p>You can also manage style packs through the <a href="https://stylemcp.com/dashboard">web dashboard</a>.</p>
+
+        <h2>Version Control Best Practices</h2>
+        <p>Treat your style pack like code:</p>
+        <ul>
+          <li>Keep it in version control (Git)</li>
+          <li>Use semantic versioning (1.0, 1.1, 2.0)</li>
+          <li>Document changes in a changelog</li>
+          <li>Test changes before deploying</li>
+        </ul>
+
+        <blockquote>A style pack is a living document. As your brand evolves, so should your rules.</blockquote>
+
+        <div class="article-cta">
+          <h3>Need a Starting Point?</h3>
+          <p>Browse our library of pre-built style packs for common industries.</p>
+          <a href="/docs.html#style-packs" class="btn btn-primary">View Style Pack Library →</a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="https://github.com/3DUNLMTD/stylemcp">GitHub</a>
+        <a href="/docs.html">Documentation</a>
+        <a href="/pricing.html">Pricing</a>
+        <a href="/blog.html">Blog</a>
+        <a href="/status.html">Status</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+      </div>
+      <div class="footer-copy">© 2026 StyleMCP. Open source under MIT license.</div>
+    </div>
+  </footer>
+</body>
+</html>

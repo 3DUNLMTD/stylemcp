@@ -54,7 +54,7 @@ vocabulary:
       avoid: ["attempt", "endeavor"]
       context: "Attempting actions"
     - preferred: "change"
-      avoid: ["modify", "alter", "adjust"]
+      avoid: ["modify", "alter", "adjust", "transform", "transforms"]
       context: "Making changes"
     - preferred: "set up"
       avoid: ["establish"]
@@ -62,6 +62,18 @@ vocabulary:
     - preferred: "fix"
       avoid: ["rectify", "resolve", "remediate"]
       context: "Correcting problems"
+    - preferred: "improve"
+      avoid: ["revolutionize", "revolutionizes", "revolutionizing"]
+      context: "Making things better"
+    - preferred: "great"
+      avoid: ["amazing", "incredible", "unbelievable"]
+      context: "Positive descriptions"
+    - preferred: "important"
+      avoid: ["crucial", "critical", "vital", "essential", "paramount"]
+      context: "Emphasizing importance"
+    - preferred: "apologize"
+      avoid: ["sincerely apologize", "deeply apologize"]
+      context: "Apologies"
 
   forbidden:
     - "synergy"

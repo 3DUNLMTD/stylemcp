@@ -87,18 +87,15 @@
     .blog-section { padding: 80px 0 120px; }
 
     .featured-post { margin-bottom: 64px; }
-    .featured-post a { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: center; text-decoration: none; color: inherit; background: var(--bg-paper); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: all 0.3s; }
+    .featured-post a { display: block; text-decoration: none; color: inherit; background: var(--bg-paper); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: all 0.3s; }
     .featured-post a:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); }
-    .featured-img { aspect-ratio: 16/10; background: var(--bg-warm); display: flex; align-items: center; justify-content: center; }
-    .featured-img span { font-family: var(--font-serif); font-size: 48px; font-style: italic; color: var(--accent); }
-    .featured-content { padding: 40px 40px 40px 0; }
+    .featured-content { padding: 40px; }
     .post-tag { display: inline-block; padding: 4px 12px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 600; border-radius: 50px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; }
     .featured-content h2 { font-family: var(--font-serif); font-size: 32px; font-weight: 400; line-height: 1.2; margin-bottom: 16px; }
     .featured-content p { color: var(--text-secondary); font-size: 16px; line-height: 1.7; margin-bottom: 20px; }
     .post-meta { font-size: 14px; color: var(--text-tertiary); }
 
     @media (max-width: 800px) {
-      .featured-post a { grid-template-columns: 1fr; }
       .featured-content { padding: 32px; }
     }
 
@@ -108,9 +105,7 @@
 
     .post-card { background: var(--bg-paper); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: all 0.3s; }
     .post-card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); }
-    .post-card a { text-decoration: none; color: inherit; }
-    .post-card-img { aspect-ratio: 16/10; background: var(--bg-warm); display: flex; align-items: center; justify-content: center; }
-    .post-card-img span { font-family: var(--font-serif); font-size: 32px; font-style: italic; color: var(--accent); }
+    .post-card a { text-decoration: none; color: inherit; display: block; }
     .post-card-content { padding: 24px; }
     .post-card-content h3 { font-size: 18px; font-weight: 600; line-height: 1.4; margin-bottom: 12px; }
     .post-card-content p { color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
@@ -177,7 +172,6 @@
       <!-- Featured Post -->
       <div class="featured-post">
         <a href="/blog/introducing-stylemcp.html">
-          <div class="featured-img"><span>S</span></div>
           <div class="featured-content">
             <span class="post-tag">Announcement</span>
             <h2>Introducing StyleMCP: Brand Rules for Every AI Output</h2>
@@ -191,7 +185,6 @@
       <div class="posts-grid">
         <article class="post-card">
           <a href="/blog/mcp-integration-guide.html">
-            <div class="post-card-img"><span>MCP</span></div>
             <div class="post-card-content">
               <span class="post-tag">Tutorial</span>
               <h3>How to Add StyleMCP to Claude Desktop</h3>
@@ -203,7 +196,6 @@
 
         <article class="post-card">
           <a href="/blog/custom-style-packs.html">
-            <div class="post-card-img"><span>YAML</span></div>
             <div class="post-card-content">
               <span class="post-tag">Guide</span>
               <h3>Creating Custom Style Packs</h3>
@@ -214,8 +206,7 @@
         </article>
 
         <article class="post-card">
-          <a href="/blog/why-ai-needs-brand-rules.html">
-            <div class="post-card-img"><span>?</span></div>
+          <a href="/blog/why-ai-outputs-need-brand-rules.html">
             <div class="post-card-content">
               <span class="post-tag">Insights</span>
               <h3>Why AI Needs Brand Guardrails</h3>

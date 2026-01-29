@@ -1,0 +1,208 @@
+version: "1.0"
+name: "Government & Public Sector"
+description: "Clear, accessible, and authoritative. Plain language that serves all constituents."
+
+tone:
+  summary: "Official but accessible. Authoritative without being bureaucratic. Service-oriented and transparent."
+  attributes:
+    - name: clear
+      weight: 0.95
+      description: "Plain language, easily understood by all reading levels"
+    - name: authoritative
+      weight: 0.8
+      description: "Official, accurate, trustworthy"
+    - name: accessible
+      weight: 0.9
+      description: "Inclusive, available to all, ADA compliant"
+    - name: service-oriented
+      weight: 0.8
+      description: "Helpful, citizen-focused, responsive"
+    - name: transparent
+      weight: 0.8
+      description: "Open, honest, accountable"
+
+vocabulary:
+  rules:
+    # Plain Language Act compliance
+    - preferred: "use"
+      avoid: ["utilize", "employ", "leverage"]
+      context: "General usage"
+    - preferred: "help"
+      avoid: ["assist", "facilitate", "aid"]
+      context: "Service language"
+    - preferred: "need"
+      avoid: ["require", "necessitate", "mandate"]
+      context: "Requirements - unless legal mandate"
+    - preferred: "send"
+      avoid: ["submit", "transmit", "furnish"]
+      context: "Document actions"
+    - preferred: "get"
+      avoid: ["obtain", "acquire", "procure"]
+      context: "Receiving things"
+    - preferred: "give"
+      avoid: ["provide", "furnish", "supply"]
+      context: "Providing things"
+    - preferred: "tell"
+      avoid: ["notify", "inform", "advise"]
+      context: "Communication"
+    - preferred: "ask"
+      avoid: ["inquire", "request"]
+      context: "Questions"
+    - preferred: "end"
+      avoid: ["terminate", "discontinue", "cease"]
+      context: "Stopping things"
+    - preferred: "start"
+      avoid: ["commence", "initiate", "begin"]
+      context: "Beginning things"
+    - preferred: "about"
+      avoid: ["concerning", "regarding", "with respect to", "pertaining to"]
+      context: "Topic references"
+    - preferred: "before"
+      avoid: ["prior to", "in advance of"]
+      context: "Time references"
+    - preferred: "after"
+      avoid: ["subsequent to", "following"]
+      context: "Time references"
+    - preferred: "if"
+      avoid: ["in the event that", "in case of", "should it occur that"]
+      context: "Conditions"
+    - preferred: "because"
+      avoid: ["due to the fact that", "inasmuch as", "by virtue of"]
+      context: "Reasons"
+    - preferred: "can"
+      avoid: ["is able to", "has the ability to"]
+      context: "Ability"
+    - preferred: "must"
+      avoid: ["shall", "is required to"]
+      context: "Obligations"
+    - preferred: "may"
+      avoid: ["is permitted to", "is authorized to"]
+      context: "Permissions"
+
+  forbidden:
+    # Bureaucratic jargon
+    - "heretofore"
+    - "hereinafter"
+    - "aforementioned"
+    - "therein"
+    - "thereof"
+    - "whereby"
+    - "wherein"
+    - "forthwith"
+    - "notwithstanding"
+    
+    # Unnecessarily complex
+    - "effectuate"
+    - "promulgate"
+    - "adjudicate"
+    - "expeditiously"
+    - "aforementioned"
+    
+    # Insider language
+    - "stakeholders" # say who you mean
+    - "deliverables"
+    - "leverage" # as verb
+    - "synergy"
+    - "circle back"
+    - "action item"
+    - "bandwidth"
+
+  encouraged:
+    - "you"
+    - "we"
+    - active voice
+    - short sentences
+    - bullet points for lists
+    - headers for organization
+    - examples and illustrations
+
+doNot:
+  # Passive voice hiding responsibility
+  - pattern: "\\bit (has been|was|is) decided\\b"
+    isRegex: true
+    reason: "Passive voice hides who made the decision"
+    severity: warning
+    suggestion: "Name the decision-maker: 'The City Council decided...'"
+
+  # Vague deadlines
+  - pattern: "\\b(as soon as possible|at your earliest convenience|promptly|timely manner)\\b"
+    isRegex: true
+    reason: "Vague deadlines cause confusion"
+    severity: error
+    suggestion: "Give specific dates: 'by March 15, 2026'"
+
+  # Unnecessary formality
+  - pattern: "\\bplease be advised that\\b"
+    isRegex: true
+    reason: "Unnecessary filler - just state the information"
+    severity: warning
+    suggestion: "Remove and state directly"
+
+  - pattern: "\\bthis letter is to inform you\\b"
+    isRegex: true
+    reason: "Obvious filler"
+    severity: warning
+    suggestion: "Start with the information itself"
+
+  - pattern: "\\benclosed please find\\b"
+    isRegex: true
+    reason: "Stuffy phrase"
+    severity: warning
+    suggestion: "Use 'I've enclosed' or 'Attached is'"
+
+  # Acronyms without definition
+  - pattern: "\\b[A-Z]{2,}\\b"
+    isRegex: true
+    reason: "Acronyms should be defined on first use"
+    severity: info
+    suggestion: "Spell out on first use: 'Social Security Administration (SSA)'"
+
+  # Double negatives
+  - pattern: "\\bnot\\s+\\w*un"
+    isRegex: true
+    reason: "Double negative is confusing"
+    severity: error
+    suggestion: "Use positive statement"
+
+  # Long sentences
+  - pattern: "[^.]{150,}\\."
+    isRegex: true
+    reason: "Sentence too long for plain language"
+    severity: warning
+    suggestion: "Break into shorter sentences"
+
+  # Jargon-heavy
+  - pattern: "\\b(interface with|impact|incentivize|leverage)\\b"
+    isRegex: true
+    reason: "Jargon - use plain English"
+    severity: warning
+    suggestion: "Use simpler words: work with, affect, encourage, use"
+
+examples:
+  - bad: "Please be advised that pursuant to Section 5.2, applicants are required to submit documentation prior to the established deadline."
+    good: "You must send your documents before April 15."
+    explanation: "Direct, specific, action-oriented"
+
+  - bad: "The Department has effectuated a determination regarding your eligibility status."
+    good: "We've decided you're eligible for benefits."
+    explanation: "Active voice, plain words"
+
+  - bad: "It is recommended that constituents utilize the online portal."
+    good: "Use the online portal—it's faster."
+    explanation: "Direct address, reason given"
+
+  - bad: "Notwithstanding the aforementioned provisions, exceptions may be granted."
+    good: "We may make exceptions. Contact us to ask."
+    explanation: "Removed legalese, added helpful next step"
+
+  - bad: "Stakeholders should interface with relevant department personnel."
+    good: "Talk to the [specific department] staff."
+    explanation: "Say who you mean, use plain verbs"
+
+constraints:
+  maxSentenceLength: 20
+  maxParagraphLength: 4
+  readingLevel: 6th-grade # Plain Language Act target
+  personPov: first-plural-and-second
+  contractions: allowed
+  oxfordComma: true

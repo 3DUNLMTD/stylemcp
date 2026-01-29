@@ -132,6 +132,31 @@ doNot:
     severity: error
     reason: "No treatment is completely without risk"
     suggestion: "Be transparent about risks involved"
+  - pattern: "amazing"
+    isRegex: false
+    severity: warning
+    reason: "Vague and unsubstantiated in healthcare context"
+    suggestion: "Use evidence-based language: 'effective', 'shown to help'"
+  - pattern: "incredible"
+    isRegex: false
+    severity: warning
+    reason: "Hyperbolic language undermines medical credibility"
+    suggestion: "Stick to factual, evidence-based claims"
+  - pattern: "revolutionary"
+    isRegex: false
+    severity: warning
+    reason: "Overpromising in healthcare can be harmful"
+    suggestion: "Describe specific benefits with evidence"
+  - pattern: "outcomes"
+    isRegex: false
+    severity: info
+    reason: "Vague - specify what outcomes (health, recovery, etc.)"
+    suggestion: "Be specific: 'health outcomes', 'treatment results'"
+  - pattern: "AI"
+    isRegex: false
+    severity: info
+    reason: "AI in healthcare requires transparency about limitations"
+    suggestion: "Clarify AI's role and that it supports (not replaces) medical professionals"
 
 examples:
   - bad: "This supplement cures diabetes naturally!"

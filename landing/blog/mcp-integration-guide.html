@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Why Your AI Outputs Need Brand Rules - StyleMCP Blog</title>
-  <meta name="description" content="AI models are great at generating content, but they don't understand your brand. Here's why brand validation matters and how to implement it.">
+  <title>How to Add StyleMCP to Claude Desktop - StyleMCP Blog</title>
+  <meta name="description" content="A step-by-step guide to integrating StyleMCP with Claude using the Model Context Protocol for automatic brand validation.">
   
   <meta property="og:type" content="article">
-  <meta property="og:url" content="https://stylemcp.com/blog/why-ai-outputs-need-brand-rules">
-  <meta property="og:title" content="Why Your AI Outputs Need Brand Rules">
-  <meta property="og:description" content="AI models are great at generating content, but they don't understand your brand. Here's why brand validation matters.">
+  <meta property="og:url" content="https://stylemcp.com/blog/mcp-integration-guide">
+  <meta property="og:title" content="How to Add StyleMCP to Claude Desktop">
+  <meta property="og:description" content="A step-by-step guide to integrating StyleMCP with Claude using the Model Context Protocol.">
   
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -87,6 +87,7 @@
     .article-content a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); transition: border-color 0.2s; }
     .article-content a:hover { border-color: var(--accent); }
     .article-content code { background: var(--bg-warm); padding: 3px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.9em; }
+    .article-content em { color: var(--text-primary); font-style: italic; }
 
     /* Code blocks */
     .code-block { background: var(--bg-ink); border-radius: var(--radius-md); margin: 32px 0; overflow: hidden; box-shadow: var(--shadow-md); }
@@ -101,9 +102,13 @@
     .code-body .string { color: #98C379; }
     .code-body .key { color: #E9967A; }
     .code-body .number { color: #D19A66; }
-    .code-body .bool { color: #56B6C2; }
 
     blockquote { border-left: 3px solid var(--accent); padding: 4px 0 4px 24px; margin: 32px 0; font-family: var(--font-serif); font-size: 20px; font-style: italic; color: var(--text-secondary); }
+
+    /* Callout */
+    .callout { background: var(--bg-paper); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px 24px; margin: 32px 0; }
+    .callout-title { font-weight: 600; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .callout p { margin-bottom: 0; font-size: 15px; }
 
     /* CTA */
     .article-cta { margin-top: 64px; padding: 48px; background: var(--bg-warm); border: 1px solid var(--border); border-radius: var(--radius-lg); text-align: center; }
@@ -145,41 +150,25 @@
     <div class="container">
       <header class="article-header">
         <div class="article-meta">
-          <span class="article-tag">Insights</span>
-          <span>January 27, 2026</span>
+          <span class="article-tag">Tutorial</span>
+          <span>January 26, 2026</span>
           <span>·</span>
-          <span>5 min read</span>
+          <span>3 min read</span>
         </div>
-        <h1>Why Your AI Outputs Need Brand Rules</h1>
-        <p class="article-intro">AI models are great at generating content, but they don't understand your brand. Here's why brand validation matters and how to implement it in your workflow.</p>
+        <h1>How to Add StyleMCP to Claude Desktop</h1>
+        <p class="article-intro">A step-by-step guide to integrating StyleMCP with Claude using the Model Context Protocol. Get automatic brand validation on every response in under 5 minutes.</p>
       </header>
 
       <div class="article-content">
-        <h2>The Brand Consistency Problem</h2>
-        <p>You've spent years building your brand voice. It's friendly but professional. Concise but not cold. Your team knows instinctively what sounds right and what doesn't.</p>
-        <p>Then you add AI to your workflow, and suddenly you're seeing content that:</p>
+        <h2>What You'll Need</h2>
         <ul>
-          <li>Uses "leverage" and "facilitate" when your brand keeps it simple</li>
-          <li>Starts every paragraph with "In today's fast-paced world..."</li>
-          <li>Ends calls-to-action with "Click here!" instead of your preferred action verbs</li>
-          <li>Adds exclamation points everywhere!!!</li>
-        </ul>
-        <p>The AI doesn't know any better. It's trained on the internet, not your style guide.</p>
-
-        <h2>What Brand Validation Actually Means</h2>
-        <p>Brand validation is the automated process of checking AI-generated content against your specific rules before it reaches your customers.</p>
-        <p>Think of it as a <strong>linter for your brand voice</strong>. Just like ESLint catches code issues before they hit production, brand validation catches voice issues before they hit your customers.</p>
-
-        <h3>What gets validated?</h3>
-        <ul>
-          <li><strong>Vocabulary:</strong> Are you using approved terms? Avoiding banned ones?</li>
-          <li><strong>Patterns:</strong> Does your content follow your structural guidelines?</li>
-          <li><strong>Tone:</strong> Is the formality level appropriate?</li>
-          <li><strong>CTAs:</strong> Are your calls-to-action following your conversion guidelines?</li>
+          <li><strong>Claude Desktop</strong> installed on your Mac or Windows machine</li>
+          <li><strong>Node.js 18+</strong> (check with <code>node --version</code>)</li>
+          <li>A <strong>StyleMCP account</strong> (free tier works fine)</li>
         </ul>
 
-        <h2>How StyleMCP Approaches This</h2>
-        <p>StyleMCP takes a rules-based approach to brand validation. You define your rules in a <strong>style pack</strong>, and every piece of content gets validated against it.</p>
+        <h2>Step 1: Install the StyleMCP Server</h2>
+        <p>The StyleMCP MCP server runs locally and connects to Claude Desktop. Install it globally:</p>
         
         <div class="code-block">
           <div class="code-header">
@@ -188,49 +177,151 @@
             <span class="code-dot green"></span>
           </div>
           <div class="code-body">
-<pre><span class="comment"># Example: Validate content</span>
-curl -X POST https://stylemcp.com/api/validate \
-  -H <span class="string">"Content-Type: application/json"</span> \
-  -d <span class="string">'{"text": "Click here to leverage our solution!"}'</span>
+<pre>npm install -g @stylemcp/mcp-server</pre>
+          </div>
+        </div>
 
-<span class="comment"># Response:</span>
-{
-  <span class="key">"valid"</span>: <span class="bool">false</span>,
-  <span class="key">"score"</span>: <span class="number">45</span>,
-  <span class="key">"violations"</span>: [
-    { <span class="key">"rule"</span>: <span class="string">"no-click-here"</span>, <span class="key">"text"</span>: <span class="string">"Click here"</span> },
-    { <span class="key">"rule"</span>: <span class="string">"no-jargon"</span>, <span class="key">"text"</span>: <span class="string">"leverage"</span> }
-  ]
+        <p>Verify the installation:</p>
+        
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+          </div>
+          <div class="code-body">
+<pre>stylemcp-server --version
+<span class="comment"># Should output: @stylemcp/mcp-server v1.x.x</span></pre>
+          </div>
+        </div>
+
+        <h2>Step 2: Get Your API Key</h2>
+        <p>Log into your <a href="https://stylemcp.com/dashboard">StyleMCP dashboard</a> and navigate to <strong>Settings → API Keys</strong>. Create a new key and copy it—you'll need it in the next step.</p>
+        
+        <div class="callout">
+          <div class="callout-title">💡 Tip</div>
+          <p>Name your API key something descriptive like "Claude Desktop - Work Laptop" so you can identify it later.</p>
+        </div>
+
+        <h2>Step 3: Configure Claude Desktop</h2>
+        <p>Claude Desktop uses a JSON configuration file to manage MCP servers. Open or create the config file:</p>
+        
+        <p><strong>On macOS:</strong></p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+          </div>
+          <div class="code-body">
+<pre>code ~/Library/Application\ Support/Claude/claude_desktop_config.json</pre>
+          </div>
+        </div>
+
+        <p><strong>On Windows:</strong></p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+          </div>
+          <div class="code-body">
+<pre>code %APPDATA%\Claude\claude_desktop_config.json</pre>
+          </div>
+        </div>
+
+        <p>Add the StyleMCP server to your configuration:</p>
+        
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+          </div>
+          <div class="code-body">
+<pre>{
+  <span class="key">"mcpServers"</span>: {
+    <span class="key">"stylemcp"</span>: {
+      <span class="key">"command"</span>: <span class="string">"stylemcp-server"</span>,
+      <span class="key">"args"</span>: [<span class="string">"--api-key"</span>, <span class="string">"YOUR_API_KEY_HERE"</span>],
+      <span class="key">"env"</span>: {
+        <span class="key">"STYLEMCP_STYLE_PACK"</span>: <span class="string">"default"</span>
+      }
+    }
+  }
 }</pre>
           </div>
         </div>
 
-        <h2>The ROI of Brand Consistency</h2>
-        <p>Is this just perfectionism, or does it actually matter?</p>
-        <p>Research consistently shows that brand consistency increases revenue by 10-20%. But beyond the numbers, consider:</p>
+        <p>Replace <code>YOUR_API_KEY_HERE</code> with the API key you copied earlier.</p>
+
+        <h2>Step 4: Restart Claude Desktop</h2>
+        <p>Quit Claude Desktop completely and reopen it. The app needs to restart to load the new MCP server configuration.</p>
+        
+        <p>You should see a small indicator that StyleMCP is connected. You can also ask Claude: <em>"What MCP tools do you have available?"</em></p>
+
+        <h2>Step 5: Test the Integration</h2>
+        <p>Try asking Claude to write something that might violate common brand rules:</p>
+        
+        <blockquote>"Write a marketing email that starts with 'In today's fast-paced world' and includes a 'Click here' call-to-action."</blockquote>
+
+        <p>Claude will generate the content, but StyleMCP will flag the violations. You'll see output like:</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+          </div>
+          <div class="code-body">
+<pre><span class="comment">⚠️ StyleMCP found 2 brand violations:</span>
+
+1. <span class="string">"In today's fast-paced world"</span> - Cliché opening
+   → Try a specific, concrete hook instead
+
+2. <span class="string">"Click here"</span> - Vague CTA
+   → Use descriptive action text like "Download the guide"
+
+<span class="comment">Brand compliance score: 62/100</span></pre>
+          </div>
+        </div>
+
+        <h2>Customizing Your Style Pack</h2>
+        <p>The default style pack catches common issues, but you'll want to customize it for your brand. In your dashboard, you can:</p>
         <ul>
-          <li><strong>Trust:</strong> Inconsistent messaging erodes customer confidence</li>
-          <li><strong>Recognition:</strong> Consistent voice makes you instantly recognizable</li>
-          <li><strong>Efficiency:</strong> Less time fixing AI outputs manually</li>
-          <li><strong>Scale:</strong> Maintain quality as you produce more content</li>
+          <li>Add <strong>forbidden words</strong> specific to your industry</li>
+          <li>Define <strong>preferred terminology</strong> (e.g., "customers" not "users")</li>
+          <li>Set <strong>tone guidelines</strong> (formal, casual, technical)</li>
+          <li>Create <strong>pattern rules</strong> for your specific needs</li>
         </ul>
+        <p>See our <a href="/blog/custom-style-packs.html">guide to creating custom style packs</a> for detailed instructions.</p>
 
-        <blockquote>"The difference between almost right and right is the difference between lightning bug and lightning." — Mark Twain</blockquote>
+        <h2>Troubleshooting</h2>
+        
+        <h3>Server not connecting?</h3>
+        <p>Check that the server is running correctly:</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+          </div>
+          <div class="code-body">
+<pre>stylemcp-server --api-key YOUR_KEY --debug</pre>
+          </div>
+        </div>
+        <p>This will show detailed logs of what's happening.</p>
 
-        <h2>Getting Started</h2>
-        <p>Ready to add brand validation to your workflow? Here's how:</p>
-        <ol>
-          <li>Sign up for a free StyleMCP account</li>
-          <li>Choose a pre-built style pack (SaaS, E-commerce, Healthcare, Finance) or create your own</li>
-          <li>Integrate via REST API, MCP, or CLI</li>
-          <li>Start validating your AI outputs automatically</li>
-        </ol>
-        <p>Your brand voice took years to build. Don't let AI dilute it in seconds.</p>
+        <h3>Validation not triggering?</h3>
+        <p>Make sure your style pack is active in the dashboard. You can also explicitly ask Claude to validate content: <em>"Check this text against my brand guidelines."</em></p>
+
+        <h3>Need help?</h3>
+        <p>Join our <a href="https://discord.gg/stylemcp">Discord community</a> or check the <a href="/docs.html">full documentation</a>.</p>
 
         <div class="article-cta">
-          <h3>Try StyleMCP Free</h3>
-          <p>5,000 free validations per month. No credit card required.</p>
-          <a href="/signup.html" class="btn btn-primary">Get Started →</a>
+          <h3>Ready to Get Started?</h3>
+          <p>Create your free account and start validating in minutes.</p>
+          <a href="/signup.html" class="btn btn-primary">Sign Up Free →</a>
         </div>
       </div>
     </div>

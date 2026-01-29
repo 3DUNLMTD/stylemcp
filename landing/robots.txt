@@ -1,0 +1,9 @@
+# StyleMCP robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://stylemcp.com/sitemap.xml
+
+# Disallow admin/dashboard areas
+Disallow: /dashboard.html

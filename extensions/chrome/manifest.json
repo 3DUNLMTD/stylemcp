@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "StyleMCP - Brand Voice Validator",
+  "version": "1.0.0",
+  "description": "Validate and fix AI-generated text to match your brand voice. Works in any text field.",
+  "author": "StyleMCP",
+  "homepage_url": "https://stylemcp.com",
+  
+  "permissions": [
+    "storage",
+    "activeTab",
+    "contextMenus"
+  ],
+  
+  "host_permissions": [
+    "https://stylemcp.com/*"
+  ],
+  
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "StyleMCP"
+  },
+  
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "css": ["content/content.css"]
+    }
+  ],
+  
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  
+  "options_page": "options/options.html"
+}

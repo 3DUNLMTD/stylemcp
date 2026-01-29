@@ -1,0 +1,12 @@
+name: education
+version: "1.0.0"
+description: "Encouraging, inclusive education communication. Growth mindset focused."
+author: StyleMCP
+license: MIT
+
+files:
+  voice: voice.yaml
+
+config:
+  strictMode: false
+  minScore: 50

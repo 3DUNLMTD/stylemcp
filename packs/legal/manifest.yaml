@@ -1,0 +1,12 @@
+name: legal
+version: "1.0.0"
+description: "Plain language legal writing. Precise, accessible, and protective."
+author: StyleMCP
+license: MIT
+
+files:
+  voice: voice.yaml
+
+config:
+  strictMode: false
+  minScore: 50

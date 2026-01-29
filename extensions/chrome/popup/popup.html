@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StyleMCP</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">S</span>
+        <span class="logo-text">StyleMCP</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- API Key Setup -->
+      <section id="setupSection" class="section setup-section">
+        <h2>Connect Your Account</h2>
+        <p>Enter your API key to get started.</p>
+        <input type="password" id="apiKeyInput" placeholder="sk-..." class="input">
+        <button id="saveApiKey" class="btn btn-primary">Save API Key</button>
+        <p class="hint">Get your key at <a href="https://stylemcp.com/dashboard" target="_blank">stylemcp.com</a></p>
+      </section>
+
+      <!-- Main Controls -->
+      <section id="mainSection" class="section main-section" style="display: none;">
+        <!-- Pack Selector -->
+        <div class="pack-selector">
+          <label>Style Pack:</label>
+          <select id="packSelect" class="select">
+            <option value="saas">SaaS</option>
+            <option value="ecommerce">E-commerce</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="finance">Finance</option>
+            <option value="legal">Legal</option>
+            <option value="realestate">Real Estate</option>
+            <option value="education">Education</option>
+            <option value="government">Government</option>
+          </select>
+        </div>
+
+        <!-- Status -->
+        <div class="status" id="status">
+          <div class="status-icon">✓</div>
+          <div class="status-text">
+            <strong>Ready</strong>
+            <span>Select text and right-click to validate</span>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="actions">
+          <button id="validateSelection" class="btn btn-secondary">
+            <span class="btn-icon">✓</span>
+            Validate Selection
+          </button>
+          <button id="rewriteSelection" class="btn btn-secondary">
+            <span class="btn-icon">✎</span>
+            Fix Selection
+          </button>
+        </div>
+
+        <!-- Last Result -->
+        <div id="lastResult" class="result" style="display: none;">
+          <div class="result-header">
+            <span class="result-score" id="resultScore">--/100</span>
+            <span class="result-count" id="resultCount">0 issues</span>
+          </div>
+          <div class="result-violations" id="resultViolations"></div>
+        </div>
+
+        <!-- Settings Link -->
+        <div class="footer-actions">
+          <button id="clearApiKey" class="btn btn-link">Disconnect</button>
+          <a href="https://stylemcp.com/dashboard" target="_blank" class="btn btn-link">Dashboard →</a>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+version: "1.0"
+name: "Legal Professional"
+description: "Precise, authoritative, and accessible. Clear communication that protects both parties."
+
+tone:
+  summary: "Professional and precise without being intimidating. Authoritative but accessible. Protective without being adversarial."
+  attributes:
+    - name: precise
+      weight: 0.9
+      description: "Exact, unambiguous, technically accurate"
+    - name: professional
+      weight: 0.8
+      description: "Formal, respectful, authoritative"
+    - name: accessible
+      weight: 0.7
+      description: "Plain language where possible, defined terms where necessary"
+    - name: protective
+      weight: 0.6
+      description: "Risk-aware, comprehensive, thorough"
+    - name: neutral
+      weight: 0.7
+      description: "Balanced, objective, non-adversarial"
+
+vocabulary:
+  rules:
+    - preferred: "must"
+      avoid: ["shall"]
+      context: "Obligations - 'shall' is archaic and often misunderstood"
+    - preferred: "may"
+      avoid: ["is permitted to", "is allowed to", "has the right to"]
+      context: "Permissions - keep it simple"
+    - preferred: "if"
+      avoid: ["in the event that", "in the event of", "in case of"]
+      context: "Conditions - plain language"
+    - preferred: "under"
+      avoid: ["pursuant to", "in accordance with"]
+      context: "References - simpler prepositions"
+    - preferred: "about"
+      avoid: ["with respect to", "regarding", "concerning", "in relation to"]
+      context: "Topic references"
+    - preferred: "before"
+      avoid: ["prior to"]
+      context: "Time references"
+    - preferred: "after"
+      avoid: ["subsequent to", "following"]
+      context: "Time references"
+    - preferred: "because"
+      avoid: ["due to the fact that", "by reason of", "on the grounds that"]
+      context: "Causation"
+    - preferred: "to"
+      avoid: ["for the purpose of", "in order to"]
+      context: "Purpose"
+    - preferred: "can"
+      avoid: ["is able to", "has the ability to", "has the capacity to"]
+      context: "Ability"
+    - preferred: "now"
+      avoid: ["at this time", "at the present time", "currently"]
+      context: "Present time"
+    - preferred: "although"
+      avoid: ["notwithstanding the fact that"]
+      context: "Contrast"
+
+  forbidden:
+    - "aforementioned"
+    - "hereinafter"
+    - "hereinbefore"
+    - "hereto"
+    - "hereby"
+    - "herewith"
+    - "thereto"
+    - "thereof"
+    - "therefrom"
+    - "wherefore"
+    - "whereas" # in most contexts
+    - "witnesseth"
+    - "know all men by these presents"
+    - "the party of the first part"
+    - "the party of the second part"
+
+  encouraged:
+    - "you"
+    - "we"
+    - "your"
+    - "our"
+    - defined terms in quotes on first use
+
+doNot:
+  # Legalese that obscures meaning
+  - pattern: "\\bhereinabove\\b"
+    isRegex: true
+    reason: "Archaic legalese - use specific section references instead"
+    severity: error
+    suggestion: "Reference the specific section: 'as described in Section 3'"
+
+  - pattern: "\\bwhereas\\b"
+    isRegex: true
+    reason: "Archaic - use plain language recitals"
+    severity: warning
+    suggestion: "Use 'Background:' section with plain statements"
+
+  # Double/triple negatives
+  - pattern: "not\\s+un"
+    isRegex: true
+    reason: "Double negative obscures meaning"
+    severity: error
+    suggestion: "Use positive statement: 'not unlikely' → 'likely'"
+
+  # Passive voice in obligations
+  - pattern: "\\bshall be\\s+\\w+ed\\b"
+    isRegex: true
+    reason: "Passive voice obscures who must act"
+    severity: warning
+    suggestion: "Name the actor: 'shall be delivered' → 'Seller must deliver'"
+
+  # Vague time references
+  - pattern: "\\b(promptly|reasonable time|timely manner)\\b"
+    isRegex: true
+    reason: "Vague time reference may cause disputes"
+    severity: warning
+    suggestion: "Specify: 'within 30 days' or 'by [date]'"
+
+  # AND/OR ambiguity
+  - pattern: "\\band/or\\b"
+    isRegex: true
+    reason: "Ambiguous - courts interpret inconsistently"
+    severity: error
+    suggestion: "Use 'or' (usually includes 'and') or list alternatives explicitly"
+
+  # Unnecessary formality
+  - pattern: "\\bsaid\\s+(agreement|contract|party|document)\\b"
+    isRegex: true
+    reason: "'Said' is unnecessary - use 'the' or 'this'"
+    severity: warning
+    suggestion: "Replace 'said agreement' with 'this Agreement'"
+
+  # Latin phrases with plain alternatives
+  - pattern: "\\binter alia\\b"
+    isRegex: true
+    reason: "Latin - use English"
+    severity: warning
+    suggestion: "Use 'among other things' or 'including'"
+
+  - pattern: "\\bmutatis mutandis\\b"
+    isRegex: true
+    reason: "Latin - use English"
+    severity: warning
+    suggestion: "Use 'with necessary changes' or spell out what changes"
+
+  - pattern: "\\bpari passu\\b"
+    isRegex: true
+    reason: "Latin - use English"
+    severity: warning
+    suggestion: "Use 'equally' or 'proportionally'"
+
+  # All caps for emphasis
+  - pattern: "[A-Z]{5,}"
+    isRegex: true
+    reason: "ALL CAPS reduces readability"
+    severity: warning
+    suggestion: "Use bold or defined terms instead of ALL CAPS"
+
+examples:
+  - bad: "The Party of the First Part shall, pursuant to the terms and conditions set forth herein, deliver said goods to the Party of the Second Part."
+    good: "The Seller must deliver the goods to the Buyer under this Agreement."
+    explanation: "Plain language with clear actor identification"
+
+  - bad: "IN THE EVENT THAT Licensee fails to make payment, Licensor may terminate this Agreement."
+    good: "If Licensee fails to pay, Licensor may end this Agreement."
+    explanation: "Simpler conditions, no ALL CAPS"
+
+  - bad: "Notwithstanding the foregoing, the provisions of Section 5 shall survive termination."
+    good: "Section 5 continues after this Agreement ends."
+    explanation: "Direct statement without legalese"
+
+  - bad: "The parties agree to resolve disputes in a timely manner."
+    good: "The parties must resolve disputes within 60 days."
+    explanation: "Specific timeframes prevent ambiguity"
+
+constraints:
+  maxSentenceLength: 35
+  maxParagraphLength: 5
+  readingLevel: moderate
+  personPov: second-or-third
+  contractions: discouraged
+  oxfordComma: true
+  definedTerms: capitalize

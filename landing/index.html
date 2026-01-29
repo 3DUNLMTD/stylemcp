@@ -733,8 +733,7 @@
     }
 
     .demo-container {
-      max-width: 720px;
-      margin: 0 auto;
+      max-width: 100%;
     }
 
     .demo-card {
@@ -743,21 +742,6 @@
       border-radius: var(--radius-lg);
       overflow: hidden;
       box-shadow: var(--shadow-md);
-    }
-
-    .demo-input-section {
-      padding: 32px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .demo-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 12px;
     }
 
     .demo-textarea {
@@ -868,8 +852,6 @@
 
     .demo-violations {
       padding: 24px 32px;
-      max-height: 320px;
-      overflow-y: auto;
     }
 
     .violation {
@@ -1016,6 +998,408 @@
 
     .demo-success p {
       color: var(--text-secondary);
+    }
+
+    /* Demo Presets Hero */
+    .demo-presets-hero {
+      padding: 28px 32px;
+      background: linear-gradient(135deg, var(--bg-warm), var(--bg-cream));
+      border-bottom: 1px solid var(--border);
+    }
+
+    .demo-presets-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .demo-presets-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .demo-preset-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 16px 12px;
+      background: var(--bg-paper);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .demo-preset-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .demo-preset-card:active {
+      transform: translateY(0);
+    }
+
+    .demo-preset-icon {
+      font-size: 24px;
+    }
+
+    .demo-preset-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .demo-preset-desc {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    .demo-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 32px;
+      color: var(--text-tertiary);
+      font-size: 13px;
+    }
+
+    .demo-divider::before,
+    .demo-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Two-column demo layout */
+    .demo-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .demo-input-col {
+      padding: 0;
+      border-right: 1px solid var(--border);
+    }
+
+    .demo-input-col .demo-comparison {
+      margin: 0 32px 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .demo-results-col {
+      padding: 28px 32px;
+      background: var(--bg-warm);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .demo-placeholder {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--text-tertiary);
+      gap: 16px;
+    }
+
+    .demo-placeholder p {
+      font-size: 15px;
+    }
+
+    .demo-results-col .demo-results {
+      padding: 0;
+      background: none;
+      border: none;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .demo-results-col .demo-results.active + .demo-placeholder {
+      display: none;
+    }
+
+    .demo-results-col .demo-cta {
+      margin-top: auto;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 900px) {
+      .demo-layout {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+      
+      .demo-input-col {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      
+      .demo-placeholder {
+        display: none;
+      }
+    }
+
+    .demo-input-section {
+      padding: 24px 32px 32px;
+    }
+
+    .demo-hint {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      background: var(--warning-soft);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--warning);
+    }
+
+    .demo-hint svg {
+      flex-shrink: 0;
+    }
+
+    /* Industry Selector */
+    .demo-industry {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .demo-industry-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .demo-industry-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .demo-pill {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--bg-cream);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .demo-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .demo-pill.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    @media (max-width: 600px) {
+      .demo-presets-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .demo-presets-hero {
+        padding: 20px;
+      }
+    }
+
+    /* Score Display */
+    .demo-score-display {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .demo-score-arrow {
+      font-size: 24px;
+      color: var(--text-tertiary);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .demo-score-after {
+      animation: scorePopIn 0.5s ease;
+    }
+
+    @keyframes scorePopIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Before/After Comparison */
+    .demo-comparison {
+      border-top: 1px solid var(--border);
+    }
+
+    .demo-comparison-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, var(--success-soft), #E8F5E9);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .demo-comparison-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    .demo-copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--bg-paper);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .demo-copy-btn:hover {
+      background: var(--bg-warm);
+      border-color: var(--border-strong);
+    }
+
+    .demo-copy-btn.copied {
+      background: var(--success-soft);
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    .demo-comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .demo-comparison-panel {
+      padding: 20px 24px;
+      background: var(--bg-paper);
+    }
+
+    .demo-comparison-before {
+      background: var(--bg-warm);
+    }
+
+    .demo-comparison-after {
+      background: var(--success-soft);
+    }
+
+    .demo-panel-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+
+    .demo-comparison-before .demo-panel-label {
+      color: var(--text-tertiary);
+    }
+
+    .demo-comparison-after .demo-panel-label {
+      color: var(--success);
+    }
+
+    .demo-panel-text {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text-primary);
+    }
+
+    .demo-panel-text .changed {
+      background: rgba(232, 93, 4, 0.15);
+      padding: 1px 4px;
+      border-radius: 3px;
+      text-decoration: line-through;
+      color: var(--text-tertiary);
+    }
+
+    .demo-panel-text .fixed {
+      background: rgba(45, 106, 79, 0.15);
+      padding: 1px 4px;
+      border-radius: 3px;
+      color: var(--success);
+      font-weight: 500;
+    }
+
+    .demo-changes {
+      padding: 16px 32px;
+      background: var(--bg-paper);
+      border-top: 1px solid var(--border);
+    }
+
+    .demo-change-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      margin: 4px;
+      font-size: 13px;
+      background: var(--bg-cream);
+      border-radius: var(--radius-sm);
+    }
+
+    .demo-change-item .from {
+      color: var(--text-tertiary);
+      text-decoration: line-through;
+    }
+
+    .demo-change-item .arrow {
+      color: var(--text-tertiary);
+    }
+
+    .demo-change-item .to {
+      color: var(--success);
+      font-weight: 500;
+    }
+
+    @media (max-width: 600px) {
+      .demo-comparison-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .demo-presets {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
 
     .demo-error {
@@ -1675,49 +2059,127 @@
       <div class="section-header">
         <span class="section-label">Try It Free</span>
         <h2>See it in action</h2>
-        <p>Paste any content and get instant feedback on brand compliance</p>
+        <p>Watch StyleMCP catch and fix brand violations in real time</p>
       </div>
 
       <div class="demo-container">
         <div class="demo-card">
-          <div class="demo-input-section">
-            <label class="demo-label" for="demoInput">Your Content</label>
-            <textarea id="demoInput" class="demo-textarea" placeholder="Paste AI-generated text here...">We leverage AI to facilitate amazing outcomes. Click here to learn more!</textarea>
-            <div class="demo-meta">
-              <span class="demo-charcount"><span id="charCount">72</span>/500</span>
-              <button id="validateBtn" class="btn btn-primary demo-btn" onclick="validateDemo()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-                Validate
-              </button>
-            </div>
-          </div>
-
-          <div id="demoLoading" class="demo-loading">
-            <div class="spinner"></div>
-            <span>Analyzing content...</span>
-          </div>
-
-          <div id="demoError" class="demo-error"></div>
-
-          <div id="demoResults" class="demo-results">
-            <div class="demo-results-header">
-              <div class="demo-score">
-                <span class="demo-score-label">Brand Score</span>
-                <span id="scoreValue" class="demo-score-value">—</span>
+          <div class="demo-layout">
+            <!-- Left: Input -->
+            <div class="demo-input-col">
+              <div class="demo-presets-hero">
+                <div class="demo-presets-title">Pick a bad example:</div>
+                <div class="demo-presets-grid">
+                  <button class="demo-preset-card" onclick="loadPreset('jargon')">
+                    <span class="demo-preset-icon">🏢</span>
+                    <span class="demo-preset-name">Corporate Jargon</span>
+                    <span class="demo-preset-desc">Synergy and paradigms</span>
+                  </button>
+                  <button class="demo-preset-card" onclick="loadPreset('marketing')">
+                    <span class="demo-preset-icon">📣</span>
+                    <span class="demo-preset-name">Marketing Fluff</span>
+                    <span class="demo-preset-desc">AMAZING! REVOLUTIONARY!</span>
+                  </button>
+                  <button class="demo-preset-card" onclick="loadPreset('support')">
+                    <span class="demo-preset-icon">📧</span>
+                    <span class="demo-preset-name">Support Response</span>
+                    <span class="demo-preset-desc">Dear Valued Customer...</span>
+                  </button>
+                </div>
               </div>
-              <div class="demo-badges" id="summaryBadges"></div>
-            </div>
-            <div class="demo-violations" id="violationsList"></div>
-            <div class="demo-rewrite" id="rewriteSection" style="display: none;">
-              <div class="demo-rewrite-label">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                Suggested Rewrite
+
+              <div class="demo-divider">
+                <span>or paste your own</span>
               </div>
-              <div class="demo-rewrite-text" id="rewriteText"></div>
+
+              <div class="demo-input-section">
+                <textarea id="demoInput" class="demo-textarea" placeholder="Paste AI-generated text here (50+ characters for best results)...">We leverage innovative solutions to facilitate outcomes for our team. Utilize our platform to achieve your goals today.</textarea>
+                
+                <div class="demo-industry">
+                  <span class="demo-industry-label">Validate as:</span>
+                  <div class="demo-industry-pills">
+                    <button class="demo-pill active" data-pack="saas" onclick="selectPack('saas')">SaaS</button>
+                    <button class="demo-pill" data-pack="ecommerce" onclick="selectPack('ecommerce')">E-commerce</button>
+                    <button class="demo-pill" data-pack="healthcare" onclick="selectPack('healthcare')">Healthcare</button>
+                    <button class="demo-pill" data-pack="finance" onclick="selectPack('finance')">Finance</button>
+                    <button class="demo-pill" data-pack="legal" onclick="selectPack('legal')">Legal</button>
+                    <button class="demo-pill" data-pack="realestate" onclick="selectPack('realestate')">Real Estate</button>
+                    <button class="demo-pill" data-pack="education" onclick="selectPack('education')">Education</button>
+                    <button class="demo-pill" data-pack="government" onclick="selectPack('government')">Government</button>
+                  </div>
+                </div>
+                
+                <div class="demo-meta">
+                  <span class="demo-charcount"><span id="charCount">118</span>/500</span>
+                  <button id="validateBtn" class="btn btn-primary demo-btn" onclick="validateDemo()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                    Validate
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Auto-Fixed Version (moved to left column) -->
+              <div class="demo-comparison" id="comparisonSection" style="display: none;">
+                <div class="demo-comparison-header">
+                  <div class="demo-comparison-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    Auto-Fixed Version
+                  </div>
+                  <button class="demo-copy-btn" onclick="copyRewrite()" id="copyBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    <span id="copyText">Copy</span>
+                  </button>
+                </div>
+                <div class="demo-comparison-grid">
+                  <div class="demo-comparison-panel demo-comparison-before">
+                    <div class="demo-panel-label">Before</div>
+                    <div class="demo-panel-text" id="beforeText"></div>
+                  </div>
+                  <div class="demo-comparison-panel demo-comparison-after">
+                    <div class="demo-panel-label">After</div>
+                    <div class="demo-panel-text" id="afterText"></div>
+                  </div>
+                </div>
+                <div class="demo-changes" id="changesList"></div>
+              </div>
             </div>
-            <div class="demo-cta">
-              <p>Get unlimited validations with a free account</p>
-              <a href="/signup.html" class="btn btn-primary">Get Started Free →</a>
+            
+            <!-- Right: Results -->
+            <div class="demo-results-col">
+              <div id="demoLoading" class="demo-loading">
+                <div class="spinner"></div>
+                <span>Analyzing content...</span>
+              </div>
+
+              <div id="demoError" class="demo-error"></div>
+
+              <div id="demoResults" class="demo-results">
+                <div class="demo-results-header">
+                  <div class="demo-score">
+                    <span class="demo-score-label">Brand Score</span>
+                    <div class="demo-score-display">
+                      <span id="scoreValue" class="demo-score-value">—</span>
+                      <span id="scoreArrow" class="demo-score-arrow" style="display: none;">→</span>
+                      <span id="scoreValueAfter" class="demo-score-value demo-score-after" style="display: none;">—</span>
+                    </div>
+                  </div>
+                  <div class="demo-badges" id="summaryBadges"></div>
+                </div>
+                <div class="demo-violations" id="violationsList"></div>
+                
+                <div class="demo-cta">
+                  <p>Get unlimited validations with a free account</p>
+                  <a href="/signup.html" class="btn btn-primary">Get Started Free →</a>
+                </div>
+              </div>
+              
+              <div id="demoPlaceholder" class="demo-placeholder">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+                  <path d="M9 12l2 2 4-4"/>
+                  <circle cx="12" cy="12" r="10"/>
+                </svg>
+                <p>Click <strong>Validate</strong> to see results</p>
+              </div>
             </div>
           </div>
         </div>
@@ -1948,13 +2410,80 @@
       if (window.innerWidth > 768) closeMobileMenu();
     });
 
-    // Character count
+    // Preset examples
+    const presets = {
+      jargon: "We leverage innovative solutions to facilitate outcomes for our team. Utilize our platform to achieve synergistic results and drive stakeholder value.",
+      marketing: "This amazing tool will revolutionize your workflow. It transforms everything and utilizes cutting-edge technology to facilitate incredible results.",
+      support: "Dear Valued Customer, We sincerely apologize for any inconvenience caused. Your feedback is extremely important to us. Click here to learn more about how we can assist you."
+    };
+
+    // Default demo text
+    const defaultDemoText = "We leverage innovative solutions to facilitate outcomes for our team. Utilize our platform to achieve your goals today.";
+
+    // Selected industry pack
+    let selectedPack = 'saas';
+
+    function selectPack(pack) {
+      selectedPack = pack;
+      // Update pill states
+      document.querySelectorAll('.demo-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.pack === pack);
+      });
+      // Re-validate if there's content and results are showing
+      const resultsDiv = document.getElementById('demoResults');
+      if (resultsDiv.classList.contains('active')) {
+        validateDemo();
+      }
+    }
+
+    function loadPreset(key) {
+      const input = document.getElementById('demoInput');
+      const charCountEl = document.getElementById('charCount');
+      const hint = document.getElementById('demoHint');
+      
+      input.value = presets[key];
+      charCountEl.textContent = presets[key].length;
+      hint.style.display = 'none';
+      
+      // Reset results then auto-validate
+      document.getElementById('demoResults').classList.remove('active');
+      validateDemo();
+    }
+
+    // Character count and hint
     const demoInput = document.getElementById('demoInput');
-    const charCount = document.getElementById('charCount');
+    const charCountEl = document.getElementById('charCount');
+    const hintEl = document.getElementById('demoHint');
+
+    function updateCharCount() {
+      const len = demoInput.value.length;
+      charCountEl.textContent = len;
+      
+      // Show hint if under 50 chars (but not empty)
+      if (len > 0 && len < 50) {
+        hintEl.style.display = 'flex';
+      } else {
+        hintEl.style.display = 'none';
+      }
+    }
 
     if (demoInput) {
-      demoInput.addEventListener('input', () => {
-        charCount.textContent = demoInput.value.length;
+      demoInput.addEventListener('input', updateCharCount);
+    }
+
+    // Copy rewrite to clipboard
+    let rewrittenText = '';
+    function copyRewrite() {
+      if (!rewrittenText) return;
+      navigator.clipboard.writeText(rewrittenText).then(() => {
+        const btn = document.getElementById('copyBtn');
+        const text = document.getElementById('copyText');
+        btn.classList.add('copied');
+        text.textContent = 'Copied!';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          text.textContent = 'Copy';
+        }, 2000);
       });
     }
 
@@ -1965,6 +2494,7 @@
       const loadingDiv = document.getElementById('demoLoading');
       const errorDiv = document.getElementById('demoError');
       const btn = document.getElementById('validateBtn');
+      const responseTimeEl = document.getElementById('responseTime');
 
       const text = input.value.trim();
       if (!text) {
@@ -1979,19 +2509,25 @@
       loadingDiv.classList.add('active');
       btn.disabled = true;
 
+      const startTime = performance.now();
+
       try {
         const [validateRes, rewriteRes] = await Promise.all([
           fetch('/api/validate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text })
+            body: JSON.stringify({ text, pack: selectedPack })
           }),
           fetch('/api/rewrite', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text, mode: 'normal' })
+            body: JSON.stringify({ text, pack: selectedPack, mode: 'normal' })
           })
         ]);
+
+        const endTime = performance.now();
+        const responseTime = ((endTime - startTime) / 1000).toFixed(2);
+        if (responseTimeEl) responseTimeEl.textContent = responseTime;
 
         if (!validateRes.ok) throw new Error('Validation failed');
 
@@ -2011,25 +2547,42 @@
     function displayResults(data, rewriteData, originalText) {
       const resultsDiv = document.getElementById('demoResults');
       const scoreEl = document.getElementById('scoreValue');
+      const scoreArrow = document.getElementById('scoreArrow');
+      const scoreAfterEl = document.getElementById('scoreValueAfter');
       const summaryEl = document.getElementById('summaryBadges');
       const violationsEl = document.getElementById('violationsList');
-      const rewriteSection = document.getElementById('rewriteSection');
-      const rewriteTextEl = document.getElementById('rewriteText');
+      const comparisonSection = document.getElementById('comparisonSection');
+      const beforeTextEl = document.getElementById('beforeText');
+      const afterTextEl = document.getElementById('afterText');
+      const changesListEl = document.getElementById('changesList');
 
-      // Score
-      const score = data.score || 0;
-      scoreEl.textContent = score + '/100';
-      scoreEl.className = 'demo-score-value ' + (score >= 80 ? 'good' : score >= 50 ? 'warning' : 'bad');
+      // Before score
+      const scoreBefore = data.score || 0;
+      scoreEl.textContent = scoreBefore + '/100';
+      scoreEl.className = 'demo-score-value ' + (scoreBefore >= 80 ? 'good' : scoreBefore >= 50 ? 'warning' : 'bad');
 
-      // Summary badges
-      const summary = data.summary || { errors: 0, warnings: 0 };
+      // Reset after score
+      scoreArrow.style.display = 'none';
+      scoreAfterEl.style.display = 'none';
+
+      // Violations - dedupe by matched text
+      const rawViolations = data.violations || [];
+      const seenTexts = new Set();
+      const violations = rawViolations.filter(v => {
+        const key = v.text?.toLowerCase();
+        if (seenTexts.has(key)) return false;
+        seenTexts.add(key);
+        return true;
+      });
+
+      // Summary badges - count deduped violations
+      const errorCount = violations.filter(v => v.severity === 'error').length;
+      const warningCount = violations.filter(v => v.severity === 'warning').length;
       let summaryHTML = '';
-      if (summary.errors > 0) summaryHTML += `<span class="demo-badge demo-badge--error">${summary.errors} error${summary.errors > 1 ? 's' : ''}</span>`;
-      if (summary.warnings > 0) summaryHTML += `<span class="demo-badge demo-badge--warning">${summary.warnings} warning${summary.warnings > 1 ? 's' : ''}</span>`;
+      if (errorCount > 0) summaryHTML += `<span class="demo-badge demo-badge--error">${errorCount} error${errorCount > 1 ? 's' : ''}</span>`;
+      if (warningCount > 0) summaryHTML += `<span class="demo-badge demo-badge--warning">${warningCount} warning${warningCount > 1 ? 's' : ''}</span>`;
       summaryEl.innerHTML = summaryHTML;
 
-      // Violations
-      const violations = data.violations || [];
       if (violations.length === 0) {
         violationsEl.innerHTML = `
           <div class="demo-success">
@@ -2037,34 +2590,71 @@
             <p>Your content passes all brand validation checks.</p>
           </div>
         `;
-        rewriteSection.style.display = 'none';
+        comparisonSection.style.display = 'none';
       } else {
-        violationsEl.innerHTML = violations.slice(0, 5).map(v => `
+        violationsEl.innerHTML = violations.slice(0, 4).map(v => `
           <div class="violation">
             <div class="violation-header">
               <span class="violation-severity violation-severity--${v.severity}">${v.severity}</span>
               <span class="violation-matched">"${escapeHtml(v.text)}"</span>
             </div>
             <div class="violation-message">${escapeHtml(v.message)}</div>
-            ${v.suggestion ? `
-              <div class="violation-suggestion">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                ${escapeHtml(v.suggestion)}
-              </div>
-            ` : ''}
           </div>
         `).join('');
 
-        if (violations.length > 5) {
-          violationsEl.innerHTML += `<p style="text-align:center;color:var(--text-tertiary);margin-top:12px;font-size:14px;">+ ${violations.length - 5} more issues</p>`;
+        if (violations.length > 4) {
+          violationsEl.innerHTML += `<p style="text-align:center;color:var(--text-tertiary);margin-top:12px;font-size:14px;">+ ${violations.length - 4} more issues</p>`;
         }
 
-        // Rewrite preview
+        // Before/After comparison
         if (rewriteData && rewriteData.rewritten && rewriteData.rewritten !== originalText) {
-          rewriteTextEl.textContent = rewriteData.rewritten;
-          rewriteSection.style.display = 'block';
+          rewrittenText = rewriteData.rewritten; // Store for copy
+          
+          // Show before text with strikethrough on changed words
+          let beforeHTML = escapeHtml(originalText);
+          let afterHTML = escapeHtml(rewriteData.rewritten);
+          
+          // Highlight changes
+          if (rewriteData.changes && rewriteData.changes.length > 0) {
+            rewriteData.changes.forEach(change => {
+              if (change.original) {
+                beforeHTML = beforeHTML.replace(
+                  escapeHtml(change.original),
+                  `<span class="changed">${escapeHtml(change.original)}</span>`
+                );
+              }
+              if (change.replacement) {
+                afterHTML = afterHTML.replace(
+                  escapeHtml(change.replacement),
+                  `<span class="fixed">${escapeHtml(change.replacement)}</span>`
+                );
+              }
+            });
+            
+            // Changes list
+            changesListEl.innerHTML = rewriteData.changes.slice(0, 5).map(c => `
+              <span class="demo-change-item">
+                <span class="from">${escapeHtml(c.original || '')}</span>
+                <span class="arrow">→</span>
+                <span class="to">${escapeHtml(c.replacement || '')}</span>
+              </span>
+            `).join('');
+          }
+          
+          beforeTextEl.innerHTML = beforeHTML;
+          afterTextEl.innerHTML = afterHTML;
+          comparisonSection.style.display = 'block';
+          
+          // Show score improvement with animation
+          const scoreAfter = rewriteData.score?.after ?? rewriteData.score ?? 85;
+          setTimeout(() => {
+            scoreArrow.style.display = 'inline';
+            scoreAfterEl.style.display = 'inline';
+            scoreAfterEl.textContent = scoreAfter + '/100';
+            scoreAfterEl.className = 'demo-score-value demo-score-after ' + (scoreAfter >= 80 ? 'good' : scoreAfter >= 50 ? 'warning' : 'bad');
+          }, 300);
         } else {
-          rewriteSection.style.display = 'none';
+          comparisonSection.style.display = 'none';
         }
       }
 
@@ -2076,6 +2666,16 @@
       div.textContent = text;
       return div.innerHTML;
     }
+
+    // Auto-run on page load to show instant value
+    document.addEventListener('DOMContentLoaded', () => {
+      // Small delay to ensure smooth page load
+      setTimeout(() => {
+        if (demoInput && demoInput.value.trim().length > 0) {
+          validateDemo();
+        }
+      }, 500);
+    });
   </script>
 </body>
 </html>

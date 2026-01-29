@@ -132,6 +132,36 @@ doNot:
     severity: error
     reason: "Poor accessibility and vague"
     suggestion: "Describe the action: 'View account details'"
+  - pattern: "amazing"
+    isRegex: false
+    severity: error
+    reason: "Hyperbolic language inappropriate for financial services"
+    suggestion: "Use measured, factual language"
+  - pattern: "incredible"
+    isRegex: false
+    severity: error
+    reason: "Emotional language undermines financial credibility"
+    suggestion: "Stick to facts and figures"
+  - pattern: "outcomes"
+    isRegex: false
+    severity: warning
+    reason: "Vague - specify financial outcomes with data"
+    suggestion: "Be specific: 'returns', 'yields', 'growth' with actual figures"
+  - pattern: "!"
+    isRegex: false
+    severity: warning
+    reason: "Exclamation marks feel unprofessional in finance"
+    suggestion: "Use periods. Let the numbers speak for themselves."
+  - pattern: "leverage"
+    isRegex: false
+    severity: warning
+    reason: "In finance, 'leverage' has specific meaning (debt/borrowing)"
+    suggestion: "If not referring to financial leverage, use 'use' instead"
+  - pattern: "AI"
+    isRegex: false
+    severity: info
+    reason: "AI in finance requires transparency about decision-making"
+    suggestion: "Clarify how AI is used and that human oversight exists"
 
 examples:
   - bad: "Guaranteed 10% returns on your investment!"

@@ -103,6 +103,36 @@ doNot:
     severity: warning
     reason: "Overused and vague"
     suggestion: "Be specific about what makes it good"
+  - pattern: "incredible"
+    isRegex: false
+    severity: warning
+    reason: "Generic superlative - be specific"
+    suggestion: "Describe the actual benefit: 'soft', 'durable', 'fast'"
+  - pattern: "revolutionary"
+    isRegex: false
+    severity: warning
+    reason: "Overused marketing buzzword"
+    suggestion: "Show don't tell - describe the innovation"
+  - pattern: "leverage"
+    isRegex: false
+    severity: warning
+    reason: "Corporate jargon - keep it conversational"
+    suggestion: "Use 'use' or describe the specific benefit"
+  - pattern: "facilitate"
+    isRegex: false
+    severity: warning
+    reason: "Formal language - e-commerce should be friendly"
+    suggestion: "Use 'help', 'make it easy', or 'let you'"
+  - pattern: "outcomes"
+    isRegex: false
+    severity: warning
+    reason: "Too corporate - focus on customer benefits"
+    suggestion: "Be specific: 'results', 'your look', 'your space'"
+  - pattern: "utilize"
+    isRegex: false
+    severity: warning
+    reason: "Too formal for e-commerce"
+    suggestion: "Use 'use' - simpler is friendlier"
 
 examples:
   - bad: "BUY NOW! Don't miss out on this AMAZING deal!!!"

@@ -1,0 +1,12 @@
+name: realestate
+version: "1.0.0"
+description: "Warm, trustworthy real estate communication. Fair Housing compliant."
+author: StyleMCP
+license: MIT
+
+files:
+  voice: voice.yaml
+
+config:
+  strictMode: false
+  minScore: 50

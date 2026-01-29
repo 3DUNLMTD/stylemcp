@@ -1,0 +1,170 @@
+version: "1.0"
+name: "Education"
+description: "Encouraging, clear, and inclusive. Supporting learners of all backgrounds and abilities."
+
+tone:
+  summary: "Supportive and encouraging without being condescending. Clear and accessible. Inclusive and respectful of diverse learners."
+  attributes:
+    - name: encouraging
+      weight: 0.9
+      description: "Supportive, positive, growth-oriented"
+    - name: clear
+      weight: 0.9
+      description: "Simple, organized, easy to follow"
+    - name: inclusive
+      weight: 0.8
+      description: "Welcoming, accessible, respectful of diversity"
+    - name: patient
+      weight: 0.7
+      description: "Understanding, non-judgmental, supportive of different paces"
+    - name: engaging
+      weight: 0.7
+      description: "Interesting, relevant, motivating"
+
+vocabulary:
+  rules:
+    - preferred: "learn"
+      avoid: ["master", "conquer"]
+      context: "Describing educational goals - competitive language can discourage"
+    - preferred: "practice"
+      avoid: ["drill", "repetition"]
+      context: "Learning activities"
+    - preferred: "explore"
+      avoid: ["study", "examine"]
+      context: "Encouraging curiosity"
+    - preferred: "challenge"
+      avoid: ["problem", "difficulty"]
+      context: "Framing learning obstacles positively"
+    - preferred: "grow"
+      avoid: ["improve", "fix"]
+      context: "Describing progress - growth mindset language"
+    - preferred: "not yet"
+      avoid: ["can't", "unable to", "failed to"]
+      context: "Describing current abilities - growth mindset"
+    - preferred: "different"
+      avoid: ["wrong", "incorrect", "mistaken"]
+      context: "Addressing misconceptions gently"
+    - preferred: "students"
+      avoid: ["pupils", "kids"]
+      context: "Referring to learners - respectful and age-neutral"
+    - preferred: "families"
+      avoid: ["parents"]
+      context: "Inclusive of diverse family structures"
+    - preferred: "guardian"
+      avoid: ["parent"]
+      context: "When singular, use inclusive term"
+
+  forbidden:
+    # Deficit language
+    - "at-risk"
+    - "low-performing"
+    - "struggling student"
+    - "slow learner"
+    - "remedial"
+    - "below grade level"
+    - "achievement gap"
+    
+    # Ableist language
+    - "crazy"
+    - "insane"
+    - "lame"
+    - "dumb"
+    - "blind to" # as metaphor
+    - "deaf to" # as metaphor
+    - "turn a blind eye"
+    - "falls on deaf ears"
+    
+    # Exclusionary
+    - "normal students"
+    - "regular classroom"
+    - "real world"
+    - "inner city"
+    - "urban students"
+    - "disadvantaged"
+    - "underprivileged"
+
+  encouraged:
+    - growth mindset language
+    - specific, actionable feedback
+    - multiple means of engagement
+    - asset-based framing
+    - culturally responsive references
+
+doNot:
+  # Fixed mindset language
+  - pattern: "\\b(smart|gifted|talented|natural)\\s+(student|learner|kid)\\b"
+    isRegex: true
+    reason: "Fixed mindset language - implies ability is innate, not developed"
+    severity: warning
+    suggestion: "Focus on effort and growth: 'hard-working student' or 'dedicated learner'"
+
+  # Gendered assumptions
+  - pattern: "\\b(he or she|his or her|him or her)\\b"
+    isRegex: true
+    reason: "Binary language excludes non-binary students"
+    severity: warning
+    suggestion: "Use 'they/their' or rephrase to avoid pronouns"
+
+  # Single correct answer framing
+  - pattern: "\\bthe (right|correct|only) answer\\b"
+    isRegex: true
+    reason: "May discourage exploration and creative thinking"
+    severity: info
+    suggestion: "Consider 'one possible answer' or 'a strong response'"
+
+  # Comparison to peers
+  - pattern: "\\b(behind|ahead of) (their|other) (peers|classmates)\\b"
+    isRegex: true
+    reason: "Peer comparison can be discouraging"
+    severity: warning
+    suggestion: "Focus on individual growth: 'making progress toward...'"
+
+  # Time pressure
+  - pattern: "\\b(should (already|have)|by now)\\b"
+    isRegex: true
+    reason: "Implies student is behind - can cause anxiety"
+    severity: warning
+    suggestion: "Focus on next steps, not missed milestones"
+
+  # Passive learning
+  - pattern: "\\bstudents will (receive|be given|be taught)\\b"
+    isRegex: true
+    reason: "Passive framing - students should be active participants"
+    severity: info
+    suggestion: "Use active voice: 'students will explore/discover/create'"
+
+  # Jargon without explanation
+  - pattern: "\\b(scaffolding|differentiation|formative assessment)\\b"
+    isRegex: true
+    reason: "Educational jargon may confuse families"
+    severity: info
+    suggestion: "Explain in plain language or define on first use"
+
+examples:
+  - bad: "Students who are struggling should ask for help."
+    good: "If you'd like additional support, your teacher is here to help."
+    explanation: "Removes stigma, invites rather than prescribes"
+
+  - bad: "Smart students will understand this quickly."
+    good: "With practice, you'll build confidence with this concept."
+    explanation: "Growth mindset, effort-focused"
+
+  - bad: "Parents should review homework nightly."
+    good: "Families can support learning by reviewing homework together."
+    explanation: "Inclusive of diverse family structures, collaborative tone"
+
+  - bad: "He or she should bring their materials to class."
+    good: "Students should bring their materials to class."
+    explanation: "Gender-inclusive language"
+
+  - bad: "Your child is behind grade level in reading."
+    good: "Your child is working toward grade-level reading goals. Here's how we'll support their growth..."
+    explanation: "Asset-based framing with clear next steps"
+
+constraints:
+  maxSentenceLength: 25
+  maxParagraphLength: 4
+  readingLevel: accessible
+  personPov: second-person
+  contractions: allowed
+  oxfordComma: true

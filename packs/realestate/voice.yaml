@@ -1,0 +1,170 @@
+version: "1.0"
+name: "Real Estate Professional"
+description: "Warm, trustworthy, and informative. Building relationships while maintaining professionalism."
+
+tone:
+  summary: "Friendly and approachable while maintaining professionalism. Enthusiastic without being pushy. Informative and transparent."
+  attributes:
+    - name: warm
+      weight: 0.8
+      description: "Personable, welcoming, relationship-focused"
+    - name: trustworthy
+      weight: 0.9
+      description: "Honest, transparent, reliable"
+    - name: knowledgeable
+      weight: 0.8
+      description: "Expert, informative, helpful"
+    - name: professional
+      weight: 0.7
+      description: "Respectful, appropriate, competent"
+    - name: responsive
+      weight: 0.7
+      description: "Attentive, prompt, available"
+
+vocabulary:
+  rules:
+    - preferred: "home"
+      avoid: ["property", "unit", "dwelling"]
+      context: "Residential - 'home' is warmer"
+    - preferred: "neighborhood"
+      avoid: ["area", "locale", "vicinity"]
+      context: "Location references"
+    - preferred: "features"
+      avoid: ["amenities", "attributes", "characteristics"]
+      context: "Describing homes"
+    - preferred: "price"
+      avoid: ["asking price", "list price"]
+      context: "Keep it simple unless distinction matters"
+    - preferred: "recently updated"
+      avoid: ["renovated", "refurbished", "remodeled"]
+      context: "Unless specifying scope of work"
+    - preferred: "spacious"
+      avoid: ["expansive", "voluminous", "capacious"]
+      context: "Size descriptions"
+    - preferred: "cozy"
+      avoid: ["intimate", "compact", "efficient"]
+      context: "Smaller space descriptions - be honest but positive"
+    - preferred: "move-in ready"
+      avoid: ["turnkey"]
+      context: "Condition descriptions"
+
+  forbidden:
+    # Overused/meaningless terms
+    - "dream home"
+    - "must see"
+    - "won't last"
+    - "priced to sell"
+    - "motivated seller"
+    - "bring all offers"
+    - "rare opportunity"
+    - "once in a lifetime"
+    - "unique opportunity"
+    - "best kept secret"
+    - "hidden gem"
+    - "charming" # overused to point of meaningless
+    - "quaint"
+    
+    # Potentially discriminatory
+    - "exclusive neighborhood"
+    - "prestigious area"
+    - "up and coming"
+    - "urban pioneer"
+    - "master bedroom" # use "primary bedroom"
+    - "master suite"
+    - "man cave"
+    - "mother-in-law suite" # use "guest suite" or "ADU"
+    
+    # Pressure tactics
+    - "act fast"
+    - "don't miss out"
+    - "last chance"
+    - "hurry"
+    - "limited time"
+
+  encouraged:
+    - specific square footage
+    - year built
+    - recent updates with years
+    - school district names
+    - walkability details
+    - natural light descriptions
+
+doNot:
+  # Vague superlatives
+  - pattern: "\\b(best|greatest|finest|most beautiful)\\b"
+    isRegex: true
+    reason: "Unsubstantiated superlatives hurt credibility"
+    severity: warning
+    suggestion: "Be specific: 'best views' → 'unobstructed mountain views'"
+
+  # ALL CAPS for emphasis
+  - pattern: "[A-Z]{4,}"
+    isRegex: true
+    reason: "ALL CAPS feels like shouting"
+    severity: error
+    suggestion: "Use normal capitalization"
+
+  # Exclamation overuse
+  - pattern: "!{2,}"
+    isRegex: true
+    reason: "Multiple exclamation marks are unprofessional"
+    severity: error
+    suggestion: "Use single exclamation sparingly, or period"
+
+  # Price anchoring pressure
+  - pattern: "\\b(below market|steal|bargain)\\b"
+    isRegex: true
+    reason: "Price pressure tactics erode trust"
+    severity: warning
+    suggestion: "Let the price speak for itself with comparable data"
+
+  # Fake urgency
+  - pattern: "\\b(multiple offers|bidding war)\\b"
+    isRegex: true
+    reason: "Creating artificial urgency can backfire"
+    severity: warning
+    suggestion: "If true, state factually without pressure language"
+
+  # Fair Housing concerns
+  - pattern: "\\b(perfect for (families|singles|retirees|young professionals))\\b"
+    isRegex: true
+    reason: "May imply preference for certain groups - Fair Housing concern"
+    severity: error
+    suggestion: "Describe the home's features, not ideal occupants"
+
+  - pattern: "\\b(walking distance to church|near synagogue|close to mosque)\\b"
+    isRegex: true
+    reason: "Religious references may violate Fair Housing"
+    severity: error
+    suggestion: "Describe proximity to amenities generally"
+
+  - pattern: "\\b(safe neighborhood|low crime)\\b"
+    isRegex: true
+    reason: "Safety claims can have discriminatory implications"
+    severity: warning
+    suggestion: "Provide crime statistics from official sources if relevant"
+
+examples:
+  - bad: "MUST SEE!! This STUNNING home won't last! Dream home in exclusive neighborhood!"
+    good: "This 3-bedroom home in Riverside features hardwood floors throughout and a recently updated kitchen (2024). The backyard includes a covered patio."
+    explanation: "Specific details beat superlatives and pressure"
+
+  - bad: "Perfect starter home for young couples!"
+    good: "This 1,200 sq ft home includes 2 bedrooms, 1 bath, and a fenced backyard."
+    explanation: "Describe features, not ideal buyers"
+
+  - bad: "Charming and quaint cottage in up-and-coming area."
+    good: "1920s bungalow with original built-ins in Cedar Park. Recent updates include new roof (2023) and HVAC (2024)."
+    explanation: "Specific details and dates build credibility"
+
+  - bad: "Master suite with his and hers closets."
+    good: "Primary bedroom with two walk-in closets and ensuite bathroom."
+    explanation: "Inclusive language"
+
+constraints:
+  maxSentenceLength: 30
+  maxParagraphLength: 4
+  readingLevel: accessible
+  personPov: second-person
+  contractions: allowed
+  oxfordComma: true
