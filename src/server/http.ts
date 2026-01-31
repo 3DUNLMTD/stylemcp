@@ -182,10 +182,26 @@ app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', version: '0.1.4' });
 });
 
-// Simple in-memory rate limiter for demo endpoint
+// Simple in-memory rate limiter for demo endpoint with automatic cleanup
 const demoRateLimiter = new Map<string, { count: number; resetAt: number }>();
 const DEMO_LIMIT = 10; // 10 requests per hour
 const DEMO_WINDOW = 60 * 60 * 1000; // 1 hour
+const CLEANUP_INTERVAL = 5 * 60 * 1000; // Clean up every 5 minutes
+
+// Periodic cleanup of expired rate limit entries to prevent memory bloat
+setInterval(() => {
+  const now = Date.now();
+  let cleaned = 0;
+  for (const [ip, record] of demoRateLimiter) {
+    if (record.resetAt < now) {
+      demoRateLimiter.delete(ip);
+      cleaned++;
+    }
+  }
+  if (cleaned > 0 && process.env.NODE_ENV !== 'production') {
+    console.log(`[RateLimit] Cleaned ${cleaned} expired entries, ${demoRateLimiter.size} active`);
+  }
+}, CLEANUP_INTERVAL).unref(); // unref() allows process to exit cleanly
 
 function checkDemoRateLimit(ip: string): { allowed: boolean; remaining: number; resetAt: number } {
   const now = Date.now();
