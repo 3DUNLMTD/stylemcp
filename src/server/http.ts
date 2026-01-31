@@ -693,7 +693,6 @@ app.post('/api/suggest-ctas', authMiddleware, async (req: Request, res: Response
 
 // Create Stripe checkout session
 // NOTE: This endpoint requires authMiddleware to prevent unauthorized access.
-// The userId should be validated against the authenticated session in production.
 app.post('/api/checkout', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (!isBillingEnabled()) {
@@ -701,17 +700,17 @@ app.post('/api/checkout', authMiddleware, async (req: Request, res: Response) =>
       return;
     }
 
-    const { userId, tier } = req.body;
+    // SECURITY: Use authenticated user's ID, not client-provided userId
+    const userId = req.user?.id;
+    const { tier } = req.body;
 
-    if (!userId || !tier) {
-      res.status(400).json({ error: 'Missing userId or tier' });
+    if (!userId) {
+      res.status(401).json({ error: 'Authentication required' });
       return;
     }
 
-    // Validate userId format (UUID)
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(userId)) {
-      res.status(400).json({ error: 'Invalid userId format' });
+    if (!tier) {
+      res.status(400).json({ error: 'Missing tier' });
       return;
     }
 
@@ -739,7 +738,6 @@ app.post('/api/checkout', authMiddleware, async (req: Request, res: Response) =>
 
 // Create Stripe customer portal session
 // NOTE: This endpoint requires authMiddleware to prevent unauthorized access.
-// The userId should be validated against the authenticated session in production.
 app.post('/api/billing/portal', authMiddleware, async (req: Request, res: Response) => {
   try {
     if (!isBillingEnabled()) {
@@ -747,17 +745,11 @@ app.post('/api/billing/portal', authMiddleware, async (req: Request, res: Respon
       return;
     }
 
-    const { userId } = req.body;
+    // SECURITY: Use authenticated user's ID, not client-provided userId
+    const userId = req.user?.id;
 
     if (!userId) {
-      res.status(400).json({ error: 'Missing userId' });
-      return;
-    }
-
-    // Validate userId format (UUID)
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(userId)) {
-      res.status(400).json({ error: 'Invalid userId format' });
+      res.status(401).json({ error: 'Authentication required' });
       return;
     }
 
