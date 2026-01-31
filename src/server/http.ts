@@ -5,6 +5,7 @@ import cors from 'cors';
 import { loadPack, getPacksDirectory, listAvailablePacks } from '../utils/pack-loader.js';
 import { validate } from '../validator/index.js';
 import { rewrite, rewriteMinimal, rewriteAggressive, formatChanges, aiRewrite, isAIRewriteAvailable, estimateAIRewriteCost } from '../rewriter/index.js';
+import { learnVoice, generatePackFiles, isLearnVoiceAvailable } from '../learn/index.js';
 import { Pack } from '../schema/index.js';
 import { join } from 'path';
 import crypto from 'crypto';
@@ -449,6 +450,75 @@ app.get('/api/rewrite/ai/status', authMiddleware, (_req: Request, res: Response)
       outputPer1M: 1.25,
       currency: 'USD',
     },
+  });
+});
+
+// Learn My Voice - analyze samples to generate custom style pack (Pro+ feature)
+app.post('/api/learn', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const { samples, brandName, industry, context } = req.body;
+
+    if (!samples || !Array.isArray(samples) || samples.length === 0) {
+      res.status(400).json({ error: 'Missing or invalid "samples" array - provide at least one text sample' });
+      return;
+    }
+
+    if (!brandName || typeof brandName !== 'string') {
+      res.status(400).json({ error: 'Missing or invalid "brandName" field' });
+      return;
+    }
+
+    // Validate samples
+    const validSamples = samples.filter(s => typeof s === 'string' && s.trim().length > 0);
+    if (validSamples.length === 0) {
+      res.status(400).json({ error: 'No valid text samples provided' });
+      return;
+    }
+
+    if (!isLearnVoiceAvailable()) {
+      res.status(503).json({
+        error: 'Voice learning is not configured on this server',
+        hint: 'Set ANTHROPIC_API_KEY environment variable to enable voice learning'
+      });
+      return;
+    }
+
+    // Learn voice from samples
+    const learned = await learnVoice({
+      samples: validSamples,
+      brandName,
+      industry,
+      context,
+    });
+
+    // Generate YAML files
+    const files = generatePackFiles(learned);
+
+    res.json({
+      packName: learned.packName,
+      displayName: learned.displayName,
+      manifest: learned.manifest,
+      voice: learned.voice,
+      analysis: learned.analysis,
+      files: {
+        manifestYaml: files.manifest,
+        voiceYaml: files.voice,
+      },
+    });
+  } catch (error) {
+    console.error('Learn voice error:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+});
+
+// Check learn availability
+app.get('/api/learn/status', authMiddleware, (_req: Request, res: Response) => {
+  res.json({
+    available: isLearnVoiceAvailable(),
+    model: 'claude-3-5-sonnet-20241022',
+    minSamples: 1,
+    recommendedSamples: 5,
+    maxSamplesPerRequest: 20,
   });
 });
 

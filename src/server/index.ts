@@ -11,6 +11,7 @@ import {
 import { loadPack, getPacksDirectory, listAvailablePacks } from '../utils/pack-loader.js';
 import { validate } from '../validator/index.js';
 import { rewrite, rewriteMinimal, rewriteAggressive, formatChanges, aiRewrite, isAIRewriteAvailable, estimateAIRewriteCost } from '../rewriter/index.js';
+import { learnVoice, generatePackFiles, isLearnVoiceAvailable } from '../learn/index.js';
 import { Pack } from '../schema/index.js';
 import { join } from 'path';
 
@@ -212,6 +213,33 @@ function createServer(): Server {
           inputSchema: {
             type: 'object',
             properties: {},
+          },
+        },
+        {
+          name: 'learn_voice',
+          description: 'Analyze sample content to generate a custom style pack. Provide text samples from your brand to extract voice rules, tone, vocabulary preferences, and patterns. Pro+ feature.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              samples: {
+                type: 'array',
+                items: { type: 'string' },
+                description: 'Array of text samples from your brand (minimum 1, recommended 5+)',
+              },
+              brandName: {
+                type: 'string',
+                description: 'Name of the brand/company',
+              },
+              industry: {
+                type: 'string',
+                description: 'Industry for context (e.g., saas, healthcare, finance)',
+              },
+              context: {
+                type: 'string',
+                description: 'Additional context about the brand voice',
+              },
+            },
+            required: ['samples', 'brandName'],
           },
         },
       ],
@@ -484,6 +512,47 @@ function createServer(): Server {
               {
                 type: 'text',
                 text: JSON.stringify({ available_packs: packs }, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'learn_voice': {
+          if (!args || !Array.isArray(args.samples) || args.samples.length === 0) {
+            throw new Error('Missing required "samples" array with at least one text sample');
+          }
+          if (!args.brandName || typeof args.brandName !== 'string') {
+            throw new Error('Missing required "brandName" string');
+          }
+
+          if (!isLearnVoiceAvailable()) {
+            throw new Error('Voice learning requires ANTHROPIC_API_KEY environment variable');
+          }
+
+          const learned = await learnVoice({
+            samples: args.samples as string[],
+            brandName: args.brandName as string,
+            industry: args.industry as string,
+            context: args.context as string,
+          });
+
+          const files = generatePackFiles(learned);
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  packName: learned.packName,
+                  displayName: learned.displayName,
+                  manifest: learned.manifest,
+                  voice: learned.voice,
+                  analysis: learned.analysis,
+                  files: {
+                    manifestYaml: files.manifest,
+                    voiceYaml: files.voice,
+                  },
+                }, null, 2),
               },
             ],
           };
