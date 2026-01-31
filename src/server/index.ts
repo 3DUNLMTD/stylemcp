@@ -29,6 +29,12 @@ async function ensurePack(packName?: string): Promise<Pack> {
     return currentPack;
   }
 
+  // Security: Validate pack name against whitelist to prevent path traversal
+  const availablePacks = await listAvailablePacks();
+  if (!availablePacks.includes(targetPack)) {
+    throw new Error(`Pack not found: ${targetPack}. Available packs: ${availablePacks.join(', ')}`);
+  }
+
   const packPath = join(getPacksDirectory(), targetPack);
   const result = await loadPack({ packPath });
 
