@@ -24,7 +24,7 @@ export function checkVoiceRules(text: string, voice: Voice): Violation[] {
  */
 function checkForbiddenWords(text: string, forbidden: string[]): Violation[] {
   const violations: Violation[] = [];
-  const lowerText = text.toLowerCase();
+  // Note: lowerText was unused, word matching uses case-insensitive regex
 
   for (const word of forbidden) {
     const lowerWord = word.toLowerCase();

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { validate, ValidateOptions } from './index.js';
+import { validate } from './index.js';
 import { Pack } from '../schema/index.js';
 
 // Minimal test pack for validation testing

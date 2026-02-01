@@ -141,6 +141,7 @@ async function getPack(packName: string): Promise<Pack> {
   return result.pack;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function getPackWithWarnings(packName: string): Promise<CachedPack> {
   if (packCache.has(packName)) {
     return packCache.get(packName)!;

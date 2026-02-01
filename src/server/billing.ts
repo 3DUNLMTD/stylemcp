@@ -206,7 +206,7 @@ export async function handleStripeWebhook(
 
   try {
     event = stripeClient.webhooks.constructEvent(payload, signature, STRIPE_WEBHOOK_SECRET);
-  } catch (err) {
+  } catch {
     return { success: false, error: `Webhook signature verification failed` };
   }
 

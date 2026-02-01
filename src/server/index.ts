@@ -415,7 +415,7 @@ function createServer(): Server {
           const pack = await ensurePack(args?.pack as string);
           const category = args?.category as string;
 
-          let data: any = {
+          const data: any = {
             guidelines: pack.ctaRules.guidelines,
             categories: pack.ctaRules.categories,
             antiPatterns: pack.ctaRules.antiPatterns,

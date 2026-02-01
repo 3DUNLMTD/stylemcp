@@ -1,4 +1,4 @@
-import { Pack, RewriteResult, Violation, ValidationResult } from '../schema/index.js';
+import { Pack, RewriteResult } from '../schema/index.js';
 import { validate } from '../validator/index.js';
 
 // Re-export AI rewriter

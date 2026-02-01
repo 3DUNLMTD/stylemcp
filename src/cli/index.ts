@@ -7,7 +7,7 @@ import { join } from 'path';
 import { loadPack, getPacksDirectory, listAvailablePacks } from '../utils/pack-loader.js';
 import { validate } from '../validator/index.js';
 import { rewrite, formatChanges, generateDiff } from '../rewriter/index.js';
-import { Pack, ValidationResult, Violation } from '../schema/index.js';
+import { ValidationResult } from '../schema/index.js';
 
 const program = new Command();
 
