@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Status – StyleMCP</title>
+  <meta name="description" content="Real-time status and uptime information for StyleMCP services.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-cream: #FAF8F5;
+      --bg-paper: #FFFFFF;
+      --bg-warm: #F5F2ED;
+      --bg-dark: #1A1918;
+      --text-primary: #1A1918;
+      --text-secondary: #5C5856;
+      --text-tertiary: #8A8684;
+      --text-inverse: #FAF8F5;
+      --accent: #E85D04;
+      --border: #E8E4DF;
+      --border-strong: #D4CFC8;
+      --shadow-md: 0 4px 12px rgba(26, 25, 24, 0.08);
+      --radius-md: 12px;
+      --font-serif: 'Instrument Serif', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+    }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-sans); background: var(--bg-cream); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+
+    .layout { display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-paper);
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      position: fixed;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      z-index: 50;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      margin-right: -12px;
+      padding-right: 12px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar { width: 4px; }
+    .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+    .nav-section { margin-bottom: 24px; }
+
+    .nav-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-tertiary);
+      padding: 0 12px;
+      margin-bottom: 10px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 12px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      margin-bottom: 4px;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .nav-link:hover { background: var(--bg-warm); color: var(--text-primary); }
+
+    .nav-link.active { background: var(--accent-soft); color: var(--accent); }
+
+    .nav-link.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 20px;
+      background: var(--accent);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .nav-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      margin-left: 260px;
+      padding: 48px;
+      min-height: 100vh;
+    }
+
+    .main-content {
+      max-width: 780px;
+    }
+
+    /* Status */
+    .status-banner { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding: 12px 16px; background: var(--bg-warm); border: 1px solid var(--border); border-radius: var(--radius-md); }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+    .status-text { font-weight: 500; color: var(--text-secondary); }
+
+    .service-list { list-style: none; margin: 0; padding: 0; }
+    .service-list-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 8px; }
+    .service-list-item:last-child { border-bottom: none; }
+    .service-name { font-weight: 600; }
+    .service-status { display: flex; align-items: center; gap: 8px; }
+    .service-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+    .service-dot.error { background: var(--error); }
+    .service-status-text { font-size: 14px; color: var(--success); font-weight: 500; }
+    .service-status-text.error { color: var(--error); }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .sidebar-nav::-webkit-scrollbar { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="sidebar-logo">
+          <div class="logo-icon">S</div>
+          <span>StyleMCP</span>
+        </a>
+      </div>
+
+      <div class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-label">Overview</div>
+          <a href="/dashboard.html" class="nav-link">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+            Dashboard
+          </a>
+          <a href="/docs.html" class="nav-link">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            Documentation
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">Account</div>
+          <a href="/pricing.html" class="nav-link">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+            Billing
+          </a>
+          <a href="/status.html" class="nav-link active">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            API Status
+          </a>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-card">
+          <div class="user-avatar" id="userAvatar">?</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">...</div>
+          </div>
+        </div>
+        <button class="btn-logout" id="logoutBtn" onclick="handleLogout()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </nav>
+
+    <main class="main">
+      <div id="status" class="main-content">
+        <h1>Service Status</h1>
+        <div class="status-banner">
+          <div class="status-dot"></div>
+          <div class="status-text">All Systems Operational</div>
+        </div>
+        <ul class="service-list">
+          <li class="service-list-item">
+            <div class="service-name">API</div>
+            <div class="service-status">
+              <div class="service-dot"></div>
+              <div class="service-status-text">Operational</div>
+            </div>
+          </li>
+          <li class="service-list-item">
+            <div class="service-name">Dashboard</div>
+            <div class="service-status">
+              <div class="service-dot"></div>
+              <div class="service-status-text">Operational</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Supabase client
+    const sb = window.supabase.createClient(
+      'https://orbliwjewqlnnutykozw.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yYmxpd2pld3Fsbm51dHlrb3p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNzE5MTEsImV4cCI6MjA4NDg0NzkxMX0.z2xrGw-3UqOHTQ28g7b83vBsavt9rDDP61MKo9I_ZSQ'
+    );
+
+    let currentUser = null;
+
+    async function init() {
+      // Check for session
+      const { data: { session }, error } = await sb.auth.getSession();
+
+      if (error || !session) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      currentUser = session.user;
+
+      // Update user card
+      document.getElementById('userName').textContent = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User';
+      document.getElementById('userEmail').textContent = currentUser.email || '';
+      document.getElementById('userAvatar').textContent = (currentUser.email || 'U')[0].toUpperCase();
+    }
+
+    async function handleLogout() {
+      try {
+        await sb.auth.signOut();
+        window.location.href = '/login.html';
+      } catch (err) {
+        console.error('Logout error:', err);
+        // Force redirect anyway
+        window.location.href = '/login.html';
+      }
+    }
+
+    // Initialize
+    init();
+  </script>
+</body>
+</html>
