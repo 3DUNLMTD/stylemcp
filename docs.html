@@ -32,13 +32,10 @@
       --warning-soft: #FFF3CD;
       --error: #9D0208;
       --error-soft: #FFE5E5;
-      --info: #1D4ED8;
-      --info-soft: #DBEAFE;
       --border: #E8E4DF;
       --border-strong: #D4CFC8;
       --shadow-sm: 0 1px 2px rgba(26, 25, 24, 0.04);
       --shadow-md: 0 4px 12px rgba(26, 25, 24, 0.08);
-      --shadow-lg: 0 12px 40px rgba(26, 25, 24, 0.12);
       --radius-sm: 6px;
       --radius-md: 12px;
       --radius-lg: 20px;
@@ -50,10 +47,111 @@
     html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
     body { font-family: var(--font-sans); background: var(--bg-cream); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
 
-    .layout { display: flex; min-height: 100vh; }
+    /* ===== PUBLIC LAYOUT (not logged in) ===== */
+    .public-layout { display: block; }
+    .public-layout .public-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(250, 248, 245, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+    }
+    .public-layout .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+    .public-layout .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+    .public-layout .logo-mark {
+      width: 40px;
+      height: 40px;
+      background: var(--bg-dark);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-style: italic;
+      color: var(--text-inverse);
+    }
+    .public-layout .logo-text {
+      font-weight: 600;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+    .public-layout .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .public-layout .nav-link {
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+    }
+    .public-layout .nav-link:hover { color: var(--text-primary); background: var(--bg-warm); }
+    .public-layout .nav-link.active { color: var(--accent); background: var(--accent-soft); }
+    .public-layout .nav-cta {
+      margin-left: 8px;
+      padding: 10px 20px;
+      background: var(--bg-dark);
+      color: var(--text-inverse);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+    }
+    .public-layout .nav-cta:hover { background: var(--accent); }
 
-    /* Sidebar */
-    .sidebar {
+    .public-layout .docs-wrapper {
+      padding-top: 72px;
+      display: flex;
+      max-width: 1200px;
+      margin: 0 auto;
+      min-height: calc(100vh - 72px);
+    }
+    .public-layout .docs-sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      background: var(--bg-paper);
+      border-right: 1px solid var(--border);
+      padding: 32px 24px;
+      position: sticky;
+      top: 72px;
+      height: calc(100vh - 72px);
+      overflow-y: auto;
+    }
+    .public-layout .docs-main {
+      flex: 1;
+      padding: 48px;
+      max-width: calc(1200px - 260px);
+    }
+
+    /* ===== AUTHENTICATED LAYOUT (logged in) ===== */
+    .auth-layout { display: none; min-height: 100vh; }
+    .auth-layout.active { display: flex; }
+    .public-layout.hidden { display: none; }
+
+    .auth-layout .sidebar {
       width: 260px;
       background: var(--bg-paper);
       border-right: 1px solid var(--border);
@@ -118,7 +216,7 @@
       margin-bottom: 10px;
     }
 
-    .nav-link {
+    .sidebar-nav .nav-link {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -133,11 +231,10 @@
       position: relative;
     }
 
-    .nav-link:hover { background: var(--bg-warm); color: var(--text-primary); }
+    .sidebar-nav .nav-link:hover { background: var(--bg-warm); color: var(--text-primary); }
+    .sidebar-nav .nav-link.active { background: var(--accent-soft); color: var(--accent); }
 
-    .nav-link.active { background: var(--accent-soft); color: var(--accent); }
-
-    .nav-link.active::before {
+    .sidebar-nav .nav-link.active::before {
       content: '';
       position: absolute;
       left: 0;
@@ -149,7 +246,7 @@
       border-radius: 0 2px 2px 0;
     }
 
-    .nav-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .sidebar-nav .nav-link svg { width: 18px; height: 18px; flex-shrink: 0; }
 
     /* Expandable submenu */
     .nav-submenu {
@@ -237,40 +334,24 @@
     .btn-logout:hover { background: var(--error-soft); border-color: var(--error); color: var(--error); }
     .btn-logout svg { width: 16px; height: 16px; }
 
-    /* Main content */
-    .main {
+    .auth-layout .main {
       flex: 1;
       margin-left: 260px;
       padding: 48px;
       min-height: 100vh;
     }
 
-    .main-content {
+    /* ===== SHARED STYLES ===== */
+    .main-content, .docs-content {
       max-width: 780px;
     }
 
-    /* Loading state */
-    .loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 50vh;
-      gap: 16px;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .loading-text { color: var(--text-secondary); font-size: 14px; }
+    /* Sidebar section styles (for public docs sidebar) */
+    .sidebar-section { margin-bottom: 28px; }
+    .sidebar-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 12px; padding-left: 12px; }
+    .sidebar-link { display: block; padding: 10px 12px; color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-sm); margin-bottom: 2px; transition: all 0.2s; }
+    .sidebar-link:hover { background: var(--bg-warm); color: var(--text-primary); }
+    .sidebar-link.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 
     /* Typography */
     h1 { font-family: var(--font-serif); font-size: 40px; font-weight: 400; margin-bottom: 16px; letter-spacing: -0.02em; }
@@ -286,13 +367,13 @@
     li { margin-bottom: 10px; }
     li code { background: var(--bg-warm); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.88em; color: var(--text-primary); }
 
-    .main-content a { color: var(--accent); text-decoration: none; }
-    .main-content a:hover { text-decoration: underline; }
+    .main-content a, .docs-content a { color: var(--accent); text-decoration: none; }
+    .main-content a:hover, .docs-content a:hover { text-decoration: underline; }
 
     /* Code blocks */
     .code-block { background: var(--bg-ink); border-radius: var(--radius-md); margin: 28px 0; overflow: hidden; box-shadow: var(--shadow-md); }
     .code-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255, 255, 255, 0.06); font-size: 12px; color: rgba(255, 255, 255, 0.4); font-family: var(--font-mono); }
-    .code-body { padding: 20px; font-family: var(--font-mono); font-size: 14px; overflow-x: auto; line-height: 1.7; color: rgba(255, 255, 255, 0.85); }
+    .code-body { padding: 20px; font-family: var(--font-mono); font-size: 14px; overflow-x: auto; line-height: 1.7; color: rgba(255, 255, 255, 0.85); white-space: pre; }
     .code-body .comment { color: #6b7280; }
     .code-body .string { color: #98C379; }
     .code-body .key { color: #E9967A; }
@@ -320,13 +401,71 @@
 
     /* Responsive */
     @media (max-width: 768px) {
-      .sidebar { display: none; }
-      .main { margin-left: 0; padding: 24px; }
+      .public-layout .docs-sidebar { display: none; }
+      .public-layout .docs-main { padding: 24px; max-width: 100%; }
+      .auth-layout .sidebar { display: none; }
+      .auth-layout .main { margin-left: 0; padding: 24px; }
     }
   </style>
 </head>
 <body>
-  <div class="layout">
+  <!-- PUBLIC LAYOUT (shown when not logged in) -->
+  <div class="public-layout" id="publicLayout">
+    <nav class="public-nav">
+      <div class="nav-inner">
+        <a href="/" class="logo">
+          <div class="logo-mark">S</div>
+          <span class="logo-text">StyleMCP</span>
+        </a>
+        <div class="nav-links">
+          <a href="/#features" class="nav-link">Features</a>
+          <a href="/docs.html" class="nav-link active">Docs</a>
+          <a href="/pricing.html" class="nav-link">Pricing</a>
+          <a href="/blog.html" class="nav-link">Blog</a>
+          <a href="/login.html" class="nav-link">Login</a>
+          <a href="/signup.html" class="nav-cta">Get Started</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="docs-wrapper">
+      <aside class="docs-sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-title">Getting Started</div>
+          <a href="#introduction" class="sidebar-link active">Introduction</a>
+          <a href="#quick-start" class="sidebar-link">Quick Start</a>
+          <a href="#authentication" class="sidebar-link">Authentication</a>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-title">API Reference</div>
+          <a href="#validate" class="sidebar-link">Validate Text</a>
+          <a href="#rewrite" class="sidebar-link">Rewrite Text</a>
+          <a href="#batch" class="sidebar-link">Batch Operations</a>
+          <a href="#packs" class="sidebar-link">Style Packs</a>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-title">Integrations</div>
+          <a href="#mcp" class="sidebar-link">MCP Server</a>
+          <a href="#cli" class="sidebar-link">CLI</a>
+          <a href="#github-action" class="sidebar-link">GitHub Action</a>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-title">Advanced</div>
+          <a href="#custom-packs" class="sidebar-link">Custom Packs</a>
+          <a href="#self-hosting" class="sidebar-link">Self-Hosting</a>
+        </div>
+      </aside>
+
+      <main class="docs-main">
+        <div class="docs-content" id="docsContent">
+          <!-- Docs content will be here -->
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATED LAYOUT (shown when logged in) -->
+  <div class="auth-layout" id="authLayout">
     <nav class="sidebar">
       <div class="sidebar-header">
         <a href="/" class="sidebar-logo">
@@ -390,7 +529,7 @@
             <div class="user-email" id="userEmail">...</div>
           </div>
         </div>
-        <button class="btn-logout" id="logoutBtn" onclick="handleLogout()">
+        <button class="btn-logout" onclick="handleLogout()">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
           Sign Out
         </button>
@@ -398,36 +537,39 @@
     </nav>
 
     <main class="main">
-      <div id="loading" class="loading">
-        <div class="spinner"></div>
-        <div class="loading-text">Loading documentation...</div>
+      <div class="main-content" id="authDocsContent">
+        <!-- Docs content will be cloned here -->
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Documentation content (shared between layouts)
+    const docsHTML = `
+      <h1 id="introduction">Documentation</h1>
+      <p class="lead">StyleMCP validates and rewrites AI-generated text to match your brand voice. Use it as an API, MCP server, CLI, or GitHub Action.</p>
+
+      <div class="callout info">
+        <p><strong>New to StyleMCP?</strong> Start with the <a href="#quick-start">Quick Start</a> guide to make your first API call in under 2 minutes.</p>
       </div>
 
-      <div id="content" class="main-content" style="display: none;">
-        <h1 id="introduction">Documentation</h1>
-        <p class="lead">StyleMCP validates and rewrites AI-generated text to match your brand voice. Use it as an API, MCP server, CLI, or GitHub Action.</p>
+      <h2 id="quick-start">Quick Start</h2>
+      <p>The fastest way to try StyleMCP is with a simple cURL request. No signup required for the demo endpoint.</p>
 
-        <div class="callout info">
-          <p><strong>New to StyleMCP?</strong> Start with the <a href="#quick-start">Quick Start</a> guide to make your first API call in under 2 minutes.</p>
-        </div>
-
-        <h2 id="quick-start">Quick Start</h2>
-        <p>The fastest way to try StyleMCP is with a simple cURL request. No signup required for the demo endpoint.</p>
-
-        <div class="code-block">
-          <div class="code-header">Terminal</div>
-          <div class="code-body">curl -X POST https://stylemcp.com/api/validate \
-  -H "Content-Type: application/json" \
+      <div class="code-block">
+        <div class="code-header">Terminal</div>
+        <div class="code-body">curl -X POST https://stylemcp.com/api/validate \\
+  -H "Content-Type: application/json" \\
   -d '{
     "text": "We are pleased to inform you that...",
     "pack": "saas"
   }'</div>
-        </div>
+      </div>
 
-        <h3>Response</h3>
-        <div class="code-block">
-          <div class="code-header">JSON</div>
-          <div class="code-body">{
+      <h3>Response</h3>
+      <div class="code-block">
+        <div class="code-header">JSON</div>
+        <div class="code-body">{
   <span class="key">"valid"</span>: <span class="boolean">false</span>,
   <span class="key">"score"</span>: <span class="number">72</span>,
   <span class="key">"violations"</span>: [
@@ -438,131 +580,85 @@
     }
   ]
 }</div>
-        </div>
+      </div>
 
-        <h2 id="authentication">Authentication</h2>
-        <p>For production use, you'll need an API key. Find yours in your <a href="/dashboard.html">dashboard</a>.</p>
+      <h2 id="authentication">Authentication</h2>
+      <p>For production use, you'll need an API key. Find yours in your <a href="/dashboard.html">dashboard</a>.</p>
 
-        <div class="code-block">
-          <div class="code-header">Terminal</div>
-          <div class="code-body">curl -X POST https://stylemcp.com/api/validate \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
+      <div class="code-block">
+        <div class="code-header">Terminal</div>
+        <div class="code-body">curl -X POST https://stylemcp.com/api/validate \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
   -d '{"text": "Your text here", "pack": "saas"}'</div>
-        </div>
+      </div>
 
-        <h2 id="validate">Validate Text</h2>
-        <p>Check text against your brand voice rules without modifying it.</p>
+      <h2 id="validate">Validate Text</h2>
+      <p>Check text against your brand voice rules without modifying it.</p>
 
-        <div class="endpoint">
-          <span class="method post">POST</span>
-          <code>/api/validate</code>
-        </div>
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <code>/api/validate</code>
+      </div>
 
-        <h3>Request Body</h3>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-            </thead>
-            <tbody>
-              <tr><td><code>text</code></td><td>string</td><td>The text to validate (required)</td></tr>
-              <tr><td><code>pack</code></td><td>string</td><td>Style pack ID (default: "saas")</td></tr>
-              <tr><td><code>strict</code></td><td>boolean</td><td>Enable strict mode for more violations</td></tr>
-            </tbody>
-          </table>
-        </div>
+      <h3>Request Body</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>text</code></td><td>string</td><td>The text to validate (required)</td></tr>
+            <tr><td><code>pack</code></td><td>string</td><td>Style pack ID (default: "saas")</td></tr>
+            <tr><td><code>strict</code></td><td>boolean</td><td>Enable strict mode for more violations</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-        <h2 id="rewrite">Rewrite Text</h2>
-        <p>Automatically fix violations and rewrite text to match your brand voice. <strong>Pro plan required.</strong></p>
+      <h2 id="rewrite">Rewrite Text</h2>
+      <p>Automatically fix violations and rewrite text to match your brand voice. <strong>Pro plan required.</strong></p>
 
-        <div class="endpoint">
-          <span class="method post">POST</span>
-          <code>/api/rewrite</code>
-        </div>
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <code>/api/rewrite</code>
+      </div>
 
-        <div class="code-block">
-          <div class="code-header">Terminal</div>
-          <div class="code-body">curl -X POST https://stylemcp.com/api/rewrite \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "text": "We are pleased to inform you that your account has been activated.",
-    "pack": "saas"
-  }'</div>
-        </div>
+      <h2 id="batch">Batch Operations</h2>
+      <p>Validate or rewrite multiple texts in a single request.</p>
 
-        <h3>Response</h3>
-        <div class="code-block">
-          <div class="code-header">JSON</div>
-          <div class="code-body">{
-  <span class="key">"original"</span>: <span class="string">"We are pleased to inform you that your account has been activated."</span>,
-  <span class="key">"rewritten"</span>: <span class="string">"Your account is now active."</span>,
-  <span class="key">"changes"</span>: <span class="number">2</span>
-}</div>
-        </div>
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <code>/api/batch/validate</code>
+      </div>
 
-        <h2 id="batch">Batch Operations</h2>
-        <p>Validate or rewrite multiple texts in a single request.</p>
+      <h2 id="packs">Style Packs</h2>
+      <p>StyleMCP includes pre-built style packs for common industries:</p>
 
-        <div class="endpoint">
-          <span class="method post">POST</span>
-          <code>/api/batch/validate</code>
-        </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Pack ID</th><th>Industry</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>saas</code></td><td>SaaS / Tech</td><td>Modern, friendly, professional tech writing</td></tr>
+            <tr><td><code>healthcare</code></td><td>Healthcare</td><td>Empathetic, clear, compliant medical content</td></tr>
+            <tr><td><code>finance</code></td><td>Finance</td><td>Trustworthy, precise financial communication</td></tr>
+            <tr><td><code>ecommerce</code></td><td>E-commerce</td><td>Persuasive, benefit-focused product copy</td></tr>
+            <tr><td><code>legal</code></td><td>Legal</td><td>Formal, precise legal writing</td></tr>
+            <tr><td><code>realestate</code></td><td>Real Estate</td><td>Warm, descriptive property content</td></tr>
+            <tr><td><code>education</code></td><td>Education</td><td>Clear, encouraging educational content</td></tr>
+            <tr><td><code>government</code></td><td>Government</td><td>Accessible, transparent public communication</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-        <div class="code-block">
-          <div class="code-header">JSON Request</div>
-          <div class="code-body">{
-  <span class="key">"texts"</span>: [
-    <span class="string">"First text to check"</span>,
-    <span class="string">"Second text to check"</span>,
-    <span class="string">"Third text to check"</span>
-  ],
-  <span class="key">"pack"</span>: <span class="string">"saas"</span>
-}</div>
-        </div>
+      <h2 id="mcp">MCP Server</h2>
+      <p>Use StyleMCP as an MCP server in Claude Desktop, Cursor, or any MCP-compatible client.</p>
 
-        <h2 id="packs">Style Packs</h2>
-        <p>StyleMCP includes pre-built style packs for common industries:</p>
-
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr><th>Pack ID</th><th>Industry</th><th>Description</th></tr>
-            </thead>
-            <tbody>
-              <tr><td><code>saas</code></td><td>SaaS / Tech</td><td>Modern, friendly, professional tech writing</td></tr>
-              <tr><td><code>healthcare</code></td><td>Healthcare</td><td>Empathetic, clear, compliant medical content</td></tr>
-              <tr><td><code>finance</code></td><td>Finance</td><td>Trustworthy, precise financial communication</td></tr>
-              <tr><td><code>ecommerce</code></td><td>E-commerce</td><td>Persuasive, benefit-focused product copy</td></tr>
-              <tr><td><code>legal</code></td><td>Legal</td><td>Formal, precise legal writing</td></tr>
-              <tr><td><code>realestate</code></td><td>Real Estate</td><td>Warm, descriptive property content</td></tr>
-              <tr><td><code>education</code></td><td>Education</td><td>Clear, encouraging educational content</td></tr>
-              <tr><td><code>government</code></td><td>Government</td><td>Accessible, transparent public communication</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="endpoint">
-          <span class="method get">GET</span>
-          <code>/api/packs</code>
-        </div>
-
-        <h2 id="mcp">MCP Server</h2>
-        <p>Use StyleMCP as an MCP server in Claude Desktop, Cursor, or any MCP-compatible client.</p>
-
-        <h3>Installation</h3>
-        <div class="code-block">
-          <div class="code-header">Terminal</div>
-          <div class="code-body">npx stylemcp</div>
-        </div>
-
-        <h3>Claude Desktop Configuration</h3>
-        <p>Add to your <code>claude_desktop_config.json</code>:</p>
-
-        <div class="code-block">
-          <div class="code-header">JSON</div>
-          <div class="code-body">{
+      <h3>Claude Desktop Configuration</h3>
+      <div class="code-block">
+        <div class="code-header">JSON</div>
+        <div class="code-body">{
   <span class="key">"mcpServers"</span>: {
     <span class="key">"stylemcp"</span>: {
       <span class="key">"command"</span>: <span class="string">"npx"</span>,
@@ -573,29 +669,26 @@
     }
   }
 }</div>
-        </div>
+      </div>
 
-        <h2 id="cli">CLI</h2>
-        <p>Validate and rewrite text from the command line.</p>
+      <h2 id="cli">CLI</h2>
+      <p>Validate and rewrite text from the command line.</p>
 
-        <div class="code-block">
-          <div class="code-header">Terminal</div>
-          <div class="code-body"><span class="comment"># Validate a file</span>
+      <div class="code-block">
+        <div class="code-header">Terminal</div>
+        <div class="code-body"><span class="comment"># Validate a file</span>
 npx stylemcp validate README.md --pack saas
 
 <span class="comment"># Rewrite text</span>
-echo "We are pleased to inform you" | npx stylemcp rewrite --pack saas
+echo "We are pleased to inform you" | npx stylemcp rewrite --pack saas</div>
+      </div>
 
-<span class="comment"># Check multiple files</span>
-npx stylemcp validate src/**/*.md --pack saas</div>
-        </div>
+      <h2 id="github-action">GitHub Action</h2>
+      <p>Automatically review copy in pull requests.</p>
 
-        <h2 id="github-action">GitHub Action</h2>
-        <p>Automatically review copy in pull requests.</p>
-
-        <div class="code-block">
-          <div class="code-header">.github/workflows/style-check.yml</div>
-          <div class="code-body">name: Style Check
+      <div class="code-block">
+        <div class="code-header">.github/workflows/style-check.yml</div>
+        <div class="code-body">name: Style Check
 on: [pull_request]
 
 jobs:
@@ -605,19 +698,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: stylemcp/action@v1
         with:
-          api-key: ${{ secrets.STYLEMCP_API_KEY }}
-          pack: saas
-          paths: |
-            docs/**/*.md
-            src/**/*.tsx</div>
-        </div>
+          api-key: \${{ secrets.STYLEMCP_API_KEY }}
+          pack: saas</div>
+      </div>
 
-        <h2 id="custom-packs">Custom Packs</h2>
-        <p>Create your own style pack with custom rules. Contact us for Team plan access.</p>
+      <h2 id="custom-packs">Custom Packs</h2>
+      <p>Create your own style pack with custom rules.</p>
 
-        <div class="code-block">
-          <div class="code-header">voice.yaml</div>
-          <div class="code-body">name: My Brand Voice
+      <div class="code-block">
+        <div class="code-header">voice.yaml</div>
+        <div class="code-body">name: My Brand Voice
 description: Custom voice for my company
 
 tone:
@@ -628,41 +718,26 @@ vocabulary:
   forbidden:
     - synergy
     - leverage
-    - circle back
   preferred:
-    utilize: use
-    endeavor: try
-    
-patterns:
-  doNot:
-    - ^Dear Sir or Madam
-    - We are pleased to</div>
-        </div>
-
-        <h2 id="self-hosting">Self-Hosting</h2>
-        <p>Run StyleMCP on your own infrastructure for complete data control.</p>
-
-        <div class="code-block">
-          <div class="code-header">Terminal</div>
-          <div class="code-body"><span class="comment"># Clone the repository</span>
-git clone https://github.com/3DUNLMTD/stylemcp
-cd stylemcp
-
-<span class="comment"># Install dependencies</span>
-npm install
-
-<span class="comment"># Start the server</span>
-npm run start</div>
-        </div>
-
-        <div class="callout warning">
-          <p><strong>Note:</strong> AI-powered rewrites require an Anthropic API key. Set <code>ANTHROPIC_API_KEY</code> in your environment.</p>
-        </div>
+    utilize: use</div>
       </div>
-    </main>
-  </div>
 
-  <script>
+      <h2 id="self-hosting">Self-Hosting</h2>
+      <p>Run StyleMCP on your own infrastructure for complete data control.</p>
+
+      <div class="code-block">
+        <div class="code-header">Terminal</div>
+        <div class="code-body">git clone https://github.com/3DUNLMTD/stylemcp
+cd stylemcp
+npm install
+npm run start</div>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Note:</strong> AI-powered rewrites require an Anthropic API key. Set <code>ANTHROPIC_API_KEY</code> in your environment.</p>
+      </div>
+    `;
+
     // Supabase client
     const sb = window.supabase.createClient(
       'https://orbliwjewqlnnutykozw.supabase.co',
@@ -672,24 +747,25 @@ npm run start</div>
     let currentUser = null;
 
     async function init() {
+      // Insert docs content into both layouts
+      document.getElementById('docsContent').innerHTML = docsHTML;
+      document.getElementById('authDocsContent').innerHTML = docsHTML;
+
       // Check for session
       const { data: { session }, error } = await sb.auth.getSession();
       
-      if (error || !session) {
-        window.location.href = '/login.html';
-        return;
+      if (session && !error) {
+        // User is logged in - show authenticated layout
+        currentUser = session.user;
+        document.getElementById('publicLayout').classList.add('hidden');
+        document.getElementById('authLayout').classList.add('active');
+        
+        // Update user card
+        document.getElementById('userName').textContent = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User';
+        document.getElementById('userEmail').textContent = currentUser.email || '';
+        document.getElementById('userAvatar').textContent = (currentUser.email || 'U')[0].toUpperCase();
       }
-
-      currentUser = session.user;
-      
-      // Update user card
-      document.getElementById('userName').textContent = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User';
-      document.getElementById('userEmail').textContent = currentUser.email || '';
-      document.getElementById('userAvatar').textContent = (currentUser.email || 'U')[0].toUpperCase();
-
-      // Show content
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('content').style.display = 'block';
+      // If not logged in, public layout is already visible
 
       // Set up hash navigation highlighting
       updateActiveLink();
@@ -698,6 +774,11 @@ npm run start</div>
 
     function updateActiveLink() {
       const hash = window.location.hash || '#introduction';
+      // Update public sidebar
+      document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === hash);
+      });
+      // Update auth sidebar
       document.querySelectorAll('.nav-sublink').forEach(link => {
         link.classList.toggle('active', link.getAttribute('href') === hash);
       });
@@ -706,11 +787,10 @@ npm run start</div>
     async function handleLogout() {
       try {
         await sb.auth.signOut();
-        window.location.href = '/login.html';
+        window.location.reload();
       } catch (err) {
         console.error('Logout error:', err);
-        // Force redirect anyway
-        window.location.href = '/login.html';
+        window.location.reload();
       }
     }
 
