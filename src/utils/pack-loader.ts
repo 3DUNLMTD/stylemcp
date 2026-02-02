@@ -120,45 +120,53 @@ export async function loadPack(options: LoadPackOptions): Promise<PackLoadResult
 
   const files = manifest.files;
 
-  // Load each component
-  let voice: Voice;
-  let copyPatterns: CopyPatterns;
-  let ctaRules: CTARules;
-  let tokens: Tokens;
-  let tests: TestSuite;
+  // Load all pack components in parallel for faster initial loads
+  const [voiceResult, copyPatternsResult, ctaRulesResult, tokensResult, testsResult] = await Promise.allSettled([
+    loadYamlFile(join(packPath, files.voice), VoiceSchema),
+    loadYamlFile(join(packPath, files.copyPatterns), CopyPatternsSchema),
+    loadYamlFile(join(packPath, files.ctaRules), CTARulesSchema),
+    loadJsonFile(join(packPath, files.tokens), TokensSchema),
+    loadYamlFile(join(packPath, files.tests), TestSuiteSchema),
+  ]);
 
-  try {
-    voice = await loadYamlFile(join(packPath, files.voice), VoiceSchema);
-  } catch (err) {
-    errors.push(`Failed to load voice: ${err instanceof Error ? err.message : err}`);
+  // Extract results with fallbacks for failures
+  let voice: Voice;
+  if (voiceResult.status === 'fulfilled') {
+    voice = voiceResult.value;
+  } else {
+    errors.push(`Failed to load voice: ${voiceResult.reason instanceof Error ? voiceResult.reason.message : voiceResult.reason}`);
     voice = VoiceSchema.parse({ name: 'default', tone: { attributes: [] }, vocabulary: { rules: [] } });
   }
 
-  try {
-    copyPatterns = await loadYamlFile(join(packPath, files.copyPatterns), CopyPatternsSchema);
-  } catch (err) {
-    errors.push(`Failed to load copy patterns: ${err instanceof Error ? err.message : err}`);
+  let copyPatterns: CopyPatterns;
+  if (copyPatternsResult.status === 'fulfilled') {
+    copyPatterns = copyPatternsResult.value;
+  } else {
+    errors.push(`Failed to load copy patterns: ${copyPatternsResult.reason instanceof Error ? copyPatternsResult.reason.message : copyPatternsResult.reason}`);
     copyPatterns = CopyPatternsSchema.parse({ name: 'default', patterns: [] });
   }
 
-  try {
-    ctaRules = await loadYamlFile(join(packPath, files.ctaRules), CTARulesSchema);
-  } catch (err) {
-    errors.push(`Failed to load CTA rules: ${err instanceof Error ? err.message : err}`);
+  let ctaRules: CTARules;
+  if (ctaRulesResult.status === 'fulfilled') {
+    ctaRules = ctaRulesResult.value;
+  } else {
+    errors.push(`Failed to load CTA rules: ${ctaRulesResult.reason instanceof Error ? ctaRulesResult.reason.message : ctaRulesResult.reason}`);
     ctaRules = CTARulesSchema.parse({ name: 'default', categories: [] });
   }
 
-  try {
-    tokens = await loadJsonFile(join(packPath, files.tokens), TokensSchema);
-  } catch (err) {
-    errors.push(`Failed to load tokens: ${err instanceof Error ? err.message : err}`);
+  let tokens: Tokens;
+  if (tokensResult.status === 'fulfilled') {
+    tokens = tokensResult.value;
+  } else {
+    errors.push(`Failed to load tokens: ${tokensResult.reason instanceof Error ? tokensResult.reason.message : tokensResult.reason}`);
     tokens = TokensSchema.parse({ name: 'default' });
   }
 
-  try {
-    tests = await loadYamlFile(join(packPath, files.tests), TestSuiteSchema);
-  } catch (err) {
-    errors.push(`Failed to load tests: ${err instanceof Error ? err.message : err}`);
+  let tests: TestSuite;
+  if (testsResult.status === 'fulfilled') {
+    tests = testsResult.value;
+  } else {
+    errors.push(`Failed to load tests: ${testsResult.reason instanceof Error ? testsResult.reason.message : testsResult.reason}`);
     tests = TestSuiteSchema.parse({ name: 'default', tests: [] });
   }
 

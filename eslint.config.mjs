@@ -23,6 +23,14 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', 'landing/**', 'action/**', '*.js'],
+    ignores: [
+      'dist/**', 
+      'node_modules/**', 
+      'landing/**', 
+      'action/**', 
+      'extensions/**',
+      '*.js',
+      'eslint.config.mjs'
+    ],
   }
 );
