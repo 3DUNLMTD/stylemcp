@@ -281,6 +281,25 @@ function checkDemoRateLimit(ip: string): { allowed: boolean; remaining: number; 
   return { allowed: true, remaining: DEMO_LIMIT - record.count, resetAt: record.resetAt };
 }
 
+// Input limits (defense in depth)
+const MAX_TEXT_CHARS = Number(process.env.MAX_TEXT_CHARS || 20000);
+const MAX_BATCH_ITEMS = Number(process.env.MAX_BATCH_ITEMS || 50);
+const MAX_LEARN_SAMPLES = Number(process.env.MAX_LEARN_SAMPLES || 20);
+
+function enforceMaxLen(args: {
+  value: string;
+  field: string;
+  max: number;
+  res: Response;
+}): boolean {
+  const { value, field, max, res } = args;
+  if (value.length > max) {
+    res.status(400).json({ error: `${field} too long (max ${max} characters)` });
+    return false;
+  }
+  return true;
+}
+
 // Public demo endpoint - try without signup (rate limited)
 app.post('/api/demo/validate', async (req: Request, res: Response) => {
   try {
@@ -376,6 +395,10 @@ app.post('/api/validate', authMiddleware, async (req: Request, res: Response) =>
       return;
     }
 
+    if (!enforceMaxLen({ value: text, field: 'text', max: MAX_TEXT_CHARS, res })) {
+      return;
+    }
+
     let selectedPack = packName;
     let voiceContext = context;
     let selectionInfo = null;
@@ -425,9 +448,20 @@ app.post('/api/validate/batch', authMiddleware, async (req: Request, res: Respon
       return;
     }
 
+    if (items.length > MAX_BATCH_ITEMS) {
+      res.status(400).json({ error: `Too many items (max ${MAX_BATCH_ITEMS})` });
+      return;
+    }
+
     const invalidIndex = items.findIndex((item: { text?: unknown }) => !item || typeof item.text !== 'string');
     if (invalidIndex !== -1) {
       res.status(400).json({ error: `Invalid item at index ${invalidIndex}: missing or invalid "text"` });
+      return;
+    }
+
+    const tooLongIndex = items.findIndex((item: { text?: unknown }) => typeof item?.text === 'string' && item.text.length > MAX_TEXT_CHARS);
+    if (tooLongIndex !== -1) {
+      res.status(400).json({ error: `Item at index ${tooLongIndex} exceeds max length (${MAX_TEXT_CHARS} characters)` });
       return;
     }
 
@@ -468,6 +502,10 @@ app.post('/api/rewrite', authMiddleware, async (req: Request, res: Response) => 
 
     if (!text || typeof text !== 'string') {
       res.status(400).json({ error: 'Missing or invalid "text" field' });
+      return;
+    }
+
+    if (!enforceMaxLen({ value: text, field: 'text', max: MAX_TEXT_CHARS, res })) {
       return;
     }
 
@@ -552,6 +590,10 @@ app.post('/api/rewrite/ai', authMiddleware, async (req: Request, res: Response) 
       return;
     }
 
+    if (!enforceMaxLen({ value: text, field: 'text', max: MAX_TEXT_CHARS, res })) {
+      return;
+    }
+
     // Check if AI rewriting is available
     if (!isAIRewriteAvailable()) {
       res.status(503).json({ 
@@ -628,6 +670,10 @@ app.post('/api/ai-output/validate', authMiddleware, async (req: Request, res: Re
       return;
     }
 
+    if (!enforceMaxLen({ value: content, field: 'content', max: MAX_TEXT_CHARS, res })) {
+      return;
+    }
+
     const validator = new AIOutputValidator();
     const result = await validator.validate({
       content,
@@ -653,6 +699,11 @@ app.post('/api/learn', authMiddleware, async (req: Request, res: Response) => {
       return;
     }
 
+    if (samples.length > MAX_LEARN_SAMPLES) {
+      res.status(400).json({ error: `Too many samples (max ${MAX_LEARN_SAMPLES})` });
+      return;
+    }
+
     if (!brandName || typeof brandName !== 'string') {
       res.status(400).json({ error: 'Missing or invalid "brandName" field' });
       return;
@@ -660,6 +711,12 @@ app.post('/api/learn', authMiddleware, async (req: Request, res: Response) => {
 
     // Validate samples
     const validSamples = samples.filter(s => typeof s === 'string' && s.trim().length > 0);
+
+    const sampleTooLong = validSamples.findIndex(s => s.length > MAX_TEXT_CHARS);
+    if (sampleTooLong !== -1) {
+      res.status(400).json({ error: `Sample at index ${sampleTooLong} exceeds max length (${MAX_TEXT_CHARS} characters)` });
+      return;
+    }
     if (validSamples.length === 0) {
       res.status(400).json({ error: 'No valid text samples provided' });
       return;
@@ -1046,6 +1103,10 @@ app.post('/api/validate/stream', authMiddleware, async (req: Request, res: Respo
       return;
     }
 
+    if (!enforceMaxLen({ value: text, field: 'text', max: MAX_TEXT_CHARS, res })) {
+      return;
+    }
+
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -1252,6 +1313,11 @@ app.post('/api/mcp/call', authMiddleware, async (req: Request, res: Response) =>
           res.status(400).json({ error: 'Missing or invalid "text" field' });
           return;
         }
+
+        if (!enforceMaxLen({ value: args.text, field: 'text', max: MAX_TEXT_CHARS, res })) {
+          return;
+        }
+
         const pack = await getPack(args?.pack || 'saas');
         const result = validate({
           pack,
@@ -1267,6 +1333,11 @@ app.post('/api/mcp/call', authMiddleware, async (req: Request, res: Response) =>
           res.status(400).json({ error: 'Missing or invalid "text" field' });
           return;
         }
+
+        if (!enforceMaxLen({ value: args.text, field: 'text', max: MAX_TEXT_CHARS, res })) {
+          return;
+        }
+
         const pack = await getPack(args?.pack || 'saas');
         const mode = args?.mode || 'normal';
         const options = {
