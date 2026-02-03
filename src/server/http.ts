@@ -19,6 +19,8 @@ import {
   createPortalSession,
   isBillingEnabled
 } from './billing.js';
+// FIXED: Import proper billing-aware auth middleware
+import { authMiddleware as authMiddleware, usageLogger } from './middleware/auth.js';
 
 const app = express();
 
@@ -60,6 +62,8 @@ app.use(requireHttps);
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.STYLEMCP_API_KEY || '';
 const GITHUB_WEBHOOK_SECRET = process.env.GITHUB_WEBHOOK_SECRET || '';
+// FIXED: Trust proxy for proper header handling behind nginx
+app.set('trust proxy', true);
 
 // IMPORTANT: Webhook routes with raw body parsing must be registered BEFORE express.json()
 
@@ -212,7 +216,13 @@ async function getPackWithWarnings(packName: string): Promise<CachedPack> {
 }
 
 // Optional API key authentication with timing-safe comparison
-function authMiddleware(req: Request, res: Response, next: NextFunction): void {
+// FIXED: Proxy-aware base URL construction
+function getBaseUrl(req: Request): string {
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const host = req.headers['x-forwarded-host'] || req.get('host');
+  return `${protocol}://${host}`;
+}
+function legacyAuthMiddleware(req: Request, res: Response, next: NextFunction): void {
   if (!API_KEY) {
     // No API key configured, allow all requests
     next();
@@ -901,8 +911,8 @@ app.post('/api/checkout', authMiddleware, async (req: Request, res: Response) =>
       return;
     }
 
-    const successUrl = `${req.protocol}://${req.get('host')}/dashboard.html?checkout=success`;
-    const cancelUrl = `${req.protocol}://${req.get('host')}/pricing.html?checkout=cancelled`;
+    const successUrl = `${getBaseUrl(req)}/dashboard.html?checkout=success`;
+    const cancelUrl = `${getBaseUrl(req)}/pricing.html?checkout=cancelled`;
 
     const checkoutUrl = await createCheckoutSession(userId, tier, successUrl, cancelUrl);
 
@@ -935,7 +945,7 @@ app.post('/api/billing/portal', authMiddleware, async (req: Request, res: Respon
       return;
     }
 
-    const returnUrl = `${req.protocol}://${req.get('host')}/dashboard.html`;
+    const returnUrl = `${getBaseUrl(req)}/dashboard.html`;
     const portalUrl = await createPortalSession(userId, returnUrl);
 
     if (!portalUrl) {
