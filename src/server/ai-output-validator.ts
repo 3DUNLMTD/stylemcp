@@ -6,6 +6,8 @@
  */
 
 import { validate } from '../validator/index.js';
+import type { Pack, ValidationResult } from '../schema/index.js';
+import type { VoiceContext } from '../utils/voice-context.js';
 import { VoiceContextManager } from '../utils/voice-context.js';
 
 export interface AIOutputValidationRequest {
@@ -36,7 +38,7 @@ export interface AIOutputValidationResult {
   /** Whether this content meets brand standards */
   compliant: boolean;
   /** Detailed validation results */
-  validation: any; // From existing validator
+  validation: ValidationResult; // From existing validator
   /** AI-specific concerns */
   aiConcerns: AIOutputConcern[];
   /** Recommended improvements */
@@ -150,7 +152,7 @@ export class AIOutputValidator {
   private async analyzeAIConcerns(
     content: string, 
     context: AIOutputValidationRequest['context'] | undefined,
-    pack: any
+    pack: Pack
   ): Promise<AIOutputConcern[]> {
     const concerns: AIOutputConcern[] = [];
 
@@ -196,11 +198,11 @@ export class AIOutputValidator {
     return concerns;
   }
 
-  private checkToneConsistency(content: string, pack: any): AIOutputConcern[] {
+  private checkToneConsistency(content: string, pack: Pack): AIOutputConcern[] {
     const concerns: AIOutputConcern[] = [];
 
     // Check if content matches pack's tone attributes
-    const toneAttributes = pack.voice?.tone?.attributes || [];
+    const toneAttributes = (pack.voice?.tone?.attributes || []).map(attribute => attribute.name);
     const _contentLower = content.toLowerCase();
 
     // Check for overly formal language when casual tone is expected
@@ -285,7 +287,7 @@ export class AIOutputValidator {
     return concerns;
   }
 
-  private checkVoiceDrift(content: string, _pack: any): AIOutputConcern[] {
+  private checkVoiceDrift(content: string, _pack: Pack): AIOutputConcern[] {
     const concerns: AIOutputConcern[] = [];
 
     // Check for generic AI assistant patterns that don't match brand voice
@@ -309,7 +311,7 @@ export class AIOutputValidator {
     return concerns;
   }
 
-  private calculateComplianceScore(validation: any, aiConcerns: AIOutputConcern[]): number {
+  private calculateComplianceScore(validation: ValidationResult, aiConcerns: AIOutputConcern[]): number {
     let baseScore = validation.score || 70;
 
     // Deduct points for AI-specific concerns
@@ -334,9 +336,9 @@ export class AIOutputValidator {
   }
 
   private generateRecommendations(
-    validation: any, 
+    validation: ValidationResult, 
     aiConcerns: AIOutputConcern[],
-    context: string
+    context: VoiceContext
   ): string[] {
     const recommendations: string[] = [];
 
@@ -358,7 +360,7 @@ export class AIOutputValidator {
     }
 
     // Add context-specific recommendations
-    const contextTips = this.voiceManager.getContextualTips(context as any);
+    const contextTips = this.voiceManager.getContextualTips(context);
     if (contextTips.length > 0) {
       recommendations.push(`For ${context} content: ${contextTips[0]}`);
     }
@@ -368,7 +370,7 @@ export class AIOutputValidator {
 
   private async generateRewrite(
     content: string,
-    _pack: any,
+    _pack: Pack,
     _concerns: AIOutputConcern[]
   ): Promise<{ content: string; changes: string[] }> {
     // This is a simplified rewrite - in production, this would call the AI rewriter

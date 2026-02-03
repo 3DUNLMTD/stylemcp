@@ -8,6 +8,8 @@ import { loadPack, getPacksDirectory, listAvailablePacks } from '../utils/pack-l
 import { validate } from '../validator/index.js';
 import { rewrite, rewriteMinimal, rewriteAggressive, formatChanges, aiRewrite, isAIRewriteAvailable, estimateAIRewriteCost } from '../rewriter/index.js';
 import { learnVoice, generatePackFiles, isLearnVoiceAvailable } from '../learn/index.js';
+import type { LearnedVoice } from '../learn/index.js';
+import type { VoiceSample } from '../learn/voice-analyzer.js';
 import { AIOutputValidator } from './ai-output-validator.js';
 import { Pack } from '../schema/index.js';
 import { join } from 'path';
@@ -17,8 +19,10 @@ import {
   createCheckoutSession,
   handleStripeWebhook,
   createPortalSession,
-  isBillingEnabled
+  isBillingEnabled,
+  tierHasAIAccess
 } from './billing.js';
+import type { VoiceContext } from '../utils/voice-context.js';
 // FIXED: Import proper billing-aware auth middleware
 import { authMiddleware as authMiddleware, usageLogger } from './middleware/auth.js';
 
@@ -62,8 +66,113 @@ app.use(requireHttps);
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.STYLEMCP_API_KEY || '';
 const GITHUB_WEBHOOK_SECRET = process.env.GITHUB_WEBHOOK_SECRET || '';
-// FIXED: Trust proxy for proper header handling behind nginx
-app.set('trust proxy', true);
+// Trust only loopback proxies by default to prevent header spoofing
+app.set('trust proxy', process.env.TRUST_PROXY || 'loopback');
+
+const MAX_TEXT_LENGTH = Number.parseInt(process.env.MAX_TEXT_LENGTH || '20000', 10);
+const MAX_CONTEXT_LENGTH = Number.parseInt(process.env.MAX_CONTEXT_LENGTH || '4000', 10);
+const MAX_SAMPLES_PER_REQUEST = Number.parseInt(process.env.MAX_SAMPLES_PER_REQUEST || '20', 10);
+const MAX_BATCH_ITEMS = Number.parseInt(process.env.MAX_BATCH_ITEMS || '50', 10);
+const MAX_PACK_NAME_LENGTH = Number.parseInt(process.env.MAX_PACK_NAME_LENGTH || '64', 10);
+const PACK_WRITE_TIERS = (process.env.PACK_WRITE_TIERS || 'team,business,enterprise')
+  .split(',')
+  .map(t => t.trim())
+  .filter(Boolean);
+const PACK_OVERWRITE_TIERS = (process.env.PACK_OVERWRITE_TIERS || 'business,enterprise')
+  .split(',')
+  .map(t => t.trim())
+  .filter(Boolean);
+
+function sanitizeString(value: unknown, maxLength: number): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.length > maxLength) return null;
+  return trimmed;
+}
+
+function sanitizeOptionalString(value: unknown, maxLength: number): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.length > maxLength) return undefined;
+  return trimmed;
+}
+
+function sanitizePackName(value: unknown, fallback?: string): string | null {
+  if (typeof value !== 'string') return fallback ?? null;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.length > MAX_PACK_NAME_LENGTH) return fallback ?? null;
+  return trimmed;
+}
+
+function sanitizeValidationContext(value: unknown): { type?: 'ui-copy' | 'marketing' | 'docs' | 'support' | 'general'; component?: string } | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const context = value as { type?: unknown; component?: unknown };
+  const type = typeof context.type === 'string' ? context.type : undefined;
+  const component = sanitizeOptionalString(context.component, 200);
+  if (type && ['ui-copy', 'marketing', 'docs', 'support', 'general'].includes(type)) {
+    return { type: type as 'ui-copy' | 'marketing' | 'docs' | 'support' | 'general', component };
+  }
+  return component ? { component } : undefined;
+}
+
+function sanitizeVoiceSampleContext(value: unknown): VoiceSample['context'] | undefined {
+  if (typeof value !== 'string') return undefined;
+  const normalized = value.trim().toLowerCase();
+  if (['email', 'blog', 'social', 'marketing', 'support', 'other'].includes(normalized)) {
+    return normalized as VoiceSample['context'];
+  }
+  return undefined;
+}
+
+function isVoiceContext(value: string): value is VoiceContext {
+  return ['email', 'blog', 'social', 'marketing', 'support', 'legal', 'internal', 'product', 'sales'].includes(value);
+}
+
+function logError(context: string, error: unknown, req?: Request): void {
+  const message = error instanceof Error ? error.message : String(error);
+  const meta = req ? `${req.method} ${req.originalUrl}` : 'no-request';
+  console.error(`[StyleMCP] ${context} (${meta}): ${message}`);
+}
+
+function enforceAIAccess(req: Request, res: Response): boolean {
+  if (!isBillingEnabled()) return true;
+  if (!req.user) {
+    res.status(401).json({ error: 'Authentication required' });
+    return false;
+  }
+  if (!tierHasAIAccess(req.user.tier)) {
+    res.status(403).json({
+      error: 'AI features require Pro tier or higher',
+      upgrade_url: 'https://stylemcp.com/pricing'
+    });
+    return false;
+  }
+  return true;
+}
+
+async function enforcePackWriteAccess(req: Request, res: Response, packName: string, allowOverwrite: boolean): Promise<boolean> {
+  if (!isBillingEnabled()) {
+    return true;
+  }
+  if (!req.user) {
+    res.status(401).json({ error: 'Authentication required' });
+    return false;
+  }
+  if (!PACK_WRITE_TIERS.includes(req.user.tier)) {
+    res.status(403).json({ error: 'Pack write access requires Team tier or higher' });
+    return false;
+  }
+  const availablePacks = await listAvailablePacks();
+  if (availablePacks.includes(packName) && !allowOverwrite) {
+    res.status(409).json({ error: `Pack '${packName}' already exists` });
+    return false;
+  }
+  if (availablePacks.includes(packName) && allowOverwrite && !PACK_OVERWRITE_TIERS.includes(req.user.tier)) {
+    res.status(403).json({ error: 'Overwriting packs requires Business tier or higher' });
+    return false;
+  }
+  return true;
+}
 
 // IMPORTANT: Webhook routes with raw body parsing must be registered BEFORE express.json()
 
@@ -173,6 +282,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'x-api-key', 'Authorization'],
 }));
 app.use(express.json({ limit: '1mb' }));
+app.use(usageLogger);
 
 // Pack cache with warnings tracking
 interface CachedPack {
@@ -229,7 +339,7 @@ function legacyAuthMiddleware(req: Request, res: Response, next: NextFunction): 
     return;
   }
 
-  const providedKey = req.headers['x-api-key'] || req.query.api_key;
+  const providedKey = req.headers['x-api-key'];
   if (!providedKey || typeof providedKey !== 'string') {
     res.status(401).json({ error: 'Invalid or missing API key' });
     return;
@@ -330,19 +440,16 @@ app.post('/api/demo/validate', async (req: Request, res: Response) => {
       return;
     }
     
-    const { text, pack: packName = 'saas' } = req.body;
+    const text = sanitizeString(req.body?.text, 500);
+    const packName = sanitizePackName(req.body?.pack, 'saas');
 
-    if (!text || typeof text !== 'string') {
+    if (!text) {
       res.status(400).json({ error: 'Missing or invalid "text" field' });
       return;
     }
 
-    // Limit text length for demo
-    if (text.length > 500) {
-      res.status(400).json({ 
-        error: 'Demo text limited to 500 characters',
-        message: 'Sign up for free to validate longer text',
-      });
+    if (!packName) {
+      res.status(400).json({ error: 'Missing or invalid "pack" field' });
       return;
     }
 
@@ -356,6 +463,7 @@ app.post('/api/demo/validate', async (req: Request, res: Response) => {
       upgradeMessage: 'Sign up free for 5,000 requests/month → stylemcp.com/signup',
     });
   } catch (error) {
+    logError('Demo validation failed', error, req);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -373,15 +481,24 @@ app.get('/api/packs', authMiddleware, async (_req: Request, res: Response) => {
 // Get pack details
 app.get('/api/packs/:pack', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const packName = String(req.params.pack);
-    const pack = await getPack(packName);
-    res.json({
+    const packName = sanitizePackName(req.params.pack);
+    if (!packName) {
+      res.status(400).json({ error: 'Invalid pack name' });
+      return;
+    }
+    const { pack, warnings } = await getPackWithWarnings(packName);
+    const response: Record<string, unknown> = {
       name: pack.manifest.name,
       version: pack.manifest.version,
       description: pack.manifest.description,
       config: pack.manifest.config,
-    });
+    };
+    if (warnings.length > 0) {
+      response.packWarnings = warnings;
+    }
+    res.json(response);
   } catch (error) {
+    logError('Pack details failed', error, req);
     res.status(404).json({ error: `Pack not found: ${req.params.pack}` });
   }
 });
@@ -389,19 +506,21 @@ app.get('/api/packs/:pack', authMiddleware, async (req: Request, res: Response) 
 // Validate text
 app.post('/api/validate', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { 
-      text, 
-      pack: packName = 'saas',
-      context,
-      channel,
-      subject,
-      audience,
-      contentType,
-      useMultiVoice = false
-    } = req.body;
+    const text = sanitizeString(req.body?.text, MAX_TEXT_LENGTH);
+    const packName = sanitizePackName(req.body?.pack, 'saas');
+    const context = sanitizeValidationContext(req.body?.context);
+    const channel = sanitizeOptionalString(req.body?.channel, MAX_CONTEXT_LENGTH);
+    const subject = sanitizeOptionalString(req.body?.subject, MAX_CONTEXT_LENGTH);
+    const audience = sanitizeOptionalString(req.body?.audience, MAX_CONTEXT_LENGTH);
+    const contentType = sanitizeOptionalString(req.body?.contentType, MAX_CONTEXT_LENGTH);
+    const useMultiVoice = req.body?.useMultiVoice === true;
 
-    if (!text || typeof text !== 'string') {
+    if (!text) {
       res.status(400).json({ error: 'Missing or invalid "text" field' });
+      return;
+    }
+    if (!packName) {
+      res.status(400).json({ error: 'Missing or invalid "pack" field' });
       return;
     }
 
@@ -410,7 +529,7 @@ app.post('/api/validate', authMiddleware, async (req: Request, res: Response) =>
     }
 
     let selectedPack = packName;
-    let voiceContext = context;
+    const validationContext = context;
     let selectionInfo = null;
 
     // Use multi-voice context selection if enabled
@@ -427,7 +546,6 @@ app.post('/api/validate', authMiddleware, async (req: Request, res: Response) =>
       });
       
       selectedPack = selection.packName;
-      voiceContext = selection.context;
       selectionInfo = {
         selectedPack: selection.packName,
         detectedContext: selection.context,
@@ -437,13 +555,17 @@ app.post('/api/validate', authMiddleware, async (req: Request, res: Response) =>
       };
     }
 
-    const pack = await getPack(selectedPack);
-    const result = validate({ pack, text, context: voiceContext });
+    const { pack, warnings } = await getPackWithWarnings(selectedPack);
+    const result = validate({ pack, text, context: validationContext });
 
     // Include voice selection info in response
-    const response = selectionInfo ? { ...result, voiceSelection: selectionInfo } : result;
+    const response: Record<string, unknown> = selectionInfo ? { ...result, voiceSelection: selectionInfo } : result;
+    if (warnings.length > 0) {
+      response.packWarnings = warnings;
+    }
     res.json(response);
   } catch (error) {
+    logError('Validation failed', error, req);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -451,19 +573,23 @@ app.post('/api/validate', authMiddleware, async (req: Request, res: Response) =>
 // Batch validate
 app.post('/api/validate/batch', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { items, pack: packName = 'saas' } = req.body;
+    const items = req.body?.items as Array<{ text?: unknown; id?: unknown; context?: unknown }> | undefined;
+    const packName = sanitizePackName(req.body?.pack, 'saas');
 
     if (!Array.isArray(items)) {
       res.status(400).json({ error: 'Missing or invalid "items" array' });
       return;
     }
-
+    if (!packName) {
+      res.status(400).json({ error: 'Missing or invalid "pack" field' });
+      return;
+    }
     if (items.length > MAX_BATCH_ITEMS) {
       res.status(400).json({ error: `Too many items (max ${MAX_BATCH_ITEMS})` });
       return;
     }
 
-    const invalidIndex = items.findIndex((item: { text?: unknown }) => !item || typeof item.text !== 'string');
+    const invalidIndex = items.findIndex((item) => !item || typeof item.text !== 'string' || (item.text as string).trim().length === 0);
     if (invalidIndex !== -1) {
       res.status(400).json({ error: `Invalid item at index ${invalidIndex}: missing or invalid "text"` });
       return;
@@ -485,22 +611,31 @@ app.post('/api/validate/batch', authMiddleware, async (req: Request, res: Respon
       return;
     }
 
-    const pack = await getPack(packName);
-    const results = items.map((item: { text: string; id?: string; context?: any }) => ({
-      id: item.id,
-      result: validate({ pack, text: item.text, context: item.context }),
+    const { pack, warnings } = await getPackWithWarnings(packName);
+    const results = items.map((item) => ({
+      id: typeof item.id === 'string' ? item.id : undefined,
+      result: validate({
+        pack,
+        text: String(item.text),
+        context: sanitizeValidationContext(item.context),
+      }),
     }));
 
     const totalScore = results.reduce((sum, r) => sum + r.result.score, 0);
     const avgScore = Math.round(totalScore / results.length);
 
-    res.json({
+    const response: Record<string, unknown> = {
       averageScore: avgScore,
       totalItems: results.length,
       passedItems: results.filter(r => r.result.valid).length,
       results,
-    });
+    };
+    if (warnings.length > 0) {
+      response.packWarnings = warnings;
+    }
+    res.json(response);
   } catch (error) {
+    logError('Batch validation failed', error, req);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -508,10 +643,25 @@ app.post('/api/validate/batch', authMiddleware, async (req: Request, res: Respon
 // Rewrite text
 app.post('/api/rewrite', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { text, pack: packName = 'saas', mode = 'normal', context, useAI = false } = req.body;
+    const text = sanitizeString(req.body?.text, MAX_TEXT_LENGTH);
+    const packName = sanitizePackName(req.body?.pack, 'saas');
+    const mode = sanitizeOptionalString(req.body?.mode, 20) || 'normal';
+    const context = sanitizeValidationContext(req.body?.context);
+    const useAI = req.body?.useAI === true;
 
-    if (!text || typeof text !== 'string') {
+    if (!text) {
       res.status(400).json({ error: 'Missing or invalid "text" field' });
+      return;
+    }
+    if (!packName) {
+      res.status(400).json({ error: 'Missing or invalid "pack" field' });
+      return;
+    }
+    if (!['normal', 'minimal', 'aggressive'].includes(mode)) {
+      res.status(400).json({ error: 'Invalid "mode" field' });
+      return;
+    }
+    if (useAI && !enforceAIAccess(req, res)) {
       return;
     }
 
@@ -519,7 +669,7 @@ app.post('/api/rewrite', authMiddleware, async (req: Request, res: Response) => 
       return;
     }
 
-    const pack = await getPack(packName);
+    const { pack, warnings } = await getPackWithWarnings(packName);
     let result;
 
     const options = { pack, text, context };
@@ -549,7 +699,7 @@ app.post('/api/rewrite', authMiddleware, async (req: Request, res: Response) => 
         // Re-validate the AI-rewritten text
         const afterValidation = validate({ pack, text: aiResult.rewritten, context });
         
-        res.json({
+        const response: Record<string, unknown> = {
           original: text,
           rewritten: aiResult.rewritten,
           changes: [{
@@ -567,7 +717,11 @@ app.post('/api/rewrite', authMiddleware, async (req: Request, res: Response) => 
           aiUsed: true,
           tokensUsed: aiResult.tokensUsed,
           estimatedCost: estimateAIRewriteCost(aiResult.tokensUsed.input, aiResult.tokensUsed.output),
-        });
+        };
+        if (warnings.length > 0) {
+          response.packWarnings = warnings;
+        }
+        res.json(response);
         return;
       }
     }
@@ -584,8 +738,12 @@ app.post('/api/rewrite', authMiddleware, async (req: Request, res: Response) => 
       response.hint = 'Rule-based rewrite could not fix these violations. Use useAI:true for AI-powered fixes (Pro+ feature).';
     }
 
+    if (warnings.length > 0) {
+      response.packWarnings = warnings;
+    }
     res.json(response);
   } catch (error) {
+    logError('Rewrite failed', error, req);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -593,10 +751,19 @@ app.post('/api/rewrite', authMiddleware, async (req: Request, res: Response) => 
 // AI-powered rewrite (requires paid tier)
 app.post('/api/rewrite/ai', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { text, pack: packName = 'saas', context } = req.body;
+    const text = sanitizeString(req.body?.text, MAX_TEXT_LENGTH);
+    const packName = sanitizePackName(req.body?.pack, 'saas');
+    const context = sanitizeValidationContext(req.body?.context);
 
-    if (!text || typeof text !== 'string') {
+    if (!text) {
       res.status(400).json({ error: 'Missing or invalid "text" field' });
+      return;
+    }
+    if (!packName) {
+      res.status(400).json({ error: 'Missing or invalid "pack" field' });
+      return;
+    }
+    if (!enforceAIAccess(req, res)) {
       return;
     }
 
@@ -613,21 +780,25 @@ app.post('/api/rewrite/ai', authMiddleware, async (req: Request, res: Response) 
       return;
     }
 
-    const pack = await getPack(packName);
+    const { pack, warnings } = await getPackWithWarnings(packName);
     
     // First validate to get violations
     const validation = validate({ pack, text, context });
 
     // If no violations, return original text
     if (validation.violations.length === 0) {
-      res.json({
+      const response: Record<string, unknown> = {
         original: text,
         rewritten: text,
         explanation: 'No violations found - text already matches brand voice',
         score: { before: validation.score, after: validation.score },
         tokensUsed: { input: 0, output: 0 },
         estimatedCost: 0,
-      });
+      };
+      if (warnings.length > 0) {
+        response.packWarnings = warnings;
+      }
+      res.json(response);
       return;
     }
 
@@ -642,7 +813,7 @@ app.post('/api/rewrite/ai', authMiddleware, async (req: Request, res: Response) 
     // Re-validate the rewritten text
     const afterValidation = validate({ pack, text: result.rewritten, context });
 
-    res.json({
+    const response: Record<string, unknown> = {
       ...result,
       score: {
         before: validation.score,
@@ -650,9 +821,13 @@ app.post('/api/rewrite/ai', authMiddleware, async (req: Request, res: Response) 
       },
       violationsFixed: validation.violations.length,
       estimatedCost: estimateAIRewriteCost(result.tokensUsed.input, result.tokensUsed.output),
-    });
+    };
+    if (warnings.length > 0) {
+      response.packWarnings = warnings;
+    }
+    res.json(response);
   } catch (error) {
-    console.error('AI rewrite error:', error);
+    logError('AI rewrite failed', error, req);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -673,10 +848,20 @@ app.get('/api/rewrite/ai/status', authMiddleware, (_req: Request, res: Response)
 // AI Output Validation - validate AI-generated content for brand compliance
 app.post('/api/ai-output/validate', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { content, pack, context, includeRewrite } = req.body;
+    const content = sanitizeString(req.body?.content, MAX_TEXT_LENGTH);
+    const pack = sanitizePackName(req.body?.pack);
+    const context = req.body?.context && typeof req.body.context === 'object' ? req.body.context : undefined;
+    const includeRewrite = req.body?.includeRewrite === true;
 
-    if (!content || typeof content !== 'string') {
+    if (!content) {
       res.status(400).json({ error: 'Missing or invalid "content" field' });
+      return;
+    }
+    if (pack === null) {
+      res.status(400).json({ error: 'Invalid "pack" field' });
+      return;
+    }
+    if (!enforceAIAccess(req, res)) {
       return;
     }
 
@@ -694,7 +879,7 @@ app.post('/api/ai-output/validate', authMiddleware, async (req: Request, res: Re
 
     res.json(result);
   } catch (error) {
-    console.error('AI output validation error:', error);
+    logError('AI output validation failed', error, req);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -702,31 +887,41 @@ app.post('/api/ai-output/validate', authMiddleware, async (req: Request, res: Re
 // Learn My Voice - analyze samples to generate custom style pack (Pro+ feature)
 app.post('/api/learn', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { samples, brandName, industry, context } = req.body;
+    const samples = Array.isArray(req.body?.samples) ? (req.body.samples as Array<unknown>) : null;
+    const brandName = sanitizeString(req.body?.brandName, 100);
+    const industry = sanitizeOptionalString(req.body?.industry, 100);
+    const context = sanitizeOptionalString(req.body?.context, MAX_CONTEXT_LENGTH);
 
-    if (!samples || !Array.isArray(samples) || samples.length === 0) {
+    if (!samples || samples.length === 0) {
       res.status(400).json({ error: 'Missing or invalid "samples" array - provide at least one text sample' });
       return;
     }
 
-    if (samples.length > MAX_LEARN_SAMPLES) {
-      res.status(400).json({ error: `Too many samples (max ${MAX_LEARN_SAMPLES})` });
+    if (!brandName) {
+      res.status(400).json({ error: 'Missing or invalid "brandName" field' });
       return;
     }
-
-    if (!brandName || typeof brandName !== 'string') {
-      res.status(400).json({ error: 'Missing or invalid "brandName" field' });
+    if (samples.length > MAX_SAMPLES_PER_REQUEST) {
+      res.status(400).json({ error: `Too many samples (max ${MAX_SAMPLES_PER_REQUEST})` });
+      return;
+    }
+    if (!enforceAIAccess(req, res)) {
       return;
     }
 
     // Validate samples
-    const validSamples = samples.filter(s => typeof s === 'string' && s.trim().length > 0);
+    const trimmedSamples = samples
+      .filter((s: unknown) => typeof s === 'string')
+      .map((s: string) => s.trim())
+      .filter((s: string) => s.length > 0);
 
-    const sampleTooLong = validSamples.findIndex(s => s.length > MAX_TEXT_CHARS);
-    if (sampleTooLong !== -1) {
-      res.status(400).json({ error: `Sample at index ${sampleTooLong} exceeds max length (${MAX_TEXT_CHARS} characters)` });
+    const sampleTooLongIndex = trimmedSamples.findIndex(s => s.length > MAX_TEXT_CHARS);
+    if (sampleTooLongIndex !== -1) {
+      res.status(400).json({ error: `Sample at index ${sampleTooLongIndex} exceeds max length (${MAX_TEXT_CHARS} characters)` });
       return;
     }
+
+    const validSamples = trimmedSamples;
     if (validSamples.length === 0) {
       res.status(400).json({ error: 'No valid text samples provided' });
       return;
@@ -763,7 +958,7 @@ app.post('/api/learn', authMiddleware, async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.error('Learn voice error:', error);
+    logError('Learn voice failed', error, req);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -782,15 +977,27 @@ app.get('/api/learn/status', authMiddleware, (_req: Request, res: Response) => {
 // Get voice rules
 app.get('/api/packs/:pack/voice', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const pack = await getPack(String(req.params.pack));
-    const section = req.query.section as string;
-
+    const packName = sanitizePackName(req.params.pack);
+    const section = sanitizeOptionalString(req.query.section, 50);
+    if (!packName) {
+      res.status(400).json({ error: 'Invalid pack name' });
+      return;
+    }
+    const { pack, warnings } = await getPackWithWarnings(packName);
     if (section && section !== 'all') {
-      res.json((pack.voice as any)[section]);
+      const voice = pack.voice as Record<string, unknown>;
+      if (warnings.length > 0) {
+        res.setHeader('X-Pack-Warnings', warnings.join(' | '));
+      }
+      res.json(voice[section]);
     } else {
+      if (warnings.length > 0) {
+        res.setHeader('X-Pack-Warnings', warnings.join(' | '));
+      }
       res.json(pack.voice);
     }
   } catch (error) {
+    logError('Pack voice failed', error, req);
     res.status(404).json({ error: `Pack not found: ${req.params.pack}` });
   }
 });
@@ -798,16 +1005,26 @@ app.get('/api/packs/:pack/voice', authMiddleware, async (req: Request, res: Resp
 // Get copy patterns
 app.get('/api/packs/:pack/patterns', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const pack = await getPack(String(req.params.pack));
-    const category = req.query.category as string;
+    const packName = sanitizePackName(req.params.pack);
+    const category = sanitizeOptionalString(req.query.category, 50);
+    if (!packName) {
+      res.status(400).json({ error: 'Invalid pack name' });
+      return;
+    }
+    const { pack, warnings } = await getPackWithWarnings(packName);
 
     let patterns = pack.copyPatterns.patterns;
     if (category && category !== 'all') {
       patterns = patterns.filter(p => p.category === category);
     }
 
-    res.json({ patterns });
+    const response: Record<string, unknown> = { patterns };
+    if (warnings.length > 0) {
+      response.packWarnings = warnings;
+    }
+    res.json(response);
   } catch (error) {
+    logError('Pack patterns failed', error, req);
     res.status(404).json({ error: `Pack not found: ${req.params.pack}` });
   }
 });
@@ -815,13 +1032,23 @@ app.get('/api/packs/:pack/patterns', authMiddleware, async (req: Request, res: R
 // Get CTA rules
 app.get('/api/packs/:pack/ctas', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const pack = await getPack(String(req.params.pack));
-    res.json({
+    const packName = sanitizePackName(req.params.pack);
+    if (!packName) {
+      res.status(400).json({ error: 'Invalid pack name' });
+      return;
+    }
+    const { pack, warnings } = await getPackWithWarnings(packName);
+    const response: Record<string, unknown> = {
       guidelines: pack.ctaRules.guidelines,
       categories: pack.ctaRules.categories,
       antiPatterns: pack.ctaRules.antiPatterns,
-    });
+    };
+    if (warnings.length > 0) {
+      response.packWarnings = warnings;
+    }
+    res.json(response);
   } catch (error) {
+    logError('Pack ctas failed', error, req);
     res.status(404).json({ error: `Pack not found: ${req.params.pack}` });
   }
 });
@@ -829,15 +1056,27 @@ app.get('/api/packs/:pack/ctas', authMiddleware, async (req: Request, res: Respo
 // Get design tokens
 app.get('/api/packs/:pack/tokens', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const pack = await getPack(String(req.params.pack));
-    const type = req.query.type as string;
-
+    const packName = sanitizePackName(req.params.pack);
+    const type = sanitizeOptionalString(req.query.type, 50);
+    if (!packName) {
+      res.status(400).json({ error: 'Invalid pack name' });
+      return;
+    }
+    const { pack, warnings } = await getPackWithWarnings(packName);
     if (type && type !== 'all') {
-      res.json((pack.tokens as any)[type]);
+      const tokens = pack.tokens as Record<string, unknown>;
+      if (warnings.length > 0) {
+        res.setHeader('X-Pack-Warnings', warnings.join(' | '));
+      }
+      res.json(tokens[type]);
     } else {
+      if (warnings.length > 0) {
+        res.setHeader('X-Pack-Warnings', warnings.join(' | '));
+      }
       res.json(pack.tokens);
     }
   } catch (error) {
+    logError('Pack tokens failed', error, req);
     res.status(404).json({ error: `Pack not found: ${req.params.pack}` });
   }
 });
@@ -845,16 +1084,21 @@ app.get('/api/packs/:pack/tokens', authMiddleware, async (req: Request, res: Res
 // Suggest CTAs
 app.post('/api/suggest-ctas', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { context, pack: packName = 'saas' } = req.body;
+    const context = sanitizeString(req.body?.context, MAX_CONTEXT_LENGTH);
+    const packName = sanitizePackName(req.body?.pack, 'saas');
 
-    if (!context || typeof context !== 'string') {
+    if (!context) {
       res.status(400).json({ error: 'Missing or invalid "context" field' });
       return;
     }
+    if (!packName) {
+      res.status(400).json({ error: 'Missing or invalid "pack" field' });
+      return;
+    }
 
-    const pack = await getPack(packName);
+    const { pack, warnings } = await getPackWithWarnings(packName);
     const lowerContext = context.toLowerCase();
-    const suggestions: any[] = [];
+    const suggestions: Array<{ text: string; category: string; priority: string; contexts: string[] }> = [];
 
     for (const category of pack.ctaRules.categories) {
       for (const cta of category.ctas) {
@@ -873,12 +1117,17 @@ app.post('/api/suggest-ctas', authMiddleware, async (req: Request, res: Response
       }
     }
 
-    res.json({
+    const response: Record<string, unknown> = {
       context,
       suggestions: suggestions.slice(0, 10),
       guidelines: pack.ctaRules.guidelines,
-    });
+    };
+    if (warnings.length > 0) {
+      response.packWarnings = warnings;
+    }
+    res.json(response);
   } catch (error) {
+    logError('CTA suggestions failed', error, req);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -923,7 +1172,7 @@ app.post('/api/checkout', authMiddleware, async (req: Request, res: Response) =>
 
     res.json({ url: checkoutUrl });
   } catch (error) {
-    console.error('Checkout error:', error);
+    logError('Checkout failed', error, req);
     res.status(500).json({ error: 'Failed to create checkout session' });
   }
 });
@@ -955,7 +1204,7 @@ app.post('/api/billing/portal', authMiddleware, async (req: Request, res: Respon
 
     res.json({ url: portalUrl });
   } catch (error) {
-    console.error('Portal error:', error);
+    logError('Portal failed', error, req);
     res.status(500).json({ error: 'Failed to create portal session' });
   }
 });
@@ -963,15 +1212,21 @@ app.post('/api/billing/portal', authMiddleware, async (req: Request, res: Respon
 // Voice learning endpoint - analyze samples and generate pack
 app.post('/api/learn/analyze', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { samples, packName, method = 'rule-based' } = req.body;
+    const samples = Array.isArray(req.body?.samples) ? req.body.samples : null;
+    const packName = sanitizePackName(req.body?.packName);
+    const method = sanitizeOptionalString(req.body?.method, 20) || 'rule-based';
     
-    if (!samples || !Array.isArray(samples) || samples.length === 0) {
+    if (!samples || samples.length === 0) {
       res.status(400).json({ error: 'samples array is required with at least one item' });
       return;
     }
     
-    if (!packName || typeof packName !== 'string') {
+    if (!packName) {
       res.status(400).json({ error: 'packName is required' });
+      return;
+    }
+    if (samples.length > MAX_SAMPLES_PER_REQUEST) {
+      res.status(400).json({ error: `Too many samples (max ${MAX_SAMPLES_PER_REQUEST})` });
       return;
     }
     
@@ -981,14 +1236,22 @@ app.post('/api/learn/analyze', authMiddleware, async (req: Request, res: Respons
       return;
     }
     
+    if (!['ai', 'rule-based'].includes(method)) {
+      res.status(400).json({ error: 'Invalid method' });
+      return;
+    }
+
     if (method === 'ai') {
+      if (!enforceAIAccess(req, res)) {
+        return;
+      }
       // Use AI-based analysis
       const { learnVoice } = await import('../learn/index.js');
       const result = await learnVoice({
-        samples: samples.map((s: any) => typeof s === 'string' ? s : s.text),
+        samples: samples.map((s: unknown) => typeof s === 'string' ? s : (s as { text?: unknown }).text).filter((s: unknown): s is string => typeof s === 'string' && s.trim().length > 0),
         brandName: packName,
-        industry: req.body.industry,
-        context: req.body.context
+        industry: sanitizeOptionalString(req.body?.industry, 100),
+        context: sanitizeOptionalString(req.body?.context, MAX_CONTEXT_LENGTH)
       });
       
       res.json({
@@ -1003,11 +1266,16 @@ app.post('/api/learn/analyze', authMiddleware, async (req: Request, res: Respons
       const { VoiceAnalyzer } = await import('../learn/voice-analyzer.js');
       const analyzer = new VoiceAnalyzer();
       
-      const voiceSamples = samples.map((s: any) => ({
-        text: typeof s === 'string' ? s : s.text,
-        source: typeof s === 'object' ? s.source : undefined,
-        context: typeof s === 'object' ? s.context : undefined
-      }));
+      const voiceSamples: VoiceSample[] = samples.map((s: unknown) => ({
+        text: typeof s === 'string' ? s : String((s as { text?: unknown }).text || ''),
+        source: typeof s === 'object' ? (s as { source?: unknown }).source as string | undefined : undefined,
+        context: typeof s === 'object' ? sanitizeVoiceSampleContext((s as { context?: unknown }).context) : undefined
+      })).filter((sample: VoiceSample) => sample.text.trim().length > 0 && sample.text.length <= MAX_TEXT_LENGTH);
+      
+      if (voiceSamples.length === 0) {
+        res.status(400).json({ error: 'No valid samples provided' });
+        return;
+      }
       
       const result = await analyzer.analyze(voiceSamples);
       
@@ -1023,7 +1291,7 @@ app.post('/api/learn/analyze', authMiddleware, async (req: Request, res: Respons
       });
     }
   } catch (error) {
-    console.error('Voice learning error:', error);
+    logError('Voice learning analyze failed', error, req);
     res.status(500).json({ 
       error: error instanceof Error ? error.message : 'Voice learning failed' 
     });
@@ -1033,7 +1301,10 @@ app.post('/api/learn/analyze', authMiddleware, async (req: Request, res: Respons
 // Generate pack files from analysis
 app.post('/api/learn/generate', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { packName, analysis, method = 'rule-based' } = req.body;
+    const packName = sanitizePackName(req.body?.packName);
+    const analysis = req.body?.analysis as { voice?: unknown; analysis?: unknown } | undefined;
+    const method = sanitizeOptionalString(req.body?.method, 20) || 'rule-based';
+    const allowOverwrite = req.body?.allowOverwrite === true;
     
     if (!packName || !analysis) {
       res.status(400).json({ error: 'packName and analysis are required' });
@@ -1045,8 +1316,32 @@ app.post('/api/learn/generate', authMiddleware, async (req: Request, res: Respon
       res.status(400).json({ error: 'packName must contain only lowercase letters, numbers, and hyphens' });
       return;
     }
+    if (!(await enforcePackWriteAccess(req, res, packName, allowOverwrite))) {
+      return;
+    }
+    if (!['ai', 'rule-based'].includes(method)) {
+      res.status(400).json({ error: 'Invalid method' });
+      return;
+    }
     
     if (method === 'ai') {
+      if (!enforceAIAccess(req, res)) {
+        return;
+      }
+      if (!analysis.voice || typeof analysis.voice !== 'object') {
+        res.status(400).json({ error: 'Invalid analysis format' });
+        return;
+      }
+      const analysisInput = (analysis.analysis || {}) as Partial<LearnedVoice['analysis']>;
+      const normalizedAnalysis: LearnedVoice['analysis'] = {
+        samplesAnalyzed: typeof analysisInput.samplesAnalyzed === 'number' ? analysisInput.samplesAnalyzed : 0,
+        totalWords: typeof analysisInput.totalWords === 'number' ? analysisInput.totalWords : 0,
+        tokensUsed: {
+          input: typeof analysisInput.tokensUsed?.input === 'number' ? analysisInput.tokensUsed.input : 0,
+          output: typeof analysisInput.tokensUsed?.output === 'number' ? analysisInput.tokensUsed.output : 0,
+        },
+        confidence: typeof analysisInput.confidence === 'number' ? analysisInput.confidence : 0.7,
+      };
       // Generate using AI analysis format
       const { generatePackFiles } = await import('../learn/index.js');
       const files = generatePackFiles({
@@ -1058,8 +1353,8 @@ app.post('/api/learn/generate', authMiddleware, async (req: Request, res: Respon
           description: `Custom style pack for ${packName}`,
           industry: 'general'
         },
-        voice: analysis.voice,
-        analysis: analysis.analysis || { samplesAnalyzed: 0, totalWords: 0, tokensUsed: { input: 0, output: 0 }, confidence: 0.7 }
+        voice: analysis.voice as LearnedVoice['voice'],
+        analysis: normalizedAnalysis
       });
       
       res.json({
@@ -1091,7 +1386,7 @@ app.post('/api/learn/generate', authMiddleware, async (req: Request, res: Respon
       });
     }
   } catch (error) {
-    console.error('Pack generation error:', error);
+    logError('Pack generation failed', error, req);
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Pack generation failed'
     });
@@ -1101,15 +1396,17 @@ app.post('/api/learn/generate', authMiddleware, async (req: Request, res: Respon
 // Streaming validation for real-time feedback
 app.post('/api/validate/stream', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { 
-      text, 
-      pack: packName = 'saas',
-      context,
-      useMultiVoice = false
-    } = req.body;
+    const text = sanitizeString(req.body?.text, MAX_TEXT_LENGTH);
+    const packName = sanitizePackName(req.body?.pack, 'saas');
+    const context = sanitizeValidationContext(req.body?.context);
+    const useMultiVoice = req.body?.useMultiVoice === true;
 
-    if (!text || typeof text !== 'string') {
+    if (!text) {
       res.status(400).json({ error: 'text is required' });
+      return;
+    }
+    if (!packName) {
+      res.status(400).json({ error: 'Invalid pack name' });
       return;
     }
 
@@ -1125,7 +1422,8 @@ app.post('/api/validate/stream', authMiddleware, async (req: Request, res: Respo
     res.write(`data: ${JSON.stringify({ type: 'start', message: 'Starting validation...' })}\n\n`);
 
     let selectedPack = packName;
-    let voiceContext = context;
+    const validationContext = context;
+    let selectedVoiceContext: VoiceContext | undefined;
 
     // Multi-voice selection with progress
     if (useMultiVoice) {
@@ -1136,7 +1434,7 @@ app.post('/api/validate/stream', authMiddleware, async (req: Request, res: Respo
       
       const selection = await voiceManager.selectVoice(text, {});
       selectedPack = selection.packName;
-      voiceContext = selection.context;
+      selectedVoiceContext = selection.context;
 
       res.write(`data: ${JSON.stringify({ 
         type: 'voice-selected', 
@@ -1150,23 +1448,25 @@ app.post('/api/validate/stream', authMiddleware, async (req: Request, res: Respo
     // Load pack with progress
     res.write(`data: ${JSON.stringify({ type: 'progress', message: 'Loading style pack...' })}\n\n`);
     
-    const pack = await getPack(selectedPack);
+    const { pack, warnings } = await getPackWithWarnings(selectedPack);
 
     // Validate with progress
     res.write(`data: ${JSON.stringify({ type: 'progress', message: 'Validating content...' })}\n\n`);
     
-    const result = validate({ pack, text, context: voiceContext });
+    const result = validate({ pack, text, context: validationContext });
 
     // Send final result
     res.write(`data: ${JSON.stringify({ 
       type: 'complete', 
       result: result,
       pack: selectedPack,
-      context: voiceContext
+      context: selectedVoiceContext,
+      packWarnings: warnings.length > 0 ? warnings : undefined
     })}\n\n`);
 
     res.end();
   } catch (error) {
+    logError('Stream validation failed', error, req);
     res.write(`data: ${JSON.stringify({ 
       type: 'error', 
       error: error instanceof Error ? error.message : 'Validation failed' 
@@ -1190,7 +1490,7 @@ app.get('/api/voices/contexts', authMiddleware, async (req: Request, res: Respon
       config: voiceManager.getConfig()
     });
   } catch (error) {
-    console.error('Voice context listing error:', error);
+    logError('Voice context listing failed', error, req);
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Failed to list voice contexts'
     });
@@ -1199,10 +1499,16 @@ app.get('/api/voices/contexts', authMiddleware, async (req: Request, res: Respon
 
 app.post('/api/voices/contexts', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { context, packName, description } = req.body;
+    const context = sanitizeOptionalString(req.body?.context, 50);
+    const packName = sanitizePackName(req.body?.packName);
+    const description = sanitizeOptionalString(req.body?.description, 200);
     
     if (!context || !packName) {
       res.status(400).json({ error: 'context and packName are required' });
+      return;
+    }
+    if (!isVoiceContext(context)) {
+      res.status(400).json({ error: 'Invalid context' });
       return;
     }
     
@@ -1224,7 +1530,7 @@ app.post('/api/voices/contexts', authMiddleware, async (req: Request, res: Respo
       mapping: { context, packName, description }
     });
   } catch (error) {
-    console.error('Voice context add error:', error);
+    logError('Voice context add failed', error, req);
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Failed to add voice context'
     });
@@ -1233,19 +1539,23 @@ app.post('/api/voices/contexts', authMiddleware, async (req: Request, res: Respo
 
 app.delete('/api/voices/contexts/:context', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const context = req.params.context;
+    const context = sanitizeOptionalString(req.params.context, 50);
+    if (!context || !isVoiceContext(context)) {
+      res.status(400).json({ error: 'Invalid context' });
+      return;
+    }
     
     const { VoiceContextManager } = await import('../utils/voice-context.js');
     const voiceManager = new VoiceContextManager();
     
-    voiceManager.removeContextVoice(context as any);
+    voiceManager.removeContextVoice(context);
     
     res.json({
       success: true,
       message: `Context '${context}' removed`
     });
   } catch (error) {
-    console.error('Voice context removal error:', error);
+    logError('Voice context removal failed', error, req);
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Failed to remove voice context'
     });
@@ -1255,9 +1565,13 @@ app.delete('/api/voices/contexts/:context', authMiddleware, async (req: Request,
 // Detect context from text (useful for testing)
 app.post('/api/voices/detect', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { text, channel, subject, audience, contentType } = req.body;
+    const text = sanitizeString(req.body?.text, MAX_TEXT_LENGTH);
+    const channel = sanitizeOptionalString(req.body?.channel, MAX_CONTEXT_LENGTH);
+    const subject = sanitizeOptionalString(req.body?.subject, MAX_CONTEXT_LENGTH);
+    const audience = sanitizeOptionalString(req.body?.audience, MAX_CONTEXT_LENGTH);
+    const contentType = sanitizeOptionalString(req.body?.contentType, MAX_CONTEXT_LENGTH);
     
-    if (!text || typeof text !== 'string') {
+    if (!text) {
       res.status(400).json({ error: 'text is required' });
       return;
     }
@@ -1280,7 +1594,7 @@ app.post('/api/voices/detect', authMiddleware, async (req: Request, res: Respons
       contextualTips: voiceManager.getContextualTips(selection.context)
     });
   } catch (error) {
-    console.error('Context detection error:', error);
+    logError('Context detection failed', error, req);
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Context detection failed'
     });
@@ -1319,41 +1633,47 @@ app.post('/api/mcp/call', authMiddleware, async (req: Request, res: Response) =>
     // Route to appropriate handler
     switch (tool) {
       case 'validate_text': {
-        if (!args || typeof args.text !== 'string') {
+        const text = sanitizeString(args?.text, MAX_TEXT_LENGTH);
+        const packName = sanitizePackName(args?.pack, 'saas');
+        if (!text) {
           res.status(400).json({ error: 'Missing or invalid "text" field' });
           return;
         }
-
-        if (!enforceMaxLen({ value: args.text, field: 'text', max: MAX_TEXT_CHARS, res })) {
+        if (!packName) {
+          res.status(400).json({ error: 'Invalid "pack" field' });
           return;
         }
-
-        const pack = await getPack(args?.pack || 'saas');
+        const { pack, warnings } = await getPackWithWarnings(packName);
         const result = validate({
           pack,
-          text: args?.text,
-          context: args?.context_type ? { type: args.context_type } : undefined,
+          text,
+          context: typeof args?.context_type === 'string' ? { type: args.context_type } : undefined,
         });
-        res.json({ result });
+        const response: Record<string, unknown> = { result };
+        if (warnings.length > 0) {
+          response.packWarnings = warnings;
+        }
+        res.json(response);
         break;
       }
 
       case 'rewrite_to_style': {
-        if (!args || typeof args.text !== 'string') {
+        const text = sanitizeString(args?.text, MAX_TEXT_LENGTH);
+        const packName = sanitizePackName(args?.pack, 'saas');
+        if (!text) {
           res.status(400).json({ error: 'Missing or invalid "text" field' });
           return;
         }
-
-        if (!enforceMaxLen({ value: args.text, field: 'text', max: MAX_TEXT_CHARS, res })) {
+        if (!packName) {
+          res.status(400).json({ error: 'Invalid "pack" field' });
           return;
         }
-
-        const pack = await getPack(args?.pack || 'saas');
-        const mode = args?.mode || 'normal';
+        const { pack, warnings } = await getPackWithWarnings(packName);
+        const mode = typeof args?.mode === 'string' ? args.mode : 'normal';
         const options = {
           pack,
-          text: args?.text,
-          context: args?.context_type ? { type: args.context_type } : undefined,
+          text,
+          context: typeof args?.context_type === 'string' ? { type: args.context_type } : undefined,
         };
 
         let result;
@@ -1365,45 +1685,87 @@ app.post('/api/mcp/call', authMiddleware, async (req: Request, res: Response) =>
           result = rewrite(options);
         }
 
-        res.json({ result: { ...result, summary: formatChanges(result) } });
+        const response: Record<string, unknown> = { result: { ...result, summary: formatChanges(result) } };
+        if (warnings.length > 0) {
+          response.packWarnings = warnings;
+        }
+        res.json(response);
         break;
       }
 
       case 'get_voice_rules': {
-        const pack = await getPack(args?.pack || 'saas');
-        const section = args?.section || 'all';
-        const data = section === 'all' ? pack.voice : (pack.voice as any)[section];
-        res.json({ result: data });
+        const packName = sanitizePackName(args?.pack, 'saas');
+        const section = typeof args?.section === 'string' ? args.section : 'all';
+        if (!packName) {
+          res.status(400).json({ error: 'Invalid "pack" field' });
+          return;
+        }
+        const { pack, warnings } = await getPackWithWarnings(packName);
+        const voice = pack.voice as Record<string, unknown>;
+        const data = section === 'all' ? pack.voice : voice[section];
+        const response: Record<string, unknown> = { result: data };
+        if (warnings.length > 0) {
+          response.packWarnings = warnings;
+        }
+        res.json(response);
         break;
       }
 
       case 'get_copy_patterns': {
-        const pack = await getPack(args?.pack || 'saas');
+        const packName = sanitizePackName(args?.pack, 'saas');
+        if (!packName) {
+          res.status(400).json({ error: 'Invalid "pack" field' });
+          return;
+        }
+        const { pack, warnings } = await getPackWithWarnings(packName);
         let patterns = pack.copyPatterns.patterns;
         if (args?.category && args.category !== 'all') {
           patterns = patterns.filter(p => p.category === args.category);
         }
-        res.json({ result: patterns });
+        const response: Record<string, unknown> = { result: patterns };
+        if (warnings.length > 0) {
+          response.packWarnings = warnings;
+        }
+        res.json(response);
         break;
       }
 
       case 'get_cta_rules': {
-        const pack = await getPack(args?.pack || 'saas');
-        res.json({
+        const packName = sanitizePackName(args?.pack, 'saas');
+        if (!packName) {
+          res.status(400).json({ error: 'Invalid "pack" field' });
+          return;
+        }
+        const { pack, warnings } = await getPackWithWarnings(packName);
+        const response: Record<string, unknown> = {
           result: {
             guidelines: pack.ctaRules.guidelines,
             categories: pack.ctaRules.categories,
             antiPatterns: pack.ctaRules.antiPatterns,
           },
-        });
+        };
+        if (warnings.length > 0) {
+          response.packWarnings = warnings;
+        }
+        res.json(response);
         break;
       }
 
       case 'get_tokens': {
-        const pack = await getPack(args?.pack || 'saas');
-        const type = args?.type || 'all';
-        const data = type === 'all' ? pack.tokens : (pack.tokens as any)[type];
-        res.json({ result: data });
+        const packName = sanitizePackName(args?.pack, 'saas');
+        const type = typeof args?.type === 'string' ? args.type : 'all';
+        if (!packName) {
+          res.status(400).json({ error: 'Invalid "pack" field' });
+          return;
+        }
+        const { pack, warnings } = await getPackWithWarnings(packName);
+        const tokens = pack.tokens as Record<string, unknown>;
+        const data = type === 'all' ? pack.tokens : tokens[type];
+        const response: Record<string, unknown> = { result: data };
+        if (warnings.length > 0) {
+          response.packWarnings = warnings;
+        }
+        res.json(response);
         break;
       }
 

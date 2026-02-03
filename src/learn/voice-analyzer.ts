@@ -426,7 +426,7 @@ curl -X POST https://stylemcp.com/api/validate \\
     await writeFile(join(packPath, 'README.md'), readme);
   }
 
-  private yamlStringify(obj: any): string {
+  private yamlStringify(obj: Record<string, unknown>): string {
     // Simple YAML stringifier - could use js-yaml for more complex objects
     return JSON.stringify(obj, null, 2)
       .replace(/"/g, '')
