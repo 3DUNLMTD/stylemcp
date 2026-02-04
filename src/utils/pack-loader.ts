@@ -45,6 +45,12 @@ const CACHE_TTL_MS = 60_000; // 1 minute
 const CACHE_MAX_SIZE = 20;
 const packCache = new Map<string, CacheEntry>();
 
+const AVAILABLE_PACKS_TTL_MS = 30_000; // 30 seconds
+
+type AvailablePacksCache = { names: string[]; cachedAt: number; dirMtime: number };
+let availablePacksCache: AvailablePacksCache | null = null;
+let availablePacksInFlight: Promise<string[]> | null = null;
+
 async function getManifestMtime(packPath: string): Promise<number> {
   try {
     const manifestPath = join(packPath, 'manifest.yaml');
@@ -73,6 +79,8 @@ function pruneCache(): void {
 /** Clear the pack cache (useful for testing or after file changes) */
 export function clearPackCache(): void {
   packCache.clear();
+  availablePacksCache = null;
+  availablePacksInFlight = null;
 }
 
 /** Get cache stats for monitoring */
@@ -204,10 +212,49 @@ export function getPacksDirectory(): string {
 export async function listAvailablePacks(): Promise<string[]> {
   const { readdir } = await import('fs/promises');
   const packsDir = getPacksDirectory();
+
+  // If a scan is already running, await it to avoid duplicate FS reads.
+  if (availablePacksInFlight) return availablePacksInFlight;
+
+  const now = Date.now();
+
+  // Use directory mtime as an invalidation signal so adding/removing packs doesn't
+  // get stuck behind the TTL.
+  let dirMtime = 0;
   try {
-    const entries = await readdir(packsDir, { withFileTypes: true });
-    return entries.filter(e => e.isDirectory()).map(e => e.name);
+    dirMtime = (await stat(packsDir)).mtimeMs;
   } catch {
-    return [];
+    dirMtime = 0;
   }
+
+  if (
+    availablePacksCache &&
+    now - availablePacksCache.cachedAt < AVAILABLE_PACKS_TTL_MS &&
+    availablePacksCache.dirMtime === dirMtime
+  ) {
+    return availablePacksCache.names;
+  }
+
+  availablePacksInFlight = (async () => {
+    try {
+      const entries = await readdir(packsDir, { withFileTypes: true });
+      const names = entries.filter(e => e.isDirectory()).map(e => e.name);
+      // Re-stat to capture mtime after reading in case it changed mid-scan.
+      let freshDirMtime = dirMtime;
+      try {
+        freshDirMtime = (await stat(packsDir)).mtimeMs;
+      } catch {
+        freshDirMtime = 0;
+      }
+      availablePacksCache = { names, cachedAt: Date.now(), dirMtime: freshDirMtime };
+      return names;
+    } catch {
+      availablePacksCache = null;
+      return [];
+    } finally {
+      availablePacksInFlight = null;
+    }
+  })();
+
+  return availablePacksInFlight;
 }
