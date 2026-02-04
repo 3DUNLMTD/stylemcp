@@ -28,7 +28,8 @@ import { authMiddleware as authMiddleware, usageLogger } from './middleware/auth
 const app = express();
 
 // Behind nginx in production: respect X-Forwarded-* headers
-app.set('trust proxy', 1);
+const TRUST_PROXY = process.env.TRUST_PROXY || 'loopback';
+app.set('trust proxy', TRUST_PROXY);
 app.disable('x-powered-by');
 
 // Security headers (API is proxied; disable CSP to avoid breaking downstream assets)
@@ -42,13 +43,22 @@ function requireHttps(req: Request, res: Response, next: NextFunction): void {
     return;
   }
 
-  // With trust proxy enabled, req.secure is based on X-Forwarded-Proto
+  // Prefer explicit proxy signal over req.secure (which can be finicky across proxy configs)
+  const xfProtoRaw = req.headers['x-forwarded-proto'];
+  const xfProto = Array.isArray(xfProtoRaw) ? xfProtoRaw[0] : xfProtoRaw;
+  if (typeof xfProto === 'string' && xfProto.split(',')[0].trim().toLowerCase() === 'https') {
+    next();
+    return;
+  }
+
   if (req.secure) {
     next();
     return;
   }
 
-  const host = req.get('host');
+  const xfHostRaw = req.headers['x-forwarded-host'];
+  const xfHost = Array.isArray(xfHostRaw) ? xfHostRaw[0] : xfHostRaw;
+  const host = (typeof xfHost === 'string' && xfHost.length > 0) ? xfHost : req.get('host');
   const url = req.originalUrl || '/';
 
   // Redirect safe methods; reject others (webhooks, etc.)
@@ -65,8 +75,6 @@ app.use(requireHttps);
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.STYLEMCP_API_KEY || '';
 const GITHUB_WEBHOOK_SECRET = process.env.GITHUB_WEBHOOK_SECRET || '';
-// Trust only loopback proxies by default to prevent header spoofing
-app.set('trust proxy', process.env.TRUST_PROXY || 'loopback');
 
 const MAX_TEXT_LENGTH = Number.parseInt(process.env.MAX_TEXT_LENGTH || '20000', 10);
 const MAX_CONTEXT_LENGTH = Number.parseInt(process.env.MAX_CONTEXT_LENGTH || '4000', 10);
