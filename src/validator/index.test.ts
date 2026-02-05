@@ -243,4 +243,44 @@ describe('validate', () => {
       expect(result.valid).toBeDefined();
     });
   });
+
+  describe('reading level constraints', () => {
+    it('should flag text that exceeds the target reading level', () => {
+      const pack = createTestPack({
+        voice: {
+          ...createTestPack().voice,
+          constraints: {
+            ...createTestPack().voice.constraints,
+            readingLevel: '6th-grade',
+          },
+        },
+      });
+
+      const result = validate({
+        pack,
+        text: 'The comprehensive implementation of the multidisciplinary methodology facilitates optimization of operational efficiencies across organizational frameworks.',
+      });
+
+      expect(result.violations.some(v => v.rule === 'constraints.readingLevel')).toBe(true);
+    });
+
+    it('should flag text that is too simple for advanced reading level', () => {
+      const pack = createTestPack({
+        voice: {
+          ...createTestPack().voice,
+          constraints: {
+            ...createTestPack().voice.constraints,
+            readingLevel: 'advanced',
+          },
+        },
+      });
+
+      const result = validate({
+        pack,
+        text: 'We help you. We make things easy.',
+      });
+
+      expect(result.violations.some(v => v.rule === 'constraints.readingLevel')).toBe(true);
+    });
+  });
 });

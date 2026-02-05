@@ -2,6 +2,7 @@ import { Voice, Violation } from '../../schema/index.js';
 import { createViolation, escapeRegex } from '../utils.js';
 
 type Constraints = Voice['constraints'];
+type ReadingLevel = NonNullable<Constraints['readingLevel']>;
 
 /**
  * Check text against writing constraints
@@ -29,6 +30,11 @@ export function checkConstraints(text: string, constraints: Constraints): Violat
   // Check Oxford comma
   if (constraints.oxfordComma !== undefined) {
     violations.push(...checkOxfordComma(text, constraints.oxfordComma));
+  }
+
+  // Check reading level
+  if (constraints.readingLevel) {
+    violations.push(...checkReadingLevel(text, constraints.readingLevel));
   }
 
   return violations;
@@ -218,6 +224,96 @@ function checkOxfordComma(text: string, required: boolean): Violation[] {
   }
 
   return violations;
+}
+
+/**
+ * Check reading level using Flesch-Kincaid Grade Level
+ */
+function checkReadingLevel(text: string, level: ReadingLevel): Violation[] {
+  const grade = estimateReadingGrade(text);
+  if (grade === null) return [];
+
+  const target = getReadingLevelTarget(level);
+  const violations: Violation[] = [];
+
+  if (target.max !== undefined && grade > target.max) {
+    violations.push(
+      createViolation(
+        'constraints.readingLevel',
+        'info',
+        `Reading level is grade ${grade}; target is ${target.label} or below`,
+        undefined,
+        undefined,
+        'Simplify vocabulary and shorten sentences'
+      )
+    );
+  }
+
+  if (target.min !== undefined && grade < target.min) {
+    violations.push(
+      createViolation(
+        'constraints.readingLevel',
+        'info',
+        `Reading level is grade ${grade}; target is ${target.label} or above`,
+        undefined,
+        undefined,
+        'Use more precise vocabulary and longer sentences when appropriate'
+      )
+    );
+  }
+
+  return violations;
+}
+
+function getReadingLevelTarget(level: ReadingLevel): { min?: number; max?: number; label: string } {
+  switch (level) {
+    case 'simple':
+      return { max: 4, label: '4th grade' };
+    case 'accessible':
+      return { max: 6, label: '6th grade' };
+    case '6th-grade':
+      return { max: 6, label: '6th grade' };
+    case '8th-grade':
+      return { max: 8, label: '8th grade' };
+    case 'moderate':
+      return { max: 10, label: '10th grade' };
+    case 'technical':
+      return { min: 11, label: '11th grade' };
+    case 'advanced':
+      return { min: 13, label: '13th grade' };
+    default:
+      return { max: 8, label: '8th grade' };
+  }
+}
+
+function estimateReadingGrade(text: string): number | null {
+  const words = text.match(/\b[\w']+\b/g) ?? [];
+  const wordCount = words.length;
+  if (wordCount === 0) return null;
+
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const sentenceCount = sentences.length || 1;
+
+  let syllableCount = 0;
+  for (const word of words) {
+    syllableCount += countSyllables(word);
+  }
+
+  const grade = 0.39 * (wordCount / sentenceCount) + 11.8 * (syllableCount / wordCount) - 15.59;
+  if (!Number.isFinite(grade)) return null;
+  return Math.round(grade * 10) / 10;
+}
+
+function countSyllables(word: string): number {
+  const normalized = word.toLowerCase().replace(/[^a-z]/g, '');
+  if (!normalized) return 0;
+  if (normalized.length <= 3) return 1;
+
+  const withoutSilentE = normalized.replace(/e$/g, '');
+  const groups = withoutSilentE.match(/[aeiouy]{1,2}/g);
+  const count = groups ? groups.length : 0;
+
+  return Math.max(1, count);
 }
 
 // Utility functions (createViolation, escapeRegex) imported from ../utils.js
