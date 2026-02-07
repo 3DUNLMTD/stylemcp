@@ -11,6 +11,14 @@ import { learnVoice, generatePackFiles, isLearnVoiceAvailable } from '../learn/i
 import type { LearnedVoice } from '../learn/index.js';
 import type { VoiceSample } from '../learn/voice-analyzer.js';
 import { AIOutputValidator } from './ai-output-validator.js';
+import {
+  captureError,
+  errorCaptureMiddleware,
+  handleClientErrorReport,
+  getErrorDashboard,
+  getRecentErrors,
+  resolveError,
+} from './error-capture.js';
 import { Pack } from '../schema/index.js';
 import { join } from 'path';
 import { verifyGitHubWebhookSignature } from './webhooks/verify-github.js';
@@ -135,11 +143,7 @@ function isVoiceContext(value: string): value is VoiceContext {
   return ['email', 'blog', 'social', 'marketing', 'support', 'legal', 'internal', 'product', 'sales'].includes(value);
 }
 
-function logError(context: string, error: unknown, req?: Request): void {
-  const message = error instanceof Error ? error.message : String(error);
-  const meta = req ? `${req.method} ${req.originalUrl}` : 'no-request';
-  console.error(`[StyleMCP] ${context} (${meta}): ${message}`);
-}
+// logError replaced by captureError from error-capture.ts
 
 function enforceAIAccess(req: Request, res: Response): boolean {
   if (!isBillingEnabled()) return true;
@@ -437,7 +441,7 @@ app.post('/api/demo/validate', async (req: Request, res: Response) => {
 
     res.json(response);
   } catch (error) {
-    logError('Demo validation failed', error, req);
+    captureError(error, { req });
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -479,7 +483,7 @@ app.post('/api/demo/rewrite', async (req: Request, res: Response) => {
 
     res.json({ ...result, demo: true });
   } catch (error) {
-    logError('Demo rewrite failed', error, req);
+    captureError(error, { req });
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -514,7 +518,7 @@ app.get('/api/packs/:pack', authMiddleware, async (req: Request, res: Response) 
     }
     res.json(response);
   } catch (error) {
-    logError('Pack details failed', error, req);
+    captureError(error, { req });
     res.status(404).json({ error: `Pack not found: ${req.params.pack}` });
   }
 });
@@ -581,7 +585,7 @@ app.post('/api/validate', authMiddleware, async (req: Request, res: Response) =>
     }
     res.json(response);
   } catch (error) {
-    logError('Validation failed', error, req);
+    captureError(error, { req });
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -651,7 +655,7 @@ app.post('/api/validate/batch', authMiddleware, async (req: Request, res: Respon
     }
     res.json(response);
   } catch (error) {
-    logError('Batch validation failed', error, req);
+    captureError(error, { req });
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -759,7 +763,7 @@ app.post('/api/rewrite', authMiddleware, async (req: Request, res: Response) => 
     }
     res.json(response);
   } catch (error) {
-    logError('Rewrite failed', error, req);
+    captureError(error, { req });
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -843,7 +847,7 @@ app.post('/api/rewrite/ai', authMiddleware, async (req: Request, res: Response) 
     }
     res.json(response);
   } catch (error) {
-    logError('AI rewrite failed', error, req);
+    captureError(error, { req });
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -895,7 +899,7 @@ app.post('/api/ai-output/validate', authMiddleware, async (req: Request, res: Re
 
     res.json(result);
   } catch (error) {
-    logError('AI output validation failed', error, req);
+    captureError(error, { req });
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -974,7 +978,7 @@ app.post('/api/learn', authMiddleware, async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    logError('Learn voice failed', error, req);
+    captureError(error, { req });
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -1013,7 +1017,7 @@ app.get('/api/packs/:pack/voice', authMiddleware, async (req: Request, res: Resp
       res.json(pack.voice);
     }
   } catch (error) {
-    logError('Pack voice failed', error, req);
+    captureError(error, { req });
     res.status(404).json({ error: `Pack not found: ${req.params.pack}` });
   }
 });
@@ -1040,7 +1044,7 @@ app.get('/api/packs/:pack/patterns', authMiddleware, async (req: Request, res: R
     }
     res.json(response);
   } catch (error) {
-    logError('Pack patterns failed', error, req);
+    captureError(error, { req });
     res.status(404).json({ error: `Pack not found: ${req.params.pack}` });
   }
 });
@@ -1064,7 +1068,7 @@ app.get('/api/packs/:pack/ctas', authMiddleware, async (req: Request, res: Respo
     }
     res.json(response);
   } catch (error) {
-    logError('Pack ctas failed', error, req);
+    captureError(error, { req });
     res.status(404).json({ error: `Pack not found: ${req.params.pack}` });
   }
 });
@@ -1092,7 +1096,7 @@ app.get('/api/packs/:pack/tokens', authMiddleware, async (req: Request, res: Res
       res.json(pack.tokens);
     }
   } catch (error) {
-    logError('Pack tokens failed', error, req);
+    captureError(error, { req });
     res.status(404).json({ error: `Pack not found: ${req.params.pack}` });
   }
 });
@@ -1143,7 +1147,7 @@ app.post('/api/suggest-ctas', authMiddleware, async (req: Request, res: Response
     }
     res.json(response);
   } catch (error) {
-    logError('CTA suggestions failed', error, req);
+    captureError(error, { req });
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
@@ -1188,7 +1192,7 @@ app.post('/api/checkout', authMiddleware, async (req: Request, res: Response) =>
 
     res.json({ url: checkoutUrl });
   } catch (error) {
-    logError('Checkout failed', error, req);
+    captureError(error, { req });
     res.status(500).json({ error: 'Failed to create checkout session' });
   }
 });
@@ -1220,7 +1224,7 @@ app.post('/api/billing/portal', authMiddleware, async (req: Request, res: Respon
 
     res.json({ url: portalUrl });
   } catch (error) {
-    logError('Portal failed', error, req);
+    captureError(error, { req });
     res.status(500).json({ error: 'Failed to create portal session' });
   }
 });
@@ -1307,7 +1311,7 @@ app.post('/api/learn/analyze', authMiddleware, async (req: Request, res: Respons
       });
     }
   } catch (error) {
-    logError('Voice learning analyze failed', error, req);
+    captureError(error, { req });
     res.status(500).json({ 
       error: error instanceof Error ? error.message : 'Voice learning failed' 
     });
@@ -1402,7 +1406,7 @@ app.post('/api/learn/generate', authMiddleware, async (req: Request, res: Respon
       });
     }
   } catch (error) {
-    logError('Pack generation failed', error, req);
+    captureError(error, { req });
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Pack generation failed'
     });
@@ -1482,7 +1486,7 @@ app.post('/api/validate/stream', authMiddleware, async (req: Request, res: Respo
 
     res.end();
   } catch (error) {
-    logError('Stream validation failed', error, req);
+    captureError(error, { req });
     res.write(`data: ${JSON.stringify({ 
       type: 'error', 
       error: error instanceof Error ? error.message : 'Validation failed' 
@@ -1506,7 +1510,7 @@ app.get('/api/voices/contexts', authMiddleware, async (req: Request, res: Respon
       config: voiceManager.getConfig()
     });
   } catch (error) {
-    logError('Voice context listing failed', error, req);
+    captureError(error, { req });
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Failed to list voice contexts'
     });
@@ -1546,7 +1550,7 @@ app.post('/api/voices/contexts', authMiddleware, async (req: Request, res: Respo
       mapping: { context, packName, description }
     });
   } catch (error) {
-    logError('Voice context add failed', error, req);
+    captureError(error, { req });
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Failed to add voice context'
     });
@@ -1571,7 +1575,7 @@ app.delete('/api/voices/contexts/:context', authMiddleware, async (req: Request,
       message: `Context '${context}' removed`
     });
   } catch (error) {
-    logError('Voice context removal failed', error, req);
+    captureError(error, { req });
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Failed to remove voice context'
     });
@@ -1610,7 +1614,7 @@ app.post('/api/voices/detect', authMiddleware, async (req: Request, res: Respons
       contextualTips: voiceManager.getContextualTips(selection.context)
     });
   } catch (error) {
-    logError('Context detection failed', error, req);
+    captureError(error, { req });
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Context detection failed'
     });
@@ -1828,6 +1832,85 @@ app.get('/api/analytics/usage', authMiddleware, async (_req: Request, res: Respo
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
+
+// ---------------------------------------------------------------------------
+// Error Capture: Client-side error reporting
+// ---------------------------------------------------------------------------
+app.post('/api/errors/report', async (req: Request, res: Response) => {
+  try {
+    const { page, message, stack, url: clientUrl, extra } = req.body;
+    if (!page || !message || typeof page !== 'string' || typeof message !== 'string') {
+      res.status(400).json({ error: 'Missing page or message' });
+      return;
+    }
+    await handleClientErrorReport(
+      {
+        page,
+        message: message.slice(0, 2000),
+        stack: typeof stack === 'string' ? stack.slice(0, 4000) : undefined,
+        userAgent: req.get('user-agent'),
+        url: typeof clientUrl === 'string' ? clientUrl.slice(0, 500) : undefined,
+        extra: typeof extra === 'object' && extra !== null ? extra : undefined,
+      },
+      req
+    );
+    res.json({ received: true });
+  } catch (error) {
+    console.error('Client error report failed:', error);
+    res.status(500).json({ error: 'Failed to log error' });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Error Capture: Dashboard endpoints (auth required)
+// ---------------------------------------------------------------------------
+app.get('/api/errors/dashboard', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const hours = Math.min(Math.max(Number(req.query.hours) || 24, 1), 720); // 1h to 30d
+    const summary = await getErrorDashboard(hours);
+    if (!summary) {
+      res.status(503).json({ error: 'Error dashboard unavailable (no Supabase)' });
+      return;
+    }
+    res.json(summary);
+  } catch (error) {
+    await captureError(error, { req, endpoint: '/api/errors/dashboard' });
+    res.status(500).json({ error: 'Dashboard query failed' });
+  }
+});
+
+app.get('/api/errors/recent', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 200);
+    const unresolvedOnly = req.query.unresolved === 'true';
+    const errors = await getRecentErrors(limit, unresolvedOnly);
+    res.json({ errors, count: errors.length });
+  } catch (error) {
+    await captureError(error, { req, endpoint: '/api/errors/recent' });
+    res.status(500).json({ error: 'Query failed' });
+  }
+});
+
+app.post('/api/errors/:id/resolve', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const errorId = String(req.params.id);
+    const resolvedBy = typeof req.body?.resolved_by === 'string' ? req.body.resolved_by : 'manual';
+    const ok = await resolveError(errorId, resolvedBy);
+    if (!ok) {
+      res.status(404).json({ error: 'Error not found or update failed' });
+      return;
+    }
+    res.json({ resolved: true });
+  } catch (error) {
+    await captureError(error, { req, endpoint: '/api/errors/resolve' });
+    res.status(500).json({ error: 'Resolve failed' });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Error capture middleware — MUST be after all routes, before startServer
+// ---------------------------------------------------------------------------
+app.use(errorCaptureMiddleware);
 
 // Start server
 export function startServer(port?: number): void {
