@@ -343,7 +343,32 @@
       color: var(--text-secondary);
       max-width: 600px;
       line-height: 1.6;
-      margin-bottom: 48px;
+      margin-bottom: 24px;
+    }
+
+    .hero-points {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 40px;
+    }
+
+    .hero-points span {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      background: var(--bg-paper);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .hero-note {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--text-tertiary);
     }
 
     .hero-ctas {
@@ -1890,8 +1915,13 @@
         MCP Compatible · API + GitHub Action
       </div>
       <div class="hero-content">
-        <h1>Brand rules for <em>every</em> AI output</h1>
-        <p class="hero-subtitle">Stop off-brand AI copy before it ships. StyleMCP validates every draft, flags violations, and auto-rewrites to your exact voice across Claude, GPT, and any model.</p>
+        <h1>Ship <em>on‑brand</em> AI copy, every time</h1>
+        <p class="hero-subtitle">Stop off‑brand AI copy before it ships. StyleMCP validates every draft, flags violations, and auto‑rewrites to your exact voice across Claude, GPT, and any model.</p>
+        <div class="hero-points">
+          <span>YAML style packs</span>
+          <span>MCP + REST API</span>
+          <span>GitHub Action for CI</span>
+        </div>
         <div class="hero-ctas">
           <a href="/signup.html" class="btn btn-primary">
             Start for Free
@@ -1902,6 +1932,7 @@
             View on GitHub
           </a>
         </div>
+        <div class="hero-note">Free tier: 5,000 requests/month · No credit card</div>
       </div>
 
       <!-- Terminal Demo -->
@@ -1957,7 +1988,7 @@
   <!-- Tech Strip -->
   <section class="trust-strip">
     <div class="container">
-      <p>Built with tools we love</p>
+      <p>Integrates with your stack</p>
       <div class="trust-logos">
         <img src="/Claude.png" alt="Claude" />
         <img src="/vercel.png" alt="Vercel" />
