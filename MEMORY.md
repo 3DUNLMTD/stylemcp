@@ -42,11 +42,11 @@ MCP server + REST API for brand voice validation and enforcement. Validates text
 **What's Not:**
 - Twitter @style_mcp has 0 followers after 4 days
 
-**Auth Status (Feb 2 - NEEDS MIGRATION):**
-- Auth was built against Supabase Cloud (`orbliwjewqlnnutykozw.supabase.co`)
-- **MUST migrate to self-hosted Supabase** at `db-stylemcp.distinctlydeveloped.com`
-- Dashboard.html, login.html, signup.html all reference stale Supabase Cloud URLs
-- GitHub OAuth was working on old instance — needs reconfiguring on self-hosted
+**Auth Status (Feb 12 - MIGRATED):**
+- ✅ Migrated to self-hosted Supabase at `db-stylemcp.distinctlydeveloped.com` (commit 4ba5ec4)
+- All 8 auth files updated (auth.js, login/signup/dashboard/docs/pricing/status/auth-debug.html)
+- Self-hosted anon key deployed
+- GitHub OAuth configured on self-hosted instance (Feb 11)
 
 ## Bugs & Issues
 
@@ -58,6 +58,13 @@ MCP server + REST API for brand voice validation and enforcement. Validates text
 - Chrome extension needs icons before Web Store submission
 
 ## Recent Work
+
+### Feb 12 - Auth Migration Complete
+- Migrated all auth to self-hosted Supabase (db-stylemcp.distinctlydeveloped.com)
+- Updated 8 files with new URL and anon key
+- Removed stale logout localStorage reference
+- Cleaned Stripe keys from git history
+- Pushed: commit 4ba5ec4
 
 ### Feb 4 - QC Scan
 - Removed redundant server-layer pack cache in HTTP server; rely on `loadPack()` TTL/invalidation cache so pack edits show up without restart
