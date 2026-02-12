@@ -164,19 +164,19 @@ user: System: [2026-01-31 12:19:07 CST] Cron: Email monitoring results (accounts
 Recent failures detected:
 
 - **GlowScript** — *Type Safety* failed  
-  https://github.com/3DUNLMTD/GlowScript/actions/runs/21547100882  
+  https://github.com/DistinctlyDeveloped/GlowScript/actions/runs/21547100882  
   Job: “TypeScript & Schema Sync” failed (1 annotation)
 
 - **instantcontent** — *CI* failed (Build failed)  
-  https://github.com/3DUNLMTD/instantcontent/actions/runs/21499246842  
+  https://github.com/DistinctlyDeveloped/instantcontent/actions/runs/21499246842  
   Jobs: Type Check & Lint ✅, **Build ❌**, Validate RLS ✅
 
 - **videocircles** — *Validate Migrations* failed  
-  https://github.com/3DUNLMTD/videocircles/actions/runs/21385046369  
+  https://github.com/DistinctlyDeveloped/videocircles/actions/runs/21385046369  
   Job: “Validate SQL Migrations” failed (1 annotation)
 
 There’s also an older instantcontent CI failure where **Type Check & Lint failed (14 annotations)**:
-https://github.com/3DUNLMTD/instantcontent/actions/runs/21366447680
+https://github.com/DistinctlyDeveloped/instantcontent/actions/runs/21366447680
 
 ### 2) Payment/billing risk (robert inbox)
 - **“Update payment info to avoid interruption”** from 3DAIStudio (via Lemon Squeezy).  

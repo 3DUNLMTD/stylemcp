@@ -8,7 +8,7 @@
 
 ---
 
-**Repo:** ~/Projects/stylemcp (GitHub: 3DUNLMTD/stylemcp)  
+**Repo:** ~/openclaw/projects/stylemcp (GitHub: DistinctlyDeveloped/stylemcp)  
 **Live:** https://stylemcp.com  
 **Started:** 2026-01-26  
 
@@ -42,13 +42,11 @@ MCP server + REST API for brand voice validation and enforcement. Validates text
 **What's Not:**
 - Twitter @style_mcp has 0 followers after 4 days
 
-**Auth Status (Feb 2 - COMPLETE):**
-- ✅ Real Supabase auth (email/password + OAuth)
-- ✅ GitHub OAuth working (Google needs testing)
-- ✅ Dashboard auto-creates profiles via RPC
-- ✅ RLS policies fixed for profiles table
-- ✅ Shared auth client across all pages (auth.js)
-- ✅ Dynamic nav shows "Dashboard" when logged in
+**Auth Status (Feb 2 - NEEDS MIGRATION):**
+- Auth was built against Supabase Cloud (`orbliwjewqlnnutykozw.supabase.co`)
+- **MUST migrate to self-hosted Supabase** at `db-stylemcp.distinctlydeveloped.com`
+- Dashboard.html, login.html, signup.html all reference stale Supabase Cloud URLs
+- GitHub OAuth was working on old instance — needs reconfiguring on self-hosted
 
 ## Bugs & Issues
 
@@ -60,6 +58,20 @@ MCP server + REST API for brand voice validation and enforcement. Validates text
 - Chrome extension needs icons before Web Store submission
 
 ## Recent Work
+
+### Feb 4 - QC Scan
+- Removed redundant server-layer pack cache in HTTP server; rely on `loadPack()` TTL/invalidation cache so pack edits show up without restart
+- Added `?noCache=1` support to `/api/demo/validate` for cache-busting when needed
+- Demo responses now include `packWarnings` when pack loads with warnings
+- Pushed: commit `8476d02`
+
+### Feb 3 - QC Scan
+- Fixed ESLint error: removed unused `crypto` import from `src/server/http.ts`
+- Consolidated auth: removed `legacyAuthMiddleware` in HTTP server (billing-aware `authMiddleware` is authoritative)
+- Restored timing-safe legacy API key compare in `src/server/middleware/auth.ts` via `timingSafeEqual`
+- Checks: `npm run build` ✅, `npm test` ✅, `npm audit --omit=dev` ✅
+- Improved packs listing cache: added TTL + directory mtime invalidation + in-flight dedupe to avoid stale results and duplicate FS reads (`src/utils/pack-loader.ts`)
+- Pushed: commits `764ec80`, `92a3fed`
 
 ### Feb 2 - Auth System Implementation
 - **Fixed dashboard infinite loading** — login/signup had fake auth that didn't create Supabase sessions
@@ -111,37 +123,27 @@ MCP server + REST API for brand voice validation and enforcement. Validates text
 
 ## Infrastructure
 
-**Everything on VPS** (82.180.163.60):
+**NO Vercel. NO Supabase Cloud. Everything on Cloudflare + VPS.**
 
-**Static Website:**
-- nginx serves from `/var/www/stylemcp/`
-- Source files come from `/opt/stylemcp/landing/`
-- Deploy: copy `landing/*.html` → `/var/www/stylemcp/`
+**Static Website (Cloudflare Pages):**
+- Deployed via `wrangler pages deploy landing --project-name=stylemcp`
+- Auto-deploys on push to `main` via GitHub Actions
+- Domain: stylemcp.com → CF Pages project `stylemcp`
 
-**API Server:**
+**API Server (VPS 82.180.163.60):**
 - Repo lives at `/opt/stylemcp/`
 - Runs via Docker on port 3000
 - nginx proxies `/api/*` → `http://127.0.0.1:3000`
 - SSE endpoint at `/api/mcp/sse` has long timeouts configured
 
-**nginx Config:**
-- Static files: `try_files $uri $uri/ $uri.html /index.html`
-- API routes proxied to Docker container
-- SSL via Let's Encrypt
+**Database:**
+- Self-hosted Supabase at `db-stylemcp.distinctlydeveloped.com`
+- **NOT** Supabase Cloud — no `orbliwjewqlnnutykozw.supabase.co` or any `.supabase.co` URLs
+- Dashboard.html still has stale Supabase Cloud references — NEEDS FIXING
 
-**Deployment Commands (run on VPS):**
-```bash
-cd /opt/stylemcp
-git pull
-cp landing/*.html /var/www/stylemcp/   # Website changes
-docker compose up -d --build            # API changes
-```
-
-**Scripts:**
-- `deploy.sh` — Docker commands (start/stop/restart/update)
-- `deploy-billing.sh` — Full deploy (copies landing + rebuilds Docker + reloads nginx)
-
-**Vercel project exists** (`stylemcp.vercel.app`) but is NOT used for production.
+**Deployment:**
+- Website: Push to `main` → GitHub Actions auto-deploys to CF Pages
+- API: SSH to VPS, `cd /opt/stylemcp && git pull && docker compose up -d --build`
 
 ## Architecture Notes
 
@@ -155,3 +157,12 @@ docker compose up -d --build            # API changes
 2. VS Code extension
 3. User auth + dashboard
 4. "Learn my voice" feature
+
+## Core Principle: Production Quality (from Robert, Feb 7 2026)
+Always take the BEST route for long-term project success, not the fast route. We are NOT spinning up MVPs — we are building production-ready projects. No shortcuts, no "good enough for now." Quality and longevity over speed.
+
+## Core Principle (from Robert, Feb 7 2026)
+When you find a problem, fix it immediately. Don't defer. Don't call it "cosmetic" or "not blocking." Fix it in the same session you found it. No excuses.
+
+## Core Principle: Verify Your Work (from Robert, Feb 7 2026)
+Don't call it done until you've confirmed it actually works. Build it, test it, verify it — in the same session. Don't commit without building. Don't deploy without checking. Don't say "shipped" without confirming it's actually working.

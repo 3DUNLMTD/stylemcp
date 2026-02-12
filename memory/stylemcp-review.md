@@ -1,7 +1,7 @@
 # StyleMCP Improvement & Promotion Plan
 
 **Generated:** 2026-01-25  
-**Project:** https://stylemcp.com | https://github.com/3DUNLMTD/stylemcp
+**Project:** https://stylemcp.com | https://github.com/DistinctlyDeveloped/stylemcp
 
 ---
 
@@ -178,7 +178,7 @@ This is significant because:
 
 ### Phase 1: Launch Foundation (This Week)
 
-- [ ] **Fix GitHub repo** — Currently returns 404. Make it public at github.com/3DUNLMTD/stylemcp
+- [ ] **Fix GitHub repo** — Currently returns 404. Make it public at github.com/DistinctlyDeveloped/stylemcp
 - [ ] **Publish to npm** — `npm publish` (name: `stylemcp`)
 - [ ] **Submit to MCP Registry** — https://github.com/modelcontextprotocol/registry
 - [ ] **Create Product Hunt draft** — Have it ready for launch day

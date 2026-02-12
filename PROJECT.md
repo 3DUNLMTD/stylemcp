@@ -1,7 +1,7 @@
 # StyleMCP
 
 **Telegram Group ID:** -5160071144  
-**Repo:** ~/Projects/stylemcp (GitHub: 3DUNLMTD/stylemcp)  
+**Repo:** ~/openclaw/projects/stylemcp (GitHub: DistinctlyDeveloped/stylemcp)  
 **Live:** https://stylemcp.com  
 **Twitter:** @style_mcp  
 
