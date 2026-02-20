@@ -1,0 +1,26 @@
+{
+  "project": "stylemcp",
+  "description": "StyleMCP application",
+  "lastUpdated": "2026-02-20",
+  "type": "html-mcp",
+  "visibility": "public",
+  "owner": "pm-agent",
+  
+  "techStack": {
+    "language": "HTML/CSS/JavaScript",
+    "type": "MCP (Model Context Protocol) application",
+    "styling": "Simple CSS"
+  },
+
+  "keyFeatures": [
+    "MCP server integration",
+    "Style management",
+    "Web interface"
+  ],
+
+  "agentGuidance": {
+    "type": "MCP application",
+    "styling": "Simple, functional",
+    "noEmojis": true
+  }
+}
